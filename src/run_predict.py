@@ -1,5 +1,5 @@
-"""Stage PREDICT: assemble rubric + memory + Channel 1, call DeepSeek,
-parse THEME_SCORES blocks, write daily prediction file, update scoreboard.
+"""Stage PREDICT: assemble rubric + memory + Channel 1, call DeepSeek with
+web_search, write daily prediction file, update scoreboard.
 
 CLI: python -m src.run_predict [--date YYYY-MM-DD]
 """
@@ -10,7 +10,18 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from . import config, memory, scoreboard
+from . import config, deepseek_client, memory, scoreboard
+
+
+def _channel1_placeholder() -> str:
+    """Lightweight Channel 1 until real fetchers are wired."""
+    return (
+        "=== CHANNEL 1: PRE-FETCHED DATA ===\n"
+        "(Placeholder — pipeline will later inject sector ETF performance, "
+        "breadth, key commodity moves, and valuation snapshots.)\n"
+        "For this run the model must rely primarily on live web_search "
+        "for discovery and validation.\n"
+    )
 
 
 def main() -> None:
@@ -22,50 +33,60 @@ def main() -> None:
     if not config.DEEPSEEK_API_KEY:
         raise SystemExit("DEEPSEEK_API_KEY not set")
 
-    # 1. Load rubric
+    # 1. Rubric
     rubric_path = config.GROUNDING / "master_rubric.md"
     with open(rubric_path, encoding="utf-8") as fh:
         rubric = fh.read()
 
-    # 2. Memory context
+    # 2. Memory + Channel 1
     mem = memory.prediction_context()
-
-    # 3. Channel 1 placeholder (to be replaced by real pre-fetched data)
-    channel1 = (
-        "=== CHANNEL 1: PRE-FETCHED DATA ===\n"
-        "(Pipeline will inject sector ETF performance, breadth, "
-        "commodity moves, valuation snapshots, recent CapEx language, etc.)\n"
-    )
+    ch1 = _channel1_placeholder()
 
     user_msg = (
         f"TODAY: {date_str} (America/New_York)\n\n"
         f"{mem}\n\n"
-        f"{channel1}\n\n"
-        "Execute the full Theme Radar rubric now. "
-        "You must perform live searches for all required Channel 2 categories "
-        "before producing any THEME_SCORES blocks."
+        f"{ch1}\n\n"
+        "Execute the full Theme Radar research process now "
+        "(Stage 1 Discovery → Stage 2 Trigger Filter → Stage 3 Five-Layer Scoring). "
+        "You must perform live web_search for all required categories before scoring."
     )
 
-    print(f"[predict] {date_str} — rubric + memory assembled.")
-    print("[predict] DeepSeek client + tool loop not yet wired in this skeleton.")
-    print("[predict] Next steps: implement deepseek_client.py + Channel 1 fetchers.")
+    # 3. LLM call with tool loop
+    transcript = str(config.DAILY / "_transcripts" / f"{date_str}_predict.json")
+    trace = str(config.DAILY / f"{date_str}_predict_trace.md")
 
-    # Placeholder write so the folder structure is usable
+    print(f"[predict] {date_str} — calling DeepSeek (tools=True)...")
+    text = deepseek_client.chat(
+        [
+            {"role": "system", "content": rubric},
+            {"role": "user", "content": user_msg},
+        ],
+        model=config.MODEL_PREDICT,
+        tools=True,
+        max_tokens=10000,
+        transcript_path=transcript,
+        trace_path=trace,
+        stage_label=f"THEME PREDICT {date_str}",
+    )
+
+    # 4. Write prediction file
     config.DAILY.mkdir(parents=True, exist_ok=True)
     out_path = config.DAILY / f"{date_str}_predict.md"
     with open(out_path, "w", encoding="utf-8") as fh:
         fh.write(f"# Theme Radar Prediction — {date_str}\n\n")
-        fh.write("## Memory Context\n\n")
-        fh.write(mem)
-        fh.write("\n\n## Channel 1\n\n")
-        fh.write(channel1)
-        fh.write("\n\n## Status\n\nSkeleton only — full LLM call pending.\n")
+        fh.write(text)
+        fh.write("\n")
 
+    # 5. Scoreboard
     board = scoreboard.load()
     entry = scoreboard.get_or_create(board, date_str, config.TOPIC)
-    entry["status"] = "skeleton"
+    entry["status"] = "predicted"
+    entry["has_output"] = True
     scoreboard.save(board)
+
     print(f"[predict] wrote {out_path}")
+    print(f"[predict] transcript → {transcript}")
+    print(f"[predict] trace → {trace}")
 
 
 if __name__ == "__main__":
