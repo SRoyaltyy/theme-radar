@@ -1,24 +1,22 @@
 """Stage PREDICT: assemble rubric + memory + Channel 1, call DeepSeek with
-web_search, write daily prediction file, update scoreboard.
+web_search, map themes to exact Finviz tickers, write daily prediction file.
 
 CLI: python -m src.run_predict [--date YYYY-MM-DD]
 """
 from __future__ import annotations
 
 import argparse
-import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from . import config, deepseek_client, memory, scoreboard
+from . import config, deepseek_client, finviz_mapper, memory, scoreboard
 
 
 def _channel1_placeholder() -> str:
-    """Lightweight Channel 1 until real fetchers are wired."""
     return (
         "=== CHANNEL 1: PRE-FETCHED DATA ===\n"
-        "(Placeholder — pipeline will later inject sector ETF performance, "
-        "breadth, key commodity moves, and valuation snapshots.)\n"
+        "(Placeholder — sector ETF performance / breadth / commodity snapshots "
+        "will be injected here in a later iteration.)\n"
         "For this run the model must rely primarily on live web_search "
         "for discovery and validation.\n"
     )
@@ -33,12 +31,10 @@ def main() -> None:
     if not config.DEEPSEEK_API_KEY:
         raise SystemExit("DEEPSEEK_API_KEY not set")
 
-    # 1. Rubric
     rubric_path = config.GROUNDING / "master_rubric.md"
     with open(rubric_path, encoding="utf-8") as fh:
         rubric = fh.read()
 
-    # 2. Memory + Channel 1
     mem = memory.prediction_context()
     ch1 = _channel1_placeholder()
 
@@ -48,10 +44,11 @@ def main() -> None:
         f"{ch1}\n\n"
         "Execute the full Theme Radar research process now "
         "(Stage 1 Discovery → Stage 2 Trigger Filter → Stage 3 Five-Layer Scoring). "
-        "You must perform live web_search for all required categories before scoring."
+        "You must perform live web_search for all required categories before scoring.\n"
+        "IMPORTANT: Put each field of every THEME_SCORES block on its own line. "
+        "Do not jam multiple fields onto one line."
     )
 
-    # 3. LLM call with tool loop
     transcript = str(config.DAILY / "_transcripts" / f"{date_str}_predict.json")
     trace = str(config.DAILY / f"{date_str}_predict_trace.md")
 
@@ -69,19 +66,27 @@ def main() -> None:
         stage_label=f"THEME PREDICT {date_str}",
     )
 
-    # 4. Write prediction file
+    print("[predict] mapping themes to Finviz pure plays...")
+    try:
+        buy_map = finviz_mapper.map_all_from_predict(text, top_n=10)
+    except Exception as e:  # noqa: BLE001
+        buy_map = f"## Actionable stock map\nMapper error: {e}\n"
+        print(f"[predict] mapper failed: {e}")
+
     config.DAILY.mkdir(parents=True, exist_ok=True)
     out_path = config.DAILY / f"{date_str}_predict.md"
     with open(out_path, "w", encoding="utf-8") as fh:
         fh.write(f"# Theme Radar Prediction — {date_str}\n\n")
         fh.write(text)
+        fh.write("\n\n---\n\n")
+        fh.write(buy_map)
         fh.write("\n")
 
-    # 5. Scoreboard
     board = scoreboard.load()
     entry = scoreboard.get_or_create(board, date_str, config.TOPIC)
     entry["status"] = "predicted"
     entry["has_output"] = True
+    entry["has_buy_map"] = True
     scoreboard.save(board)
 
     print(f"[predict] wrote {out_path}")
