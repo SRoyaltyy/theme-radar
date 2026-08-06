@@ -1,0 +1,43 @@
+name: Theme Radar Predict
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "YYYY-MM-DD (default: today ET)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run theme prediction
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          SEARXNG_URL: ${{ secrets.SEARXNG_URL }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          DATE: ${{ github.event.inputs.run_date }}
+        run: python -m src.run_predict ${DATE:+--date "$DATE"}
+
+      - name: Commit outputs
+        run: |
+          git config user.name "Theme-Radar-Bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          git commit -m "auto: theme predict [$(date -u +%F_%H%M)]" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin main
