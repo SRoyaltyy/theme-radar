@@ -1,28 +1,42 @@
-# Finviz Universe
+# Finviz universe
 
-Place a processed version of the Finviz export here as `finviz_universe.csv`.
+Source: full Finviz export with company descriptions.
 
-## Recommended columns for theme mapping
+## Layout
 
-- Ticker
-- Company
-- Sector
-- Industry
-- Market Cap
-- Performance (Week / Month / Quarter / Half Year / YTD)
-- Relative Strength / technicals if available
-- Finviz_Description (or a shortened version)
-- Country / Exchange
+Preferred load order in `finviz_mapper._load_universe()`:
 
-## Handling the large file
+1. `data/finviz_universe.csv` (single file, if present)
+2. `data/universe_parts/part_*.csv` (split shards — recommended for git)
+3. `data/finviz_with_descriptions.csv` (raw dump fallback)
 
-The original export is ~9 MB and contains thousands of rows.  
-Do **not** inject the entire CSV into the LLM context.
+## How to install the data (one-time)
 
-Instead:
+The processed shards are ~0.85 MB each (4 parts, ~5960 tickers).
 
-1. Pre-build lightweight indexes (by Sector, by Industry, by keyword in description).
-2. When a theme is scored, the mapper queries only the relevant slice (e.g. all “Semiconductors” + description contains “HBM” or “PCIe”).
-3. Return a short ranked list of pure-play candidates (ticker, market cap, recent performance, one-line description).
+**Option A — GitHub web UI**  
+Create folder `data/universe_parts/` and upload `part_00.csv` … `part_03.csv`.
 
-This keeps token usage low and makes the mapping step fast and auditable.
+**Option B — local git**
+```bash
+git clone https://github.com/SRoyaltyy/theme-radar.git
+cd theme-radar
+# copy the four part_*.csv files into data/universe_parts/
+git add data/universe_parts
+git commit -m "Add Finviz universe with descriptions"
+git push
+```
+
+## Columns kept
+
+Ticker, Company, Industry, Sector, Country, Exchange, Market Cap, Price,
+Average Volume, Short Float, Volume, performance windows (Week/Month/Quarter/
+Half Year/YTD/Year), Analyst Recom, Target Price, growth/EPS fields, and
+**Finviz_Description** (truncated ~550 chars; still enough for keyword matching
+on business model — optical, nuclear, copper, HBM, data center, etc.).
+
+## How the mapper uses descriptions
+
+For each theme, `desc_keywords` are matched against `Finviz_Description`.
+Hits boost `rank_score` so true pure plays surface even when Industry is
+broad (e.g. "Specialty Industrial Machinery" for GE Vernova nuclear/power).
