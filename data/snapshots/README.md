@@ -1,35 +1,41 @@
-# Finviz snapshots (current + previous)
-
-Theme Radar always wants **two** Finviz exports ~one month apart.
+# Finviz snapshots (date-stamped archive)
 
 ```
-data/snapshots/current.csv    ← newest export
-data/snapshots/previous.csv   ← prior export (~30 days older)
-data/snapshots/archive/       ← optional dated history
+data/snapshots/
+  YYYY-MM-DD.csv     ← one file per export day
+  manifest.json      ← list of available dates
+  current.csv        ← latest (compat pointer)
+  previous.csv       ← prior latest (compat pointer)
 ```
 
-## Workflow when a new Finviz file arrives
+## Automated daily fetch (Elite API)
+
+1. In Finviz Elite, open your **Custom** screener with the columns you want.
+2. Copy the export URL from the browser (or use API key only).
+3. Add GitHub secrets:
+   - `FINVIZ_API_KEY` — from Elite account
+   - `FINVIZ_EXPORT_URL` (optional) — full export URL with your column set; auth appended if missing
+4. Workflow: **Finviz Daily Snapshot** (weekdays + manual)
 
 ```bash
-# from repo root, with the new raw export saved somewhere:
-python -m src.promote_snapshot /path/to/finviz_new.csv --as-of 2026-08-06
+python -m src.finviz_fetch
+python -m src.finviz_fetch --date 2026-08-06
 ```
 
-This will:
-1. Move existing `current.csv` → `previous.csv`
-2. Write the new file as normalized `current.csv`
-3. Optionally archive a dated copy
+## Manual ingest
 
-## What the delta unlocks
+```bash
+python -m src.promote_snapshot /path/to/export.csv --as-of 2026-06-15
+```
 
-| Signal | How used |
-|--------|----------|
-| Industry median Month / d_Month | Stage 1 cluster discovery |
-| Ticker d_Performance (Month) | Acceleration filter |
-| d_Institutional Transactions | Smart-money confirmation |
-| d_Short Float | Crowding change |
-| d_Insider Transactions | Insider cluster shifts |
-| New tickers (`is_new`) | IPO / listing awareness |
-| Target upside change | Valuation kill switch |
+## Delta between arbitrary dates
 
-Without `previous.csv`, the system still runs but delta features are blank.
+```python
+from src.finviz_delta import load_by_date, compute_delta, format_delta_brief
+cur = load_by_date("2026-08-06")
+prev = load_by_date("2026-06-15")
+print(format_delta_brief(compute_delta(cur, prev),
+      cur_label="2026-08-06", prev_label="2026-06-15"))
+```
+
+Predict auto-picks latest vs ~30d earlier from the manifest.
