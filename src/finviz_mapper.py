@@ -2,8 +2,8 @@
 
 Rules:
 - Prefer liquid names (avg volume + market cap floors)
-- Match by Industry, Sector, description keywords, and PURE_PLAY_HINTS
-- Rank by momentum + size quality + keyword hit strength
+- Match by Industry + Finviz_Description keywords + PURE_PLAY_HINTS
+- Rank by momentum + size + keyword hit strength
 - Flag extended names (already parabolic)
 """
 from __future__ import annotations
@@ -89,20 +89,32 @@ THEME_CONFIG: dict[str, dict[str, Any]] = {
 
 
 def _load_universe() -> pd.DataFrame:
+    """Load Finviz universe from single CSV or data/universe_parts/*.csv."""
     path = config.FINVIZ_CSV
-    if not path.exists():
+    parts_dir = config.DATA / "universe_parts"
+    frames = []
+    if path.exists():
+        frames.append(pd.read_csv(path, low_memory=False))
+    elif parts_dir.exists():
+        part_files = sorted(parts_dir.glob("part_*.csv"))
+        if not part_files:
+            raise FileNotFoundError(f"No part_*.csv in {parts_dir}")
+        for pf in part_files:
+            frames.append(pd.read_csv(pf, low_memory=False))
+    else:
         alt = config.DATA / "finviz_with_descriptions.csv"
-        path = alt if alt.exists() else path
-    if not path.exists():
-        raise FileNotFoundError(
-            f"Finviz universe not found at {config.FINVIZ_CSV}. "
-            "Place finviz_universe.csv in data/."
-        )
-    df = pd.read_csv(path, low_memory=False)
+        if alt.exists():
+            frames.append(pd.read_csv(alt, low_memory=False))
+        else:
+            raise FileNotFoundError(
+                f"Finviz universe not found. Expected {path} or {parts_dir}/part_*.csv"
+            )
+    df = pd.concat(frames, ignore_index=True)
+    df = df.drop_duplicates(subset=["Ticker"], keep="first")
     for c in [
         "Market Cap", "Price", "Average Volume", "Short Float",
         "Performance (Week)", "Performance (Month)", "Performance (Quarter)",
-        "Performance (Half Year)", "Performance (YTD)",
+        "Performance (Half Year)", "Performance (YTD)", "Performance (Year)",
     ]:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
@@ -151,7 +163,7 @@ def map_theme(
         & (df["Average Volume"].fillna(0) >= min_adv)
     )
     ind_mask = df["Industry"].fillna("").isin(industries) if industries else False
-    desc = df["Finviz_Description"].fillna("").str.lower()
+    desc = df["Finviz_Description"].fillna("").str.lower() if "Finviz_Description" in df.columns else pd.Series("", index=df.index)
     kw_mask = False
     for kw in keywords:
         kw_mask = kw_mask | desc.str.contains(re.escape(kw.lower()), na=False)
@@ -169,7 +181,7 @@ def map_theme(
     sub["hint_boost"] = sub["Ticker"].str.upper().isin(boost).astype(int) * 3
     sub["ind_boost"] = sub["Industry"].fillna("").isin(industries).astype(int) * 2
 
-    q = sub["Performance (Quarter)"].fillna(sub["Performance (YTD)"]).fillna(0)
+    q = sub["Performance (Quarter)"].fillna(sub.get("Performance (YTD)", 0)).fillna(0)
     q_clipped = q.clip(-50, 250)
     sub["mom_score"] = (q_clipped + 50) / 50
     sub["size_score"] = np.log10(sub["Market Cap"].clip(lower=50))
@@ -182,7 +194,7 @@ def map_theme(
     )
 
     ytd = sub["Performance (YTD)"].fillna(0)
-    half = sub["Performance (Half Year)"].fillna(ytd)
+    half = sub["Performance (Half Year)"].fillna(ytd) if "Performance (Half Year)" in sub.columns else ytd
     sub["extended"] = (ytd > 150) | (half > 120)
 
     sub = sub.sort_values("rank_score", ascending=False).head(top_n)
