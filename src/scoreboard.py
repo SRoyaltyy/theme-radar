@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from . import config
 
 SCOREBOARD_PATH = config.SCOREBOARD_DIR / "scoreboard.json"

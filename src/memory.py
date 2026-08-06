@@ -1,12 +1,4 @@
-"""Memory-tier context assembly for Theme Radar.
-
-Every prediction run reads:
-  - 00_grounding/master_rubric.md (handled by caller)
-  - 04_archive/consolidated_memory.md
-  - 02_lessons/active/*
-  - 03_scoreboard summary
-  - recent 01_daily prediction + reflect files
-"""
+"""Memory-tier context assembly for Theme Radar."""
 from __future__ import annotations
 
 import glob
@@ -40,7 +32,6 @@ def active_lessons() -> str:
 def scoreboard_summary() -> str:
     board = scoreboard.load()
     runs = board.get("runs", [])
-    # Placeholder accuracy helpers — will be fleshed out
     n = len([r for r in runs if r.get("graded")])
     hits = len([r for r in runs if r.get("theme_hit")])
     rate = f"{hits}/{n}" if n else "n/a"
@@ -51,7 +42,7 @@ def scoreboard_summary() -> str:
     ]
     for r in runs[-8:]:
         lines.append(
-            f"- {r.get('date')}: themes={r.get('themes', [])} "
+            f"- {r.get('date')}: status={r.get('status')} "
             f"hit={r.get('theme_hit')} graded={r.get('graded')}"
         )
     return "\n".join(lines)
@@ -59,20 +50,26 @@ def scoreboard_summary() -> str:
 
 def recent_daily_logs() -> str:
     preds = sorted(glob.glob(str(config.DAILY / "*_predict.md")))
-    dates = [re.sub(r"_predict\.md$", "", os.path.basename(p)) for p in preds]
-    dates = dates[-config.MEMORY_WINDOW_DAYS:]
+    dates = [
+        re.sub(r"_predict\.md$", "", os.path.basename(p)) for p in preds
+    ]
+    dates = dates[-config.MEMORY_WINDOW_DAYS :]
     parts = []
     for d in dates:
         pp = config.DAILY / f"{d}_predict.md"
         rp = config.DAILY / f"{d}_reflect.md"
-        parts.append(f"===== {d} PREDICT =====\n{_read(pp)}")
+        content = _read(pp)
+        if content:
+            lines = content.splitlines()[:120]
+            parts.append(f"===== {d} PREDICT =====\n" + "\n".join(lines))
         if rp.exists():
-            parts.append(f"===== {d} REFLECT =====\n{_read(rp)}")
+            rcontent = _read(rp)
+            rlines = rcontent.splitlines()[:80]
+            parts.append(f"===== {d} REFLECT =====\n" + "\n".join(rlines))
     return "\n\n".join(parts) or "(no prior daily logs — this is the first run)"
 
 
 def prediction_context() -> str:
-    """Full memory block injected into the theme prediction prompt."""
     return (
         "=== MEMORY CONTEXT ===\n\n"
         f"[SCOREBOARD]\n{scoreboard_summary()}\n\n"
