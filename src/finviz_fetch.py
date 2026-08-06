@@ -1,15 +1,11 @@
 """Fetch Finviz Elite screener CSV via the official export endpoint.
 
-Elite export API (no browser):
-  GET https://elite.finviz.com/export.ashx
-      ?v=152          # Custom view
-      &c=1,2,3,...    # column IDs
-      &auth=API_KEY
+Preferred: set secret FINVIZ_EXPORT to the full export URL that already
+includes your auth key (the single link Finviz gives you).
 
-Auth: set FINVIZ_API_KEY in env / GitHub Secrets
+Fallback: FINVIZ_API_KEY + optional FINVIZ_EXPORT_URL / column list.
 
-Daily workflow writes:
-  data/snapshots/YYYY-MM-DD.csv
+Writes: data/snapshots/YYYY-MM-DD.csv
 """
 from __future__ import annotations
 
@@ -33,20 +29,26 @@ EXPORT_URL = "https://elite.finviz.com/export.ashx"
 
 
 def fetch_csv(api_key: str | None = None, extra_params: dict | None = None) -> bytes:
-    key = (api_key or os.environ.get("FINVIZ_API_KEY", "")).strip()
-    if not key:
-        raise SystemExit(
-            "FINVIZ_API_KEY not set. Get it from Finviz Elite account settings."
-        )
+    # Preferred: single secret with full URL + auth already embedded
+    full = (
+        os.environ.get("FINVIZ_EXPORT", "")
+        or os.environ.get("FINVIZ_EXPORT_URL", "")
+    ).strip()
 
-    override = os.environ.get("FINVIZ_EXPORT_URL", "").strip()
-    if override:
-        sep = "&" if "?" in override else "?"
-        if "auth=" not in override:
-            override = f"{override}{sep}auth={key}"
-        url = override
+    key = (api_key or os.environ.get("FINVIZ_API_KEY", "")).strip()
+
+    if full:
+        url = full
+        # If they stored URL without auth but have a separate key, append it
+        if key and "auth=" not in url:
+            sep = "&" if "?" in url else "?"
+            url = f"{url}{sep}auth={key}"
         params = None
     else:
+        if not key:
+            raise SystemExit(
+                "Set FINVIZ_EXPORT (full link+auth) or FINVIZ_API_KEY."
+            )
         url = EXPORT_URL
         params = {
             "v": os.environ.get("FINVIZ_VIEW", "152"),
@@ -57,14 +59,19 @@ def fetch_csv(api_key: str | None = None, extra_params: dict | None = None) -> b
             params.update(extra_params)
 
     headers = {
-        "User-Agent": "theme-radar/1.0 (+github.com/SRoyaltyy/theme-radar)",
+        "User-Agent": (
+            "Mozilla/5.0 (compatible; theme-radar/1.0; "
+            "+https://github.com/SRoyaltyy/theme-radar)"
+        ),
     }
-    r = requests.get(url, params=params, headers=headers, timeout=120)
+    r = requests.get(url, params=params, headers=headers, timeout=180)
     r.raise_for_status()
-    if not r.content or b"Ticker" not in r.content[:500]:
+    head = r.content[:800]
+    if not r.content or (b"Ticker" not in head and b"ticker" not in head):
         raise RuntimeError(
             "Finviz export did not return a CSV with Ticker header. "
-            "Check API key and column list / FINVIZ_EXPORT_URL."
+            f"Status={r.status_code}, bytes={len(r.content)}, "
+            f"start={head[:120]!r}"
         )
     return r.content
 
@@ -126,7 +133,7 @@ def main() -> None:
     print("[finviz_fetch] downloading export...")
     content = fetch_csv()
     path = save_dated_snapshot(content, as_of=args.date)
-    print(f"[finviz_fetch] wrote {path}")
+    print(f"[finviz_fetch] wrote {path} ({len(content):,} bytes)")
     print(f"[finviz_fetch] dates on disk: {list_snapshot_dates()}")
 
 
