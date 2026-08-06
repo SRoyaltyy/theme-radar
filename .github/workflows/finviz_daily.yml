@@ -24,8 +24,9 @@ jobs:
 
       - name: Fetch Finviz Elite export
         env:
-          FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
+          FINVIZ_EXPORT: ${{ secrets.FINVIZ_EXPORT }}
           FINVIZ_EXPORT_URL: ${{ secrets.FINVIZ_EXPORT_URL }}
+          FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
         run: python -m src.finviz_fetch
 
       - name: Commit snapshot
