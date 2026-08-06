@@ -3,14 +3,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# --- credentials (never hardcode) ---
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
-SEARXNG_URL = os.environ.get("SEARXNG_URL", "").rstrip("/")
-FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
+# --- credentials (never hardcode; strip to survive trailing newlines from GH secrets) ---
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "").strip()
+SEARXNG_URL = os.environ.get("SEARXNG_URL", "").strip().rstrip("/")
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "").strip()
 
 # --- DeepSeek ---
-MODEL_PREDICT = os.environ.get("MODEL_PREDICT", "deepseek-chat")
-DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+MODEL_PREDICT = os.environ.get("MODEL_PREDICT", "deepseek-chat").strip()
+DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com").strip()
 MAX_TOOL_ROUNDS = 12
 
 # --- paths ---
