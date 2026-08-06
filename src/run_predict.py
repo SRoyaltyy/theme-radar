@@ -1,5 +1,5 @@
-"""Stage PREDICT: assemble rubric + memory + Channel 1, call DeepSeek with
-web_search, map themes to exact Finviz tickers, write daily prediction file.
+"""Stage PREDICT: rubric + memory + Finviz delta Channel 1 + DeepSeek research
+→ theme scores → Finviz pure-play buy map.
 
 CLI: python -m src.run_predict [--date YYYY-MM-DD]
 """
@@ -9,17 +9,21 @@ import argparse
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from . import config, deepseek_client, finviz_mapper, memory, scoreboard
+from . import config, deepseek_client, finviz_delta, finviz_mapper, memory, scoreboard
 
 
-def _channel1_placeholder() -> str:
-    return (
-        "=== CHANNEL 1: PRE-FETCHED DATA ===\n"
-        "(Placeholder — sector ETF performance / breadth / commodity snapshots "
-        "will be injected here in a later iteration.)\n"
-        "For this run the model must rely primarily on live web_search "
-        "for discovery and validation.\n"
-    )
+def _channel1_from_finviz() -> str:
+    """Build Channel 1 from current vs previous Finviz snapshots."""
+    try:
+        cur, prev = finviz_delta.load_current_previous()
+        delta = finviz_delta.compute_delta(cur, prev)
+        return finviz_delta.format_delta_brief(delta)
+    except Exception as e:  # noqa: BLE001
+        return (
+            "=== CHANNEL 1: FINVIZ DELTA ===\n"
+            f"(Unavailable: {e})\n"
+            "Place exports at data/snapshots/current.csv and previous.csv\n"
+        )
 
 
 def main() -> None:
@@ -36,17 +40,18 @@ def main() -> None:
         rubric = fh.read()
 
     mem = memory.prediction_context()
-    ch1 = _channel1_placeholder()
+    ch1 = _channel1_from_finviz()
 
     user_msg = (
         f"TODAY: {date_str} (America/New_York)\n\n"
         f"{mem}\n\n"
         f"{ch1}\n\n"
         "Execute the full Theme Radar research process now "
-        "(Stage 1 Discovery → Stage 2 Trigger Filter → Stage 3 Five-Layer Scoring). "
-        "You must perform live web_search for all required categories before scoring.\n"
-        "IMPORTANT: Put each field of every THEME_SCORES block on its own line. "
-        "Do not jam multiple fields onto one line."
+        "(Stage 1 Discovery → Stage 2 Trigger Filter → Stage 3 Five-Layer Scoring).\n"
+        "Use the FINVIZ DELTA block above as primary evidence for which industries "
+        "and tickers are already accelerating. Supplement with live web_search for "
+        "macro/policy, hyperscaler CapEx, and dated triggers.\n"
+        "IMPORTANT: Put each field of every THEME_SCORES block on its own line."
     )
 
     transcript = str(config.DAILY / "_transcripts" / f"{date_str}_predict.json")
@@ -90,8 +95,6 @@ def main() -> None:
     scoreboard.save(board)
 
     print(f"[predict] wrote {out_path}")
-    print(f"[predict] transcript → {transcript}")
-    print(f"[predict] trace → {trace}")
 
 
 if __name__ == "__main__":
