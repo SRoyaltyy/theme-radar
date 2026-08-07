@@ -45,6 +45,10 @@ DELTA_NUMERIC = [
     "20-Day Simple Moving Average", "50-Day Simple Moving Average",
     "200-Day Simple Moving Average",
     "EPS Growth This Year", "EPS Growth Next Year",
+    # added for scoring engine (levels only; deltas computed when present)
+    "Beta", "Volume", "Average True Range",
+    "Volatility (Week)", "Volatility (Month)",
+    "Total Debt/Equity", "Current Ratio",
 ]
 
 META = [
