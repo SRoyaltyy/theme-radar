@@ -3,9 +3,14 @@
 Preferred: set secret FINVIZ_EXPORT to the full export URL that already
 includes your auth key (the single link Finviz gives you).
 
-Fallback: FINVIZ_API_KEY + optional FINVIZ_EXPORT_URL / column list.
+Writes (append-only history):
+  data/snapshots/YYYY-MM-DD.csv          ← canonical snapshot for that ET date
+  data/snapshots/archive/YYYY-MM-DD_HHMMSS.csv  ← prior version if same day re-run
+  data/snapshots/current.csv / previous.csv     ← convenience pointers only
+  data/snapshots/manifest.json
 
-Writes: data/snapshots/YYYY-MM-DD.csv
+IMPORTANT: dated files are NEVER deleted. Same-day re-fetch archives the
+old file under archive/ before replacing YYYY-MM-DD.csv.
 """
 from __future__ import annotations
 
@@ -26,10 +31,10 @@ DEFAULT_COLS = (
 )
 
 EXPORT_URL = "https://elite.finviz.com/export.ashx"
+ARCHIVE_DIR = SNAPSHOT_DIR / "archive"
 
 
 def fetch_csv(api_key: str | None = None, extra_params: dict | None = None) -> bytes:
-    # Preferred: single secret with full URL + auth already embedded
     full = (
         os.environ.get("FINVIZ_EXPORT", "")
         or os.environ.get("FINVIZ_EXPORT_URL", "")
@@ -39,7 +44,6 @@ def fetch_csv(api_key: str | None = None, extra_params: dict | None = None) -> b
 
     if full:
         url = full
-        # If they stored URL without auth but have a separate key, append it
         if key and "auth=" not in url:
             sep = "&" if "?" in url else "?"
             url = f"{url}{sep}auth={key}"
@@ -76,6 +80,22 @@ def fetch_csv(api_key: str | None = None, extra_params: dict | None = None) -> b
     return r.content
 
 
+def _archive_if_exists(path: Path, stamp: str) -> Path | None:
+    """If path exists, copy to archive/ with timestamp. Never delete the original
+    until the caller replaces it; archive is the safety copy."""
+    if not path.exists():
+        return None
+    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+    dest = ARCHIVE_DIR / f"{path.stem}_{stamp}{path.suffix}"
+    # avoid clobbering archive too
+    n = 1
+    while dest.exists():
+        dest = ARCHIVE_DIR / f"{path.stem}_{stamp}_{n}{path.suffix}"
+        n += 1
+    shutil.copy2(path, dest)
+    return dest
+
+
 def save_dated_snapshot(
     content: bytes,
     as_of: str | None = None,
@@ -85,25 +105,44 @@ def save_dated_snapshot(
     import pandas as pd
 
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
-    date_str = as_of or datetime.now(ZoneInfo(tz)).date().isoformat()
+    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now(ZoneInfo(tz))
+    date_str = as_of or now.date().isoformat()
+    stamp = now.strftime("%Y%m%d_%H%M%S")
+
     raw_path = SNAPSHOT_DIR / f"{date_str}.raw.csv"
     path = SNAPSHOT_DIR / f"{date_str}.csv"
+
+    # Preserve any existing same-day files before overwrite
+    archived_norm = _archive_if_exists(path, stamp)
+    archived_raw = _archive_if_exists(raw_path, stamp)
+    if archived_norm:
+        print(f"[finviz_fetch] archived prior {path.name} → {archived_norm.name}")
+    if archived_raw:
+        print(f"[finviz_fetch] archived prior {raw_path.name} → {archived_raw.name}")
 
     raw_path.write_bytes(content)
     df = pd.read_csv(raw_path, low_memory=False)
     norm = normalize_frame(df)
     norm.to_csv(path, index=False)
 
+    # Also keep a uniquely named copy in archive for this run (immutable history)
+    run_archive = ARCHIVE_DIR / f"{date_str}_{stamp}.csv"
+    shutil.copy2(path, run_archive)
+
     current = SNAPSHOT_DIR / "current.csv"
     previous = SNAPSHOT_DIR / "previous.csv"
     if current.exists():
+        # archive outgoing current before rotating previous
+        _archive_if_exists(previous, stamp)
         if previous.exists():
             previous.unlink()
-        shutil.copy(current, previous)
-    shutil.copy(path, current)
+        shutil.copy2(current, previous)
+    shutil.copy2(path, current)
 
     man = SNAPSHOT_DIR / "manifest.json"
-    data = {"dates": [], "files": {}}
+    data = {"dates": [], "files": {}, "runs": []}
     if man.exists():
         data = json.loads(man.read_text())
     dates = data.get("dates", [])
@@ -113,6 +152,17 @@ def save_dated_snapshot(
     data["dates"] = dates
     data["latest"] = dates[-1] if dates else None
     data.setdefault("files", {})[date_str] = path.name
+    runs = data.setdefault("runs", [])
+    runs.append(
+        {
+            "date": date_str,
+            "stamp": stamp,
+            "canonical": path.name,
+            "archive": run_archive.name,
+            "bytes": len(content),
+        }
+    )
+    data["runs"] = runs[-90:]  # keep last ~90 runs in manifest
     man.write_text(json.dumps(data, indent=2))
     return path
 
@@ -128,7 +178,7 @@ def list_snapshot_dates() -> list[str]:
 def main() -> None:
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("--date", default=None)
+    ap.add_argument("--date", default=None, help="Override ET calendar date label")
     args = ap.parse_args()
     print("[finviz_fetch] downloading export...")
     content = fetch_csv()
