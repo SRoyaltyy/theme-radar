@@ -8,18 +8,25 @@ For every ticker in the latest Finviz snapshot, and each horizon (1d/1w/1m):
   4. apply the ordered interaction gates
   5. emit per-category scores, pos/neg counts and weights, total score
 
-Outputs:
-  data/scores/<date>_1d.csv / _1w.csv / _1m.csv   (one row per ticker)
-  data/scores/<date>_segments.csv                  (industry aggregates)
-  01_daily/<date>_scan.md                          (human-readable brief)
+Transparency:
+  Every rule can emit an audit row: field, kind, now, then, raw, direction,
+  signal, weight, points, skip reason. Use --trace TICKER to print it.
 
-CLI: python -m src.score_engine [--date YYYY-MM-DD]
+Outputs:
+  data/scores/<date>_1d.csv / _1w.csv / _1m.csv
+  data/scores/<date>_segments.csv
+  01_daily/<date>_scan.md
+  01_daily/<date>_trace_<TICKER>.md   (when --trace is set)
+
+CLI:
+  python -m src.score_engine [--date YYYY-MM-DD]
+  python -m src.score_engine --date 2026-08-07 --trace MP,OKLO --horizon 1d
 """
 from __future__ import annotations
 
 import argparse
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -38,7 +45,6 @@ CATEGORIES = ["price", "flow", "technical", "positioning", "valuation",
 
 # ------------------------------------------------------------------ pairing
 def snapshot_dates() -> dict[str, Path]:
-    """date -> canonical dated CSV path (manifest first, glob fallback)."""
     out = {}
     man = SNAPSHOT_DIR / "manifest.json"
     if man.exists():
@@ -53,7 +59,6 @@ def snapshot_dates() -> dict[str, Path]:
 
 
 def find_prior(dates: dict[str, Path], target: date, horizon: str):
-    """Nearest snapshot date inside the horizon window before target."""
     lo, hi = HORIZON_WINDOWS[horizon]
     best = None
     for d in dates:
@@ -83,6 +88,16 @@ def _g(row, col, default=np.nan):
         return default
 
 
+def _fmt(v, pct=False):
+    if v is None or (isinstance(v, float) and np.isnan(v)):
+        return "n/a"
+    if pct:
+        return f"{v * 100:+.2f}%" if abs(v) < 5 else f"{v:+.2f}%"
+    if isinstance(v, float):
+        return f"{v:.4g}"
+    return str(v)
+
+
 def compute_status(row: pd.Series, upside: float) -> dict:
     pw = _g(row, "Performance (Week)")
     pm = _g(row, "Performance (Month)")
@@ -90,6 +105,16 @@ def compute_status(row: pd.Series, upside: float) -> dict:
     v50 = _g(row, "50-Day Simple Moving Average")
     v200 = _g(row, "200-Day Simple Moving Average")
     sf = _g(row, "Short Float")
+
+    status_inputs = {
+        "Performance (Week)": pw,
+        "Performance (Month)": pm,
+        "RSI (14)": rsi,
+        "50-DMA %": v50,
+        "200-DMA %": v200,
+        "Short Float": sf,
+        "upside_pct": upside,
+    }
 
     if not np.isnan(pw) and pw > STATUS["extreme_week_pct"]:
         ext = "EXTREME"
@@ -114,14 +139,17 @@ def compute_status(row: pd.Series, upside: float) -> dict:
              else "ELEVATED" if not np.isnan(sf) and sf > STATUS["elevated_short_pct"]
              else "LOW")
 
-    return {"status_extension": ext, "status_trend": trend,
-            "status_short": short,
-            "status_street": "STREET_EXTENDED" if upside < 0 else "OK"}
+    return {
+        "status_extension": ext,
+        "status_trend": trend,
+        "status_short": short,
+        "status_street": "STREET_EXTENDED" if upside < 0 else "OK",
+        "status_inputs": status_inputs,
+    }
 
 
 # ------------------------------------------------------------------ curves
 def _curves(name: str, v: float) -> float:
-    """Level -> signal in [-1, +1] for curve: polarity rules."""
     if np.isnan(v):
         return 0.0
     if name == "rsi":
@@ -129,14 +157,14 @@ def _curves(name: str, v: float) -> float:
         if v >= 65: return 0.5
         if v >= 45: return 1.0
         if v >= 30: return -0.5
-        return -0.5  # oversold: falling knife until repair confirms
+        return -0.5
     if name == "rvol":
         if v >= 2.0: return 1.0
         if v >= 1.3: return 0.5
         if v >= 0.6: return 0.0
-        return -0.5  # dead tape
+        return -0.5
     if name == "sma50":
-        if v > STATUS["far_above_50dma_pct"]: return -1.0  # extension
+        if v > STATUS["far_above_50dma_pct"]: return -1.0
         if v > 0: return 1.0
         return -1.0
     if name == "sma200":
@@ -144,7 +172,7 @@ def _curves(name: str, v: float) -> float:
     if name == "vol":
         if v >= 8: return -1.0
         if v >= 5: return -0.5
-        if v <= 2: return 0.5   # coiled
+        if v <= 2: return 0.5
         return 0.0
     if name == "short":
         if v > STATUS["high_short_pct"]: return -1.0
@@ -154,7 +182,7 @@ def _curves(name: str, v: float) -> float:
         if v >= 30: return 1.0
         if v >= 5: return 0.3
         if v >= 0: return 0.0
-        return -1.0  # price above target
+        return -1.0
     if name == "debt":
         if v >= 2.0: return -1.0
         if v >= 1.0: return -0.5
@@ -162,91 +190,177 @@ def _curves(name: str, v: float) -> float:
     return 0.0
 
 
-# ------------------------------------------------------------------ scoring
 def _sign_dead(value: float, deadzone: float) -> int:
     if np.isnan(value) or abs(value) < deadzone:
         return 0
     return 1 if value > 0 else -1
 
 
-def score_ticker(now: pd.Series, then: pd.Series | None, horizon: str) -> dict:
-    """One ticker, one horizon. `then` is None in levels-only mode."""
-    price_now, price_then = _g(now, "Price"), (_g(then, "Price") if then is not None else np.nan)
-    ret = (price_now / price_then - 1) if (not np.isnan(price_now) and not np.isnan(price_then) and price_then) else np.nan
-    upside = ((_g(now, "Target Price") - price_now) / price_now * 100
-              if not np.isnan(price_now) and price_now
-              and not np.isnan(_g(now, "Target Price")) else np.nan)
+def _direction(raw: float, dz: float) -> str:
+    if raw is None or (isinstance(raw, float) and np.isnan(raw)):
+        return "n/a"
+    if abs(raw) < dz:
+        return "flat (inside deadzone)"
+    return "up" if raw > 0 else "down"
+
+
+# ------------------------------------------------------------------ scoring
+def score_ticker(now: pd.Series, then: pd.Series | None, horizon: str,
+                 collect_trace: bool = False) -> dict:
+    """One ticker, one horizon. When collect_trace=True, attach full audit rows."""
+    price_now = _g(now, "Price")
+    price_then = _g(then, "Price") if then is not None else np.nan
+    ret = (price_now / price_then - 1) if (
+        not np.isnan(price_now) and not np.isnan(price_then) and price_then
+    ) else np.nan
+    upside = ((
+        (_g(now, "Target Price") - price_now) / price_now * 100
+        if not np.isnan(price_now) and price_now
+        and not np.isnan(_g(now, "Target Price")) else np.nan
+    ))
     rvol = _g(now, "Relative Volume")
     inst_tx = _g(now, "Institutional Transactions")
     n_cat = int(sum(1 for c in now.index
                     if c.startswith("cat_") and bool(now.get(c))))
 
     st = compute_status(now, upside if not np.isnan(upside) else 0.0)
+    status_inputs = st.pop("status_inputs")
     cat = {c: 0.0 for c in CATEGORIES}
     n_pos = n_neg = 0
     w_pos = w_neg = 0.0
     drivers_pos, drivers_neg = [], []
+    trace: list[dict] = []
 
     for rule in RUBRIC:
+        field = rule["field"]
+        kind = rule["kind"]
+        audit = {
+            "field": field,
+            "kind": kind,
+            "category": rule["category"],
+            "speed": rule["speed"],
+            "weight": rule["weight"],
+            "polarity": rule["polarity"],
+            "note": rule.get("note", ""),
+            "now": None,
+            "then": None,
+            "raw": None,
+            "deadzone": None,
+            "direction": None,
+            "signal": 0.0,
+            "points": 0.0,
+            "skipped": None,
+            "override": None,
+        }
+
         if horizon not in rule["horizons"]:
+            audit["skipped"] = f"horizon {horizon} not in {rule['horizons']}"
+            if collect_trace:
+                trace.append(audit)
             continue
         if rule["speed"] == "slow" and horizon == "1d":
+            audit["skipped"] = "slow field blocked on 1d"
+            if collect_trace:
+                trace.append(audit)
             continue
 
-        # raw value
-        if rule["kind"] == "ret":
+        # ---- raw value
+        if kind == "ret":
+            audit["now"] = price_now
+            audit["then"] = price_then
             raw = ret
             dz = RET_DEADZONE[horizon]
-        elif rule["kind"] == "delta":
+            audit["deadzone"] = dz
             if then is None:
+                audit["skipped"] = "no prior snapshot for true return"
+                if collect_trace:
+                    trace.append(audit)
                 continue
-            a, b = _g(now, rule["field"]), _g(then, rule["field"])
+        elif kind == "delta":
+            if then is None:
+                audit["skipped"] = "no prior snapshot for delta"
+                if collect_trace:
+                    trace.append(audit)
+                continue
+            a, b = _g(now, field), _g(then, field)
+            audit["now"], audit["then"] = a, b
             if np.isnan(a) or np.isnan(b):
+                audit["skipped"] = "missing now or then value"
+                if collect_trace:
+                    trace.append(audit)
                 continue
             if str(rule["polarity"]).startswith("pct:"):
-                raw = (a / b - 1) if b else np.nan  # relative change
+                raw = (a / b - 1) if b else np.nan
             else:
                 raw = a - b
             dz = rule["deadzone"]
-        elif rule["field"] == "upside_pct":
+            audit["deadzone"] = dz
+        elif field == "upside_pct":
+            audit["now"] = upside
+            audit["then"] = None
             raw, dz = upside, rule["deadzone"]
-        elif rule["field"] == "n_catalysts":
+            audit["deadzone"] = dz
+        elif field == "n_catalysts":
+            audit["now"] = float(n_cat)
             raw, dz = float(n_cat), rule["deadzone"]
-        else:
-            raw, dz = _g(now, rule["field"]), rule["deadzone"]
+            audit["deadzone"] = dz
+        else:  # level
+            a = _g(now, field)
+            audit["now"] = a
+            audit["then"] = _g(then, field) if then is not None else np.nan
+            raw, dz = a, rule["deadzone"]
+            audit["deadzone"] = dz
+
         if raw is None or (isinstance(raw, float) and np.isnan(raw)):
+            audit["skipped"] = "raw is nan"
+            if collect_trace:
+                trace.append(audit)
             continue
 
-        # signal
+        audit["raw"] = float(raw)
+        audit["direction"] = _direction(float(raw), float(dz or 0))
+
+        # ---- signal
         pol = rule["polarity"]
         if str(pol).startswith("curve:"):
             s = _curves(str(pol)[6:], float(raw))
         else:
-            s = float(_sign_dead(float(raw), dz))
+            s = float(_sign_dead(float(raw), float(dz or 0)))
             base = str(pol).lstrip("pct:")
             if base == "-":
                 s = -s
-        # RVol direction follows the tape: hot + up = ignition, hot + down = event selling
-        if rule["field"] == "Relative Volume" and s > 0 and not np.isnan(ret):
+
+        # RVol follows tape direction
+        if field == "Relative Volume" and s > 0 and not np.isnan(ret):
             if abs(ret) < RET_DEADZONE[horizon]:
                 s = 0.0
+                audit["override"] = "RVol zeroed: price flat inside deadzone"
             elif ret < 0:
                 s = -s
+                audit["override"] = "RVol flipped: hot volume + price down = selling"
 
-        # status overrides (field level)
-        if rule["status_mode"] == "momentum" and s > 0:
+        # status overrides on signal
+        if rule.get("status_mode") == "momentum" and s > 0:
             if st["status_extension"] == "EXTREME":
                 s = -1.0
-        if rule["status_mode"] == "rsi":
+                audit["override"] = "EXTREME extension: momentum signal flipped bearish"
+        if rule.get("status_mode") == "rsi":
             rsi_now = _g(now, "Relative Strength Index (14)")
             if not np.isnan(rsi_now) and rsi_now > STATUS["extended_rsi"] and s > 0:
-                s = 0.0  # rising INTO overbought earns nothing
+                s = 0.0
+                audit["override"] = "RSI already overbought: rising RSI earns 0"
 
         p = s * rule["weight"]
+        audit["signal"] = s
+        audit["points"] = p
+
+        if collect_trace:
+            trace.append(audit)
+
         if p == 0:
             continue
         cat[rule["category"]] += p
-        label = f"{rule['field']}{'Δ' if rule['kind'] == 'delta' else ''}"
+        label = f"{field}{'Δ' if kind == 'delta' else ''}"
         if p > 0:
             n_pos += 1
             w_pos += p
@@ -256,44 +370,54 @@ def score_ticker(now: pd.Series, then: pd.Series | None, horizon: str) -> dict:
             w_neg += -p
             drivers_neg.append(f"{label} {p:.1f}")
 
-    # ---------------- interaction gates (ordered) ----------------
+    # ---------------- interaction gates ----------------
     flags: list[str] = []
+    gate_log: list[str] = []
     confidence = 1.0
-    ctx = {"cat": cat, "ret": 0.0 if np.isnan(ret) else ret, "rvol": rvol,
-           "upside_pct": upside, "inst_tx": inst_tx, "horizon": horizon,
-           "flags": flags, **st}
+    pre_gate_cat = dict(cat)
 
     for gate in INTERACTIONS:
         gid = gate["id"]
         if gid == "extension_cap" and st["status_extension"] == "EXTENDED" and cat["price"] > 0:
+            old = cat["price"]
             cat["price"] *= 0.25
             flags.append("EXTENSION_CAP")
+            gate_log.append(f"EXTENSION_CAP: price {old:.2f} → {cat['price']:.2f} (×0.25)")
         elif gid == "extreme_flip" and st["status_extension"] == "EXTREME" and cat["price"] > 0:
+            old = cat["price"]
             cat["price"] = -abs(cat["price"]) * 0.5
             flags.append("EXTREME_FLIP")
+            gate_log.append(f"EXTREME_FLIP: price {old:.2f} → {cat['price']:.2f}")
         elif gid == "downtrend_bounce_discount" and st["status_trend"] == "DOWNTREND" \
                 and horizon in ("1w", "1m") and cat["price"] > 0:
+            old = cat["price"]
             cat["price"] *= 0.5
             flags.append("DOWNTREND_BOUNCE_DISCOUNT")
+            gate_log.append(f"DOWNTREND_BOUNCE_DISCOUNT: price {old:.2f} → {cat['price']:.2f}")
         elif gid == "street_extended_discount" and not np.isnan(upside) and upside < 0 and cat["price"] > 0:
+            old = cat["price"]
             cat["price"] *= 0.5
             flags.append("STREET_EXTENDED_DISCOUNT")
+            gate_log.append(f"STREET_EXTENDED_DISCOUNT: price {old:.2f} → {cat['price']:.2f}")
         elif gid == "squeeze_flag" and st["status_short"] == "HIGH_SHORT" \
                 and not np.isnan(ret) and ret > 0.05 and not np.isnan(rvol) and rvol > 1.5:
             flags.append("SQUEEZE_SETUP")
+            gate_log.append("SQUEEZE_SETUP: high short + ret>5% + RVol>1.5")
         elif gid == "unconfirmed_rally" and not np.isnan(inst_tx) and inst_tx < 0 \
                 and not np.isnan(ret) and ret > 0:
             confidence *= 0.8
             flags.append("UNCONFIRMED_RALLY")
+            gate_log.append(f"UNCONFIRMED_RALLY: inst_tx={inst_tx:.2f}<0 while ret>0 → conf×0.8")
         elif gid == "capitulation_watch" and st["status_extension"] == "WASHED" \
                 and not np.isnan(ret) and ret < -0.03 and not np.isnan(rvol) and rvol > 1.5:
             flags.append("CAPITULATION_WATCH")
+            gate_log.append("CAPITULATION_WATCH: washed + ret<-3% + high RVol")
 
     total = sum(cat.values())
     max_total = sum(CATEGORY_MAX.values())
     score_100 = round(total / max_total * 100, 1)
 
-    return {
+    out = {
         "ret_H": round(ret * 100, 2) if not np.isnan(ret) else None,
         "upside_pct": round(upside, 1) if not np.isnan(upside) else None,
         **st,
@@ -307,6 +431,14 @@ def score_ticker(now: pd.Series, then: pd.Series | None, horizon: str) -> dict:
         "top_neg": "; ".join(drivers_neg[:4]),
         "n_catalysts": n_cat,
     }
+    if collect_trace:
+        out["_trace"] = trace
+        out["_gate_log"] = gate_log
+        out["_status_inputs"] = status_inputs
+        out["_pre_gate_cat"] = pre_gate_cat
+        out["_price_now"] = price_now
+        out["_price_then"] = price_then
+    return out
 
 
 # ------------------------------------------------------------------ identity
@@ -344,10 +476,10 @@ def score_universe(cur: pd.DataFrame, prev: pd.DataFrame | None,
         rec["Price"] = _g(row, "Price")
         rec["mcap_bucket"] = _size_bucket(_g(row, "Market Cap"))
         rec["beta_bucket"] = _beta_bucket(_g(row, "Beta"))
-        rec.update(score_ticker(row, then, horizon))
+        scored = score_ticker(row, then, horizon, collect_trace=False)
+        rec.update(scored)
         rows.append(rec)
-    df = pd.DataFrame(rows)
-    return df.sort_values("total_score", ascending=False)
+    return pd.DataFrame(rows).sort_values("total_score", ascending=False)
 
 
 # ------------------------------------------------------------------ segments
@@ -373,6 +505,10 @@ def brief(date_str: str, per_horizon: dict[str, pd.DataFrame | None],
     L.append("Deterministic rubric over dated Finviz snapshots. No LLM. "
              "Score > 0 = more bullish evidence than bearish, after status "
              "gates and interaction dampeners.")
+    L.append("")
+    L.append("For a full per-metric audit of any ticker:")
+    L.append("`python -m src.score_engine --date " + date_str +
+             " --trace TICKER --horizon 1d`")
     L.append("")
     for h in ("1d", "1w", "1m"):
         df = per_horizon.get(h)
@@ -428,16 +564,136 @@ def brief(date_str: str, per_horizon: dict[str, pd.DataFrame | None],
     return "\n".join(L)
 
 
+# ------------------------------------------------------------------ trace render
+def format_trace(ticker: str, horizon: str, pair: str | None,
+                 meta: dict, result: dict) -> str:
+    L = []
+    L.append(f"# Score audit — {ticker} — horizon {horizon}")
+    L.append("")
+    L.append(f"- **Pair:** {pair or 'NONE (levels only)'}")
+    L.append(f"- **Company:** {meta.get('Company', '')}")
+    L.append(f"- **Sector / Industry:** {meta.get('Sector', '')} / {meta.get('Industry', '')}")
+    L.append(f"- **Total score:** {result['total_score']:+.2f}  "
+             f"(score_100={result['score_100']}, conf={result['confidence']})")
+    L.append(f"- **True return ret_H:** {result.get('ret_H')}%")
+    L.append(f"- **Status:** {result['status_extension']} / {result['status_trend']} / "
+             f"{result['status_short']} / {result['status_street']}")
+    L.append(f"- **Flags:** {result['kill_flags'] or '—'}")
+    L.append("")
+
+    L.append("## Status inputs (levels on current snapshot)")
+    L.append("")
+    L.append("| Metric | Value | Role |")
+    L.append("|---|---|---|")
+    for k, v in result.get("_status_inputs", {}).items():
+        L.append(f"| {k} | {_fmt(v)} | bucket input |")
+    L.append("")
+
+    L.append("## Per-rule audit")
+    L.append("")
+    L.append("| Field | Kind | Now | Then | Raw | Direction | Signal | W | Points | Skip / override |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|")
+    for a in result.get("_trace", []):
+        skip = a.get("skipped") or a.get("override") or ""
+        raw = a.get("raw")
+        raw_s = _fmt(raw) if raw is not None else "—"
+        # show ret as percent for readability
+        if a["kind"] == "ret" and raw is not None and not (isinstance(raw, float) and np.isnan(raw)):
+            raw_s = f"{raw * 100:+.2f}%"
+        L.append(
+            f"| {a['field']} | {a['kind']} | {_fmt(a.get('now'))} | {_fmt(a.get('then'))} | "
+            f"{raw_s} | {a.get('direction') or '—'} | {a.get('signal', 0):+.2f} | "
+            f"{a['weight']} | {a.get('points', 0):+.2f} | {skip or '—'} |"
+        )
+    L.append("")
+
+    L.append("## Category sums (before → after gates)")
+    L.append("")
+    pre = result.get("_pre_gate_cat", {})
+    L.append("| Category | Pre-gate | Post-gate |")
+    L.append("|---|---|---|")
+    for c in CATEGORIES:
+        post = result.get(f"{c}_score", 0)
+        L.append(f"| {c} | {pre.get(c, 0):+.2f} | {post:+.2f} |")
+    L.append("")
+
+    L.append("## Gates fired")
+    L.append("")
+    gl = result.get("_gate_log") or []
+    if not gl:
+        L.append("_None._")
+    else:
+        for g in gl:
+            L.append(f"- {g}")
+    L.append("")
+
+    L.append("## Arithmetic")
+    L.append("")
+    L.append(f"- Price now / then: {_fmt(result.get('_price_now'))} / {_fmt(result.get('_price_then'))}")
+    L.append(f"- n_pos={result['n_pos']} w_pos={result['w_pos']} | "
+             f"n_neg={result['n_neg']} w_neg={result['w_neg']}")
+    L.append(f"- **total_score = Σ post-gate categories = {result['total_score']:+.2f}**")
+    L.append("")
+    return "\n".join(L)
+
+
+def run_traces(tickers: list[str], date_str: str, horizon: str,
+               dates: dict[str, Path], target: date) -> None:
+    if date_str not in dates:
+        raise SystemExit(f"[trace] no snapshot for {date_str}")
+    cur = load_dated(dates[date_str])
+    cur = _add_catalyst_flags(cur)
+    prior = find_prior(dates, target, horizon)
+    prev = load_dated(dates[prior]) if prior else None
+    prev_map = {}
+    if prev is not None:
+        prev_map = {t: r for t, r in prev.set_index("Ticker", drop=False).iterrows()}
+
+    cur_idx = cur.set_index("Ticker", drop=False)
+    daily_dir = config.DAILY
+    daily_dir.mkdir(parents=True, exist_ok=True)
+
+    for t in tickers:
+        t = t.upper().strip()
+        if t not in cur_idx.index:
+            print(f"[trace] {t}: not in snapshot {date_str}")
+            continue
+        row = cur_idx.loc[t]
+        if isinstance(row, pd.DataFrame):
+            row = row.iloc[0]
+        then = prev_map.get(t)
+        result = score_ticker(row, then, horizon, collect_trace=True)
+        meta = {c: row.get(c, "") for c in META_COLS}
+        text = format_trace(t, horizon, prior, meta, result)
+        path = daily_dir / f"{date_str}_trace_{t}_{horizon}.md"
+        path.write_text(text, encoding="utf-8")
+        print(text)
+        print(f"\n[trace] wrote {path}\n")
+
+
 # ------------------------------------------------------------------ main
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default=None)
+    ap.add_argument("--trace", default=None,
+                    help="Comma-separated tickers for full per-rule audit (e.g. MP,OKLO)")
+    ap.add_argument("--horizon", default="1d", choices=["1d", "1w", "1m"],
+                    help="Horizon used with --trace (default 1d)")
+    ap.add_argument("--skip-universe", action="store_true",
+                    help="Only run --trace, skip full universe score CSVs")
     args = ap.parse_args()
+
     target = (date.fromisoformat(args.date) if args.date else
               datetime.now(ZoneInfo(config.TZ)).date())
     date_str = target.isoformat()
-
     dates = snapshot_dates()
+
+    if args.trace:
+        tickers = [x.strip() for x in args.trace.split(",") if x.strip()]
+        run_traces(tickers, date_str, args.horizon, dates, target)
+        if args.skip_universe:
+            return
+
     if date_str not in dates:
         raise SystemExit(f"[score] no snapshot for {date_str}; "
                          f"have: {list(dates)[-5:]}")
