@@ -27,6 +27,7 @@ jobs:
         id: gate
         run: |
           python - <<'PY'
+          import os
           from src.trading_calendar import is_trading_day, today_et
           d = today_et()
           open_ = is_trading_day(d)
@@ -34,7 +35,6 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
               fh.write(f"trading={str(open_).lower()}\n")
               fh.write(f"et_date={d.isoformat()}\n")
-          import os
           PY
 
       - name: Fetch Finviz Elite export
