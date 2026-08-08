@@ -1,0 +1,149 @@
+name: Factor Backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      scan_date:
+        description: >
+          Scan date to grade (YYYY-MM-DD). Leave empty to backfill+attribute ALL
+          feature dates that have later snapshots.
+        required: false
+        default: ""
+      ensure_features:
+        description: "If true, run score_engine first so features exist for scan_date"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Show available snapshots / features
+        run: |
+          echo "=== snapshots ==="
+          ls -la data/snapshots/*.csv 2>/dev/null | head -30 || true
+          echo "=== features ==="
+          ls -la data/features/ 2>/dev/null || true
+          echo "=== labels ==="
+          ls -la data/labels/ 2>/dev/null || true
+          if [ -f data/snapshots/manifest.json ]; then
+            echo "=== manifest ==="
+            cat data/snapshots/manifest.json
+          fi
+
+      - name: Ensure features (score_engine) for scan_date
+        if: ${{ github.event.inputs.ensure_features == 'true' && github.event.inputs.scan_date != '' }}
+        run: |
+          set -e
+          DATE="${{ github.event.inputs.scan_date }}"
+          echo "=== score_engine --date $DATE (writes scores + features) ==="
+          python -m src.score_engine --date "$DATE"
+
+      - name: Ensure features for all dated snapshots (no scan_date)
+        if: ${{ github.event.inputs.ensure_features == 'true' && github.event.inputs.scan_date == '' }}
+        run: |
+          set -e
+          python - <<'PY'
+          from pathlib import Path
+          from src.score_engine import snapshot_dates
+          from src.feature_log import FEATURES_DIR
+          import subprocess, sys
+          dates = sorted(snapshot_dates().keys())
+          print("snapshot dates:", dates)
+          for d in dates:
+              feat = FEATURES_DIR / f"{d}_1d.csv"
+              if feat.exists():
+                  print(f"[skip score] features exist {feat.name}")
+                  continue
+              print(f"[run] score_engine --date {d}")
+              r = subprocess.run([sys.executable, "-m", "src.score_engine", "--date", d])
+              if r.returncode != 0:
+                  print(f"[warn] score failed for {d} (missing prior pair is OK for oldest day)")
+          PY
+
+      - name: Label backfill (forward returns)
+        run: |
+          set -e
+          DATE="${{ github.event.inputs.scan_date }}"
+          if [ -n "$DATE" ]; then
+            echo "=== label_backfill --scan-date $DATE ==="
+            python -m src.label_backfill --scan-date "$DATE"
+          else
+            echo "=== label_backfill (all feature dates) ==="
+            python -m src.label_backfill
+          fi
+
+      - name: Attribution (full-universe IC / combos / risk)
+        run: |
+          set -e
+          DATE="${{ github.event.inputs.scan_date }}"
+          if [ -n "$DATE" ]; then
+            echo "=== attribution --scan-date $DATE ==="
+            python -m src.attribution --scan-date "$DATE"
+          else
+            echo "=== attribution (all) ==="
+            python -m src.attribution
+          fi
+
+      - name: Print results to log
+        run: |
+          DATE="${{ github.event.inputs.scan_date }}"
+          echo "=== labels ==="
+          ls -la data/labels/ 2>/dev/null || true
+          echo "=== attribution ==="
+          ls -la data/attribution/ 2>/dev/null || true
+          if [ -n "$DATE" ]; then
+            for f in \
+              data/labels/${DATE}_fwd.csv \
+              data/labels/${DATE}_fwd.meta.json \
+              data/attribution/${DATE}_ic.csv \
+              data/attribution/${DATE}_summary.json \
+              01_daily/${DATE}_attribution.md
+            do
+              if [ -f "$f" ]; then
+                echo "======== $f ========"
+                if [[ "$f" == *.csv ]]; then
+                  head -5 "$f"
+                  echo "...(rows: $(wc -l < "$f"))"
+                else
+                  cat "$f"
+                fi
+              else
+                echo "(missing) $f"
+              fi
+            done
+          else
+            for f in 01_daily/*_attribution.md; do
+              [ -f "$f" ] || continue
+              echo "======== $f ========"
+              cat "$f"
+            done
+          fi
+
+      - name: Commit backtest outputs
+        run: |
+          git config user.name "Theme-Radar-Bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/features/ data/scores/ data/labels/ data/attribution/ 01_daily/ 02_lessons/ || true
+          MSG="auto: backtest ${{ github.event.inputs.scan_date }}"
+          [ -z "${{ github.event.inputs.scan_date }}" ] && MSG="auto: backtest all eligible dates"
+          git commit -m "$MSG" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin main
