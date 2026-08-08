@@ -10,6 +10,14 @@ on:
         description: "Snapshot date YYYY-MM-DD (default: latest in manifest / today ET)"
         required: false
         default: ""
+      trace_tickers:
+        description: "Optional comma-separated tickers for full per-rule audit (e.g. MP,OKLO)"
+        required: false
+        default: ""
+      trace_horizon:
+        description: "Horizon for --trace (1d, 1w, or 1m)"
+        required: false
+        default: "1d"
 
 permissions:
   contents: write
@@ -34,7 +42,6 @@ jobs:
           if [ -n "${{ github.event.inputs.run_date }}" ]; then
             echo "date=${{ github.event.inputs.run_date }}" >> "$GITHUB_OUTPUT"
           else
-            # Prefer latest date from manifest if present
             if [ -f data/snapshots/manifest.json ]; then
               LATEST=$(python -c "import json; print(json.load(open('data/snapshots/manifest.json')).get('latest',''))")
               if [ -n "$LATEST" ]; then
@@ -46,29 +53,38 @@ jobs:
               echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
             fi
           fi
-          echo "Target date: $(cat $GITHUB_OUTPUT | grep date=)"
 
       - name: Run score engine (1d / 1w / 1m)
         run: |
           set -e
           DATE="${{ steps.date.outputs.date }}"
+          TRACE="${{ github.event.inputs.trace_tickers }}"
+          HORIZON="${{ github.event.inputs.trace_horizon }}"
+          HORIZON="${HORIZON:-1d}"
           echo "=== score_engine --date $DATE ==="
-          python -m src.score_engine --date "$DATE"
+          if [ -n "$TRACE" ]; then
+            python -m src.score_engine --date "$DATE" --trace "$TRACE" --horizon "$HORIZON"
+          else
+            python -m src.score_engine --date "$DATE"
+          fi
 
-      - name: Print 1d brief to log
+      - name: Print brief + traces to log
         run: |
           DATE="${{ steps.date.outputs.date }}"
           BRIEF="01_daily/${DATE}_scan.md"
           if [ -f "$BRIEF" ]; then
             echo "======== $BRIEF ========"
             cat "$BRIEF"
-          else
-            echo "No brief at $BRIEF"
-            ls -la 01_daily/ || true
-            ls -la data/scores/ || true
           fi
+          echo "======== traces ========"
+          ls -la 01_daily/${DATE}_trace_*.md 2>/dev/null || echo "(no trace files)"
+          for f in 01_daily/${DATE}_trace_*.md; do
+            [ -f "$f" ] || continue
+            echo "----- $f -----"
+            cat "$f"
+          done
 
-      - name: Commit scores + brief
+      - name: Commit scores + brief + traces
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
