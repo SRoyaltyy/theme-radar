@@ -2,6 +2,7 @@ name: Finviz Daily Snapshot
 
 on:
   schedule:
+    # After US cash close: 16:30 ET ≈ 20:30 UTC (EDT)
     - cron: "30 20 * * 1-5"
   workflow_dispatch:
 
@@ -22,7 +23,22 @@ jobs:
       - name: Install deps
         run: pip install requests pandas
 
+      - name: Gate on US trading day (ET)
+        id: gate
+        run: |
+          python - <<'PY'
+          from src.trading_calendar import is_trading_day, today_et
+          d = today_et()
+          open_ = is_trading_day(d)
+          print(f"ET date={d} trading_day={open_}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"trading={str(open_).lower()}\n")
+              fh.write(f"et_date={d.isoformat()}\n")
+          import os
+          PY
+
       - name: Fetch Finviz Elite export
+        if: steps.gate.outputs.trading == 'true'
         env:
           FINVIZ_EXPORT: ${{ secrets.FINVIZ_EXPORT }}
           FINVIZ_EXPORT_URL: ${{ secrets.FINVIZ_EXPORT_URL }}
@@ -30,10 +46,11 @@ jobs:
         run: python -m src.finviz_fetch
 
       - name: Commit snapshot
+        if: steps.gate.outputs.trading == 'true'
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
           git add data/snapshots/
-          git commit -m "auto: finviz snapshot $(date -u +%F)" || echo "No changes"
+          git commit -m "auto: finviz snapshot ${{ steps.gate.outputs.et_date }}" || echo "No changes"
           git pull --rebase origin main || true
           git push origin main

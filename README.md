@@ -1,52 +1,51 @@
 # Theme Radar
 
-**Closed-loop Theme & Sector Rally Predictor**
+Closed-loop **theme / sector / stock** radar on daily Finviz Elite snapshots.
 
-Detects high-confidence market themes/concepts likely to rally over the coming weeks/months, maps them to pure-play stocks, and improves through predict → outcome → reflect → distill.
+## What runs daily (US trading days, America/New_York)
 
-Architecture mirrors `SRoyaltyy/fullscan`.
+1. **Finviz snapshot** (`finviz_daily.yml` ~20:30 UTC) — full universe export, date-stamped under `data/snapshots/`
+2. **Score + feature log** (`score_delta.yml` ~21:00 UTC)
+   - Preliminary rubric scores for **every** ticker → `data/scores/YYYY-MM-DD_{1d,1w,1m}.csv`
+   - Human brief (top/bottom only) → `01_daily/YYYY-MM-DD_scan.md`
+   - **Full-universe** levels + deltas + scores → `data/features/YYYY-MM-DD_1d.csv`
+3. **Label backfill** — when later snapshots exist, attach `fwd_1d/2d/3d` → `data/labels/`
+4. **Attribution** — score IC, per-delta IC, combinations, risk probes on **all** labeled rows → `data/attribution/` + `01_daily/YYYY-MM-DD_attribution.md` + candidate lessons
 
-## How research works
+Weekly: **promote** repeated lessons → `02_lessons/active/`
 
-Every predict run forces the model through a staged process:
+Scoring weights are **not** auto-edited; lessons propose changes after repeats.
 
-1. **Stage 1 – Broad Discovery**  
-   Live web search across macro/policy, hyperscaler CapEx, commodities, analyst notes, and price-action clusters. Surfaces 8–15 candidate narratives.
+## Local commands
 
-2. **Stage 2 – Hard Trigger Filter**  
-   Only candidates with a concrete, dated trigger in the last 14–21 days survive.
-
-3. **Stage 3 – Five-Layer Scoring**  
-   Narrative / Trigger / Scarcity / Institutional / Momentum + Kill Switches.
-
-4. **Output**  
-   Structured `THEME_SCORES` blocks that the pipeline can parse and later map to stocks via the Finviz universe.
-
-## Secrets (same names as fullscan)
-
-In GitHub → Settings → Secrets and variables → Actions, add:
-
-- `DEEPSEEK_API_KEY` (required)
-- `SEARXNG_URL` (optional but recommended)
-- `FRED_API_KEY` (optional for later Channel 1)
-
-You can copy the values from the fullscan repository secrets.
-
-## Run
-
-**Manual (GitHub Actions)**  
-Actions → Theme Radar Predict → Run workflow
-
-**Local**
 ```bash
-export DEEPSEEK_API_KEY=...
-export SEARXNG_URL=...   # optional
 pip install -r requirements.txt
-python -m src.run_predict
+
+# Full score + feature log (all tickers)
+python -m src.score_engine --date 2026-08-07
+
+# Per-ticker audit
+python -m src.score_engine --date 2026-08-07 --trace MP,OKLO --horizon 1d --skip-universe
+
+# Forward labels (needs later snapshots)
+python -m src.label_backfill
+
+# Attribution (needs features + labels)
+python -m src.attribution --scan-date 2026-08-07
+
+# Promote repeated lessons
+python -m src.promote_lessons
 ```
 
-## Status
+## Full universe rule
 
-- Predict stage is operational (DeepSeek + web_search tool loop)
-- Outcome / Reflect / Finviz pure-play mapper still to be built
-- Channel 1 is currently a placeholder (model relies on live search)
+Markdown tables may show top/bottom 15. **CSV feature/score/label files always contain every ticker** in the snapshot. Attribution statistics use the full cross-section.
+
+## Secrets
+
+- `FINVIZ_EXPORT` (or URL/key variants) for daily fetch
+- `DEEPSEEK_API_KEY` / `SEARXNG_URL` only for theme *predict* workflow (optional)
+
+## Timezones
+
+All market-day decisions use **America/New_York**. HKT is display-only; do not gate jobs on Hong Kong weekdays alone. NYSE holidays are listed in `src/trading_calendar.py`.

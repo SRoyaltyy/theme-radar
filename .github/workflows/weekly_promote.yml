@@ -1,0 +1,30 @@
+name: Weekly Lesson Promote
+
+on:
+  schedule:
+    # Sunday 15:00 UTC
+    - cron: "0 15 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Promote repeated candidate lessons
+        run: python -m src.promote_lessons
+      - name: Commit
+        run: |
+          git config user.name "Theme-Radar-Bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add 02_lessons/ || true
+          git commit -m "auto: weekly lesson promote" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin main

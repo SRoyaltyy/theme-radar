@@ -2,20 +2,20 @@ name: Finviz Score Delta
 
 on:
   schedule:
-    # After Finviz Daily Snapshot (20:30 UTC Mon–Fri)
+    # After Finviz snapshot (20:30 UTC)
     - cron: "0 21 * * 1-5"
   workflow_dispatch:
     inputs:
       run_date:
-        description: "Snapshot date YYYY-MM-DD (default: latest in manifest / today ET)"
+        description: "Snapshot date YYYY-MM-DD (default: manifest latest)"
         required: false
         default: ""
       trace_tickers:
-        description: "Optional comma-separated tickers for full per-rule audit (e.g. MP,OKLO)"
+        description: "Optional tickers for full audit (e.g. MP,OKLO)"
         required: false
         default: ""
       trace_horizon:
-        description: "Horizon for --trace (1d, 1w, or 1m)"
+        description: "1d / 1w / 1m"
         required: false
         default: "1d"
 
@@ -25,7 +25,7 @@ permissions:
 jobs:
   score:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -36,25 +36,37 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Gate on US trading day (ET) unless manual date set
+        id: gate
+        run: |
+          python - <<'PY'
+          import os
+          from src.trading_calendar import is_trading_day, today_et
+          manual = "${{ github.event.inputs.run_date }}".strip()
+          d = today_et()
+          # Manual runs always proceed; scheduled runs need a trading day
+          event = "${{ github.event_name }}"
+          trading = True if (event == "workflow_dispatch" or manual) else is_trading_day(d)
+          print(f"event={event} ET={d} trading={trading} manual={manual!r}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"trading={str(trading).lower()}\n")
+          PY
+
       - name: Resolve target date
+        if: steps.gate.outputs.trading == 'true'
         id: date
         run: |
           if [ -n "${{ github.event.inputs.run_date }}" ]; then
             echo "date=${{ github.event.inputs.run_date }}" >> "$GITHUB_OUTPUT"
+          elif [ -f data/snapshots/manifest.json ]; then
+            LATEST=$(python -c "import json; print(json.load(open('data/snapshots/manifest.json')).get('latest',''))")
+            echo "date=${LATEST:-$(TZ=America/New_York date +%F)}" >> "$GITHUB_OUTPUT"
           else
-            if [ -f data/snapshots/manifest.json ]; then
-              LATEST=$(python -c "import json; print(json.load(open('data/snapshots/manifest.json')).get('latest',''))")
-              if [ -n "$LATEST" ]; then
-                echo "date=$LATEST" >> "$GITHUB_OUTPUT"
-              else
-                echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
-              fi
-            else
-              echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
-            fi
+            echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Run score engine (1d / 1w / 1m)
+      - name: Score + full-universe feature log
+        if: steps.gate.outputs.trading == 'true'
         run: |
           set -e
           DATE="${{ steps.date.outputs.date }}"
@@ -68,27 +80,29 @@ jobs:
             python -m src.score_engine --date "$DATE"
           fi
 
-      - name: Print brief + traces to log
+      - name: Backfill forward labels (all scan dates with later snapshots)
+        if: steps.gate.outputs.trading == 'true'
+        run: python -m src.label_backfill
+
+      - name: Attribution (full universe IC / combos / risk)
+        if: steps.gate.outputs.trading == 'true'
+        run: python -m src.attribution
+
+      - name: Print brief + attribution to log
+        if: steps.gate.outputs.trading == 'true'
         run: |
           DATE="${{ steps.date.outputs.date }}"
-          BRIEF="01_daily/${DATE}_scan.md"
-          if [ -f "$BRIEF" ]; then
-            echo "======== $BRIEF ========"
-            cat "$BRIEF"
-          fi
-          echo "======== traces ========"
-          ls -la 01_daily/${DATE}_trace_*.md 2>/dev/null || echo "(no trace files)"
-          for f in 01_daily/${DATE}_trace_*.md; do
-            [ -f "$f" ] || continue
-            echo "----- $f -----"
-            cat "$f"
+          for f in 01_daily/${DATE}_scan.md 01_daily/${DATE}_attribution.md; do
+            [ -f "$f" ] && echo "======== $f ========" && cat "$f"
           done
+          ls -la data/features/ data/labels/ data/scores/ data/attribution/ 2>/dev/null || true
 
-      - name: Commit scores + brief + traces
+      - name: Commit all research outputs
+        if: steps.gate.outputs.trading == 'true'
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/scores/ 01_daily/ || true
-          git commit -m "auto: score delta ${{ steps.date.outputs.date }}" || echo "No changes"
+          git add data/scores/ data/features/ data/labels/ data/attribution/ 01_daily/ 02_lessons/ || true
+          git commit -m "auto: score+features+labels+attr ${{ steps.date.outputs.date }}" || echo "No changes"
           git pull --rebase origin main || true
           git push origin main
