@@ -1,0 +1,78 @@
+name: Finviz Score Delta
+
+on:
+  schedule:
+    # After Finviz Daily Snapshot (20:30 UTC Mon–Fri)
+    - cron: "0 21 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "Snapshot date YYYY-MM-DD (default: latest in manifest / today ET)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Resolve target date
+        id: date
+        run: |
+          if [ -n "${{ github.event.inputs.run_date }}" ]; then
+            echo "date=${{ github.event.inputs.run_date }}" >> "$GITHUB_OUTPUT"
+          else
+            # Prefer latest date from manifest if present
+            if [ -f data/snapshots/manifest.json ]; then
+              LATEST=$(python -c "import json; print(json.load(open('data/snapshots/manifest.json')).get('latest',''))")
+              if [ -n "$LATEST" ]; then
+                echo "date=$LATEST" >> "$GITHUB_OUTPUT"
+              else
+                echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
+              fi
+            else
+              echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+          echo "Target date: $(cat $GITHUB_OUTPUT | grep date=)"
+
+      - name: Run score engine (1d / 1w / 1m)
+        run: |
+          set -e
+          DATE="${{ steps.date.outputs.date }}"
+          echo "=== score_engine --date $DATE ==="
+          python -m src.score_engine --date "$DATE"
+
+      - name: Print 1d brief to log
+        run: |
+          DATE="${{ steps.date.outputs.date }}"
+          BRIEF="01_daily/${DATE}_scan.md"
+          if [ -f "$BRIEF" ]; then
+            echo "======== $BRIEF ========"
+            cat "$BRIEF"
+          else
+            echo "No brief at $BRIEF"
+            ls -la 01_daily/ || true
+            ls -la data/scores/ || true
+          fi
+
+      - name: Commit scores + brief
+        run: |
+          git config user.name "Theme-Radar-Bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/scores/ 01_daily/ || true
+          git commit -m "auto: score delta ${{ steps.date.outputs.date }}" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin main
