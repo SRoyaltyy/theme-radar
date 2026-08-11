@@ -80,6 +80,12 @@ jobs:
             python -m src.score_engine --date "$DATE"
           fi
 
+      - name: Universe deep labeling (segment membership + stats)
+        if: steps.gate.outputs.trading == 'true'
+        run: |
+          DATE="${{ steps.date.outputs.date }}"
+          python -m src.segments ${DATE:+--date "$DATE"}
+
       - name: Backfill forward labels (all scan dates with later snapshots)
         if: steps.gate.outputs.trading == 'true'
         run: python -m src.label_backfill
@@ -108,7 +114,7 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/scores/ data/features/ data/labels/ data/attribution/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
+          git add data/scores/ data/features/ data/labels/ data/attribution/ data/universe/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
           git commit -m "auto: score+features+labels+attr ${{ steps.date.outputs.date }}" || echo "No changes"
           git pull --rebase origin main || true
           git push origin main
