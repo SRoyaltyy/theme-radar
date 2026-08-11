@@ -102,6 +102,11 @@ jobs:
             python -m src.attribution
           fi
 
+      - name: Aggregate factor report + weight learning
+        run: |
+          python -m src.attribution_aggregate
+          python -m src.weight_learner
+
       - name: Print results to log
         run: |
           DATE="${{ github.event.inputs.scan_date }}"
@@ -141,7 +146,7 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/features/ data/scores/ data/labels/ data/attribution/ 01_daily/ 02_lessons/ || true
+          git add data/features/ data/scores/ data/labels/ data/attribution/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
           MSG="auto: backtest ${{ github.event.inputs.scan_date }}"
           [ -z "${{ github.event.inputs.scan_date }}" ] && MSG="auto: backtest all eligible dates"
           git commit -m "$MSG" || echo "No changes"

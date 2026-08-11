@@ -6,7 +6,11 @@ Writes:
   01_daily/YYYY-MM-DD_attribution.md
   02_lessons/candidate/YYYY-MM-DD_lesson.md (provisional)
 
-CLI: python -m src.attribution [--scan-date YYYY-MM-DD]
+CLI: python -m src.attribution [--scan-date YYYY-MM-DD] [--horizon 1d|2d|3d|auto]
+
+Every report states EXPLICITLY: the scan date whose features were used, the
+prior snapshot the deltas were computed against, which forward horizon was
+graded, and the exact calendar dates that horizon covers.
 """
 from __future__ import annotations
 
@@ -63,13 +67,32 @@ def _feature_cols(df: pd.DataFrame) -> list[str]:
     return cols
 
 
-def analyze(scan_date: str, df: pd.DataFrame) -> dict:
-    label = "fwd_3d" if df["fwd_3d"].notna().sum() >= 30 else (
-        "fwd_2d" if df.get("fwd_2d", pd.Series(dtype=float)).notna().sum() >= 30 else "fwd_1d"
-    )
+def pick_label(df: pd.DataFrame, horizon: str = "auto") -> str:
+    """horizon: '1d'/'2d'/'3d' forces fwd_<horizon>; 'auto' keeps the legacy
+    deepest-label-with-data preference (3d → 2d → 1d)."""
+    if horizon in ("1d", "2d", "3d"):
+        return f"fwd_{horizon}"
+    if df["fwd_3d"].notna().sum() >= 30:
+        return "fwd_3d"
+    if df.get("fwd_2d", pd.Series(dtype=float)).notna().sum() >= 30:
+        return "fwd_2d"
+    return "fwd_1d"
+
+
+def analyze(scan_date: str, df: pd.DataFrame, horizon: str = "auto") -> dict:
+    label = pick_label(df, horizon)
     y = df[label]
     n = int(y.notna().sum())
-    result = {"scan_date": scan_date, "label": label, "n": n, "features": []}
+    hnum = label[-2]  # '1' | '2' | '3'
+    pair_date = (df["pair_date"].mode().iloc[0]
+                 if "pair_date" in df.columns and df["pair_date"].notna().any()
+                 else "?")
+    label_date = (df[f"label_date_{hnum}"].mode().iloc[0]
+                  if f"label_date_{hnum}" in df.columns
+                  and df[f"label_date_{hnum}"].notna().any() else "?")
+    result = {"scan_date": scan_date, "label": label, "n": n,
+              "pair_date": pair_date, "label_date": label_date,
+              "features": []}
 
     # score calibration
     if "total_score" in df.columns:
@@ -88,7 +111,9 @@ def analyze(scan_date: str, df: pd.DataFrame) -> dict:
             })
         result["score_calibration"] = cal
 
-    # univariate ICs
+    # univariate ICs (overall + within up-movers / within down-movers)
+    y_up = y > 0
+    y_dn = y < 0
     for col in _feature_cols(df):
         if col == "total_score":
             continue
@@ -103,6 +128,8 @@ def analyze(scan_date: str, df: pd.DataFrame) -> dict:
         result["features"].append({
             "feature": col,
             "ic": ic,
+            "ic_within_up": _spearman(df[col][y_up], y[y_up]),
+            "ic_within_down": _spearman(df[col][y_dn], y[y_dn]),
             "mean_fwd_when_pos": mean_up,
             "mean_fwd_when_neg": mean_dn,
             "n_pos": int((up & y.notna()).sum()),
@@ -177,8 +204,18 @@ def write_ic_csv(scan_date: str, result: dict) -> Path:
 def write_md(result: dict) -> Path:
     d = result["scan_date"]
     L = [f"# Factor attribution — {d}", ""]
-    L.append(f"Full-universe analysis. Label=`{result['label']}`, n={result['n']}.")
+    L.append(f"**What this report measures, exactly:** features computed from "
+             f"the **{d}** Finviz snapshot (deltas vs the **{result.get('pair_date', '?')}** "
+             f"snapshot), graded against `{result['label']}` = the return from "
+             f"**{d}** to **{result.get('label_date', '?')}** "
+             f"(n={result['n']} stocks with valid labels).")
     L.append("Provisional until multiple scan dates agree.")
+    L.append("")
+    L.append("_Column guide: **IC** = Spearman rank correlation between the "
+             "feature and the forward return (whole universe); **IC↑** = IC "
+             "computed only among stocks that went UP; **IC↓** = IC only "
+             "among stocks that went DOWN. A high IC↑ means the feature "
+             "ranks winners among winners._")
     L.append("")
     if "score_ic" in result:
         L.append(f"## Score calibration")
@@ -191,13 +228,22 @@ def write_md(result: dict) -> Path:
         L.append("")
     L.append("## Top |IC| features (full universe)")
     L.append("")
-    L.append("| Feature | IC | Mean fwd when + | Mean fwd when − | n+/n− |")
-    L.append("|---|---|---|---|---|")
+    L.append("| Feature | IC | IC↑ | IC↓ | Mean fwd when + | Mean fwd when − | n+/n− |")
+    L.append("|---|---|---|---|---|---|---|")
+
+    def _ic_s(v: float) -> str:
+        return f"{v:+.4f}" if v == v else "n/a"
+
+    def _pct_s(v: float) -> str:
+        return f"{v * 100:.2f}%" if v == v else "n/a"
+
     for r in result.get("features", [])[:25]:
         L.append(
-            f"| {r['feature']} | {r['ic']:+.4f} | "
-            f"{r['mean_fwd_when_pos']*100 if r['mean_fwd_when_pos']==r['mean_fwd_when_pos'] else float('nan'):.2f}% | "
-            f"{r['mean_fwd_when_neg']*100 if r['mean_fwd_when_neg']==r['mean_fwd_when_neg'] else float('nan'):.2f}% | "
+            f"| {r['feature']} | {_ic_s(r['ic'])} | "
+            f"{_ic_s(r.get('ic_within_up', float('nan')))} | "
+            f"{_ic_s(r.get('ic_within_down', float('nan')))} | "
+            f"{_pct_s(r['mean_fwd_when_pos'])} | "
+            f"{_pct_s(r['mean_fwd_when_neg'])} | "
             f"{r['n_pos']}/{r['n_neg']} |"
         )
     L.append("")
@@ -262,7 +308,7 @@ def write_candidate_lesson(result: dict) -> Path | None:
     return path
 
 
-def run(scan_date: str) -> None:
+def run(scan_date: str, horizon: str = "auto") -> None:
     df = _load_joined(scan_date)
     if df is None:
         print(f"[attr] {scan_date}: need features + labels — skip")
@@ -270,7 +316,11 @@ def run(scan_date: str) -> None:
     if df["fwd_1d"].notna().sum() < 30 and df.get("fwd_3d", pd.Series(dtype=float)).notna().sum() < 30:
         print(f"[attr] {scan_date}: insufficient labeled rows")
         return
-    result = analyze(scan_date, df)
+    result = analyze(scan_date, df, horizon=horizon)
+    if result["n"] < 30:
+        print(f"[attr] {scan_date}: label {result['label']} has only "
+              f"{result['n']} valid rows — skip")
+        return
     write_ic_csv(scan_date, result)
     md = write_md(result)
     les = write_candidate_lesson(result)
@@ -280,12 +330,16 @@ def run(scan_date: str) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--scan-date", default=None)
+    ap.add_argument("--horizon", default="auto",
+                    choices=["auto", "1d", "2d", "3d"],
+                    help="which forward return to grade against; "
+                         "auto = deepest label with >=30 rows")
     args = ap.parse_args()
     if args.scan_date:
-        run(args.scan_date)
+        run(args.scan_date, horizon=args.horizon)
         return
     for p in sorted(FEATURES_DIR.glob("*_1d.csv")):
-        run(p.stem.replace("_1d", ""))
+        run(p.stem.replace("_1d", ""), horizon=args.horizon)
 
 
 if __name__ == "__main__":

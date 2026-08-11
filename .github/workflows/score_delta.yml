@@ -88,6 +88,12 @@ jobs:
         if: steps.gate.outputs.trading == 'true'
         run: python -m src.attribution
 
+      - name: Aggregate factor report + weight learning
+        if: steps.gate.outputs.trading == 'true'
+        run: |
+          python -m src.attribution_aggregate
+          python -m src.weight_learner
+
       - name: Print brief + attribution to log
         if: steps.gate.outputs.trading == 'true'
         run: |
@@ -102,7 +108,7 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/scores/ data/features/ data/labels/ data/attribution/ 01_daily/ 02_lessons/ || true
+          git add data/scores/ data/features/ data/labels/ data/attribution/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
           git commit -m "auto: score+features+labels+attr ${{ steps.date.outputs.date }}" || echo "No changes"
           git pull --rebase origin main || true
           git push origin main

@@ -43,6 +43,24 @@ SCORES_DIR = config.DATA / "scores"
 CATEGORIES = ["price", "flow", "technical", "positioning", "valuation",
               "fundamental", "catalyst"]
 
+_WEIGHT_OVERRIDES: dict | None = None
+
+
+def _override_mult(rule: dict) -> float:
+    """Learned weight multiplier from src/weight_learner.py
+    (data/weight_overrides.json). 1.0 when absent — champion behavior.
+    Keyed '<field>|<kind>' because the same field can appear as both a
+    level and a delta rule."""
+    global _WEIGHT_OVERRIDES
+    if _WEIGHT_OVERRIDES is None:
+        try:
+            _WEIGHT_OVERRIDES = json.loads(
+                (config.DATA / "weight_overrides.json")
+                .read_text(encoding="utf-8")).get("multipliers", {})
+        except (OSError, ValueError):
+            _WEIGHT_OVERRIDES = {}
+    return float(_WEIGHT_OVERRIDES.get(f"{rule['field']}|{rule['kind']}", 1.0))
+
 
 def snapshot_dates() -> dict[str, Path]:
     out = {}
@@ -233,6 +251,7 @@ def score_ticker(now: pd.Series, then: pd.Series | None, horizon: str,
         audit = {
             "field": field, "kind": kind, "category": rule["category"],
             "speed": rule["speed"], "weight": rule["weight"],
+            "weight_mult": _override_mult(rule),
             "polarity": rule["polarity"], "note": rule.get("note", ""),
             "now": None, "then": None, "raw": None, "deadzone": None,
             "direction": None, "signal": 0.0, "points": 0.0,
@@ -325,7 +344,7 @@ def score_ticker(now: pd.Series, then: pd.Series | None, horizon: str,
                 s = 0.0
                 audit["override"] = "RSI already overbought: rising RSI earns 0"
 
-        p = s * rule["weight"]
+        p = s * rule["weight"] * _override_mult(rule)
         audit["signal"] = s
         audit["points"] = p
         if collect_trace:

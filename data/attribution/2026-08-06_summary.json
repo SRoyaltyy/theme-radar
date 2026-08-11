@@ -2,10 +2,14 @@
   "scan_date": "2026-08-06",
   "label": "fwd_2d",
   "n": 11518,
+  "pair_date": "?",
+  "label_date": "2026-08-10",
   "features": [
     {
       "feature": "Performance (Week)",
       "ic": 0.18200025236155637,
+      "ic_within_up": 0.2194264903185598,
+      "ic_within_down": -0.03172288179361114,
       "mean_fwd_when_pos": 0.01280657618462729,
       "mean_fwd_when_neg": 0.10625607975349684,
       "n_pos": 7796,
@@ -14,6 +18,8 @@
     {
       "feature": "upside_pct_lvl",
       "ic": 0.13568840689138617,
+      "ic_within_up": 0.2750078835540824,
+      "ic_within_down": -0.2780004568357469,
       "mean_fwd_when_pos": 0.044603916342696975,
       "mean_fwd_when_neg": 0.006247833531106515,
       "n_pos": 4270,
@@ -22,6 +28,8 @@
     {
       "feature": "Relative Strength Index (14)",
       "ic": 0.11021580997524456,
+      "ic_within_up": -0.1790845177851208,
+      "ic_within_down": 0.05282747773986404,
       "mean_fwd_when_pos": 0.041587368773504885,
       "mean_fwd_when_neg": NaN,
       "n_pos": 11422,
@@ -30,6 +38,8 @@
     {
       "feature": "Performance (Month)",
       "ic": 0.05699659898101152,
+      "ic_within_up": -0.006948234873181769,
+      "ic_within_down": 0.09394861651421807,
       "mean_fwd_when_pos": 0.008477921902060752,
       "mean_fwd_when_neg": 0.08749450761513582,
       "n_pos": 6468,
@@ -38,6 +48,8 @@
     {
       "feature": "Short Float",
       "ic": 0.055113117894277475,
+      "ic_within_up": 0.298535052474624,
+      "ic_within_down": -0.1585543483795132,
       "mean_fwd_when_pos": 0.07569571681578648,
       "mean_fwd_when_neg": NaN,
       "n_pos": 5674,
@@ -46,6 +58,8 @@
     {
       "feature": "Institutional Transactions",
       "ic": 0.02508863135943655,
+      "ic_within_up": 0.07939444305747648,
+      "ic_within_down": -0.006730215242003422,
       "mean_fwd_when_pos": 0.138989666718211,
       "mean_fwd_when_neg": 0.030254680485685755,
       "n_pos": 2535,
@@ -54,6 +68,8 @@
     {
       "feature": "Relative Volume",
       "ic": -0.010547236938676083,
+      "ic_within_up": 0.09237698659799128,
+      "ic_within_down": -0.10402363897887669,
       "mean_fwd_when_pos": 0.04237405337137635,
       "mean_fwd_when_neg": NaN,
       "n_pos": 11231,
