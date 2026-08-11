@@ -1,6 +1,6 @@
 # Factor report — multi-date aggregate
 
-_Generated 2026-08-11 03:42 EDT from 2 scan dates._
+_Generated 2026-08-11 17:37 EDT from 3 scan dates._
 
 How to read: **IC** = Spearman rank correlation between the factor and the forward return, computed per scan date then averaged (mean IC). **ICIR** = mean/std across dates — the consistency score; |ICIR| above ~0.5 with sign consistency ≥ 2/3 is what we call a real signal. **spread** = average forward return when the factor is positive minus when negative. Factors marked ⚠️ flips sign between dates — treat as noise.
 
@@ -8,87 +8,125 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 
 | Scan date (features) | Deltas vs | 1d label | 2d label | 3d label | Stocks |
 |---|---|---|---|---|---|
-| 2026-08-06 | — | 2026-08-07 | 2026-08-10 | — | 11543 |
-| 2026-08-07 | 2026-08-06 | 2026-08-10 | — | — | 11525 |
+| 2026-08-06 | — | 2026-08-07 | 2026-08-10 | 2026-08-11 | 11543 |
+| 2026-08-07 | 2026-08-06 | 2026-08-10 | 2026-08-11 | — | 11525 |
+| 2026-08-10 | 2026-08-07 | 2026-08-11 | — | — | 11533 |
 
 ## Composite score effectiveness (total_score IC)
 
 | Scan date | 1d IC | 2d IC | 3d IC |
 |---|---|---|---|
-| 2026-08-06 | +0.0958 | +0.0636 | — |
-| 2026-08-07 | -0.0339 | — | — |
-- **1d**: mean IC **+0.0309**, ICIR +0.48, sign consistency 50% over 2 dates
-- **2d**: mean IC **+0.0636**, ICIR +nan, sign consistency 100% over 1 dates
+| 2026-08-06 | +0.0958 | +0.0636 | +0.0815 |
+| 2026-08-07 | -0.0339 | -0.0242 | — |
+| 2026-08-10 | -0.0491 | — | — |
+- **1d**: mean IC **+0.0042**, ICIR +0.07, sign consistency 33% over 3 dates
+- **2d**: mean IC **+0.0197**, ICIR +0.45, sign consistency 50% over 2 dates
+- **3d**: mean IC **+0.0815**, ICIR +nan, sign consistency 100% over 1 dates
 
 ## Factor ranking — 1d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
-| Beta | -0.1566 | +nan | 100% | 1 | +2.89% | ⚠️ flips / too few dates |
-| Volatility (Month) | -0.1242 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| d_Performance (Week) | -0.1212 | +nan | 100% | 1 | -7.72% | ⚠️ flips / too few dates |
-| d_20-Day Simple Moving Average | -0.1028 | +nan | 100% | 1 | -12.05% | ⚠️ flips / too few dates |
-| Total Debt/Equity | -0.0936 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Performance (Week) | +0.0910 | +0.64 | 50% | 2 | -7.80% | ⚠️ flips / too few dates |
-| d_Performance (Quarter) | -0.0875 | +nan | 100% | 1 | -15.17% | ⚠️ flips / too few dates |
-| 20-Day Simple Moving Average | +0.0841 | +1.57 | 100% | 2 | -5.69% | ✅ consistent |
-| true_ret | -0.0831 | +nan | 100% | 1 | -10.74% | ⚠️ flips / too few dates |
-| d_50-Day Simple Moving Average | -0.0829 | +nan | 100% | 1 | -11.97% | ⚠️ flips / too few dates |
-| d_200-Day Simple Moving Average | -0.0815 | +nan | 100% | 1 | -12.30% | ⚠️ flips / too few dates |
-| upside_pct | +0.0807 | +1.09 | 100% | 2 | +2.39% | ✅ consistent |
-| upside_pct_lvl | +0.0807 | +1.09 | 100% | 2 | +2.37% | ✅ consistent |
-| d_Performance (YTD) | -0.0806 | +nan | 100% | 1 | -9.69% | ⚠️ flips / too few dates |
-| Relative Strength Index (14) | +0.0748 | +1.36 | 100% | 2 | +nan% | ✅ consistent |
-| d_Price | -0.0688 | +nan | 100% | 1 | -10.74% | ⚠️ flips / too few dates |
-| Analyst Recom | -0.0616 | -7.30 | 100% | 2 | +nan% | ✅ consistent |
-| d_Forward P/E | -0.0614 | +nan | 100% | 1 | -0.30% | ⚠️ flips / too few dates |
-| cat_copper_metals | +0.0550 | +9.39 | 100% | 2 | +nan% | ✅ consistent |
-| d_Market Cap | -0.0548 | +nan | 100% | 1 | -14.67% | ⚠️ flips / too few dates |
-| Sales Growth Quarter Over Quarter | +0.0527 | +5.10 | 100% | 2 | -1.79% | ✅ consistent |
-| Performance (Month) | +0.0501 | +0.90 | 50% | 2 | -4.53% | ⚠️ flips / too few dates |
-| Profit Margin | -0.0500 | -0.69 | 50% | 2 | -11.31% | ⚠️ flips / too few dates |
-| Sales Year Over Year TTM | +0.0492 | +12.55 | 100% | 2 | +0.45% | ✅ consistent |
-| Performance (YTD) | -0.0455 | -3.17 | 100% | 2 | -5.02% | ✅ consistent |
-| n_neg | -0.0451 | -3.11 | 100% | 2 | +nan% | ✅ consistent |
-| w_neg | -0.0431 | -4.64 | 100% | 2 | +nan% | ✅ consistent |
-| Gross Margin | +0.0393 | +8.40 | 100% | 2 | -4.39% | ✅ consistent |
-| d_Relative Strength Index (14) | -0.0388 | +nan | 100% | 1 | -13.70% | ⚠️ flips / too few dates |
-| d_Gross Margin | +0.0378 | +nan | 100% | 1 | +0.91% | ⚠️ flips / too few dates |
+| d_Performance (Week) | -0.1012 | -5.06 | 100% | 2 | -3.60% | ✅ consistent |
+| d_20-Day Simple Moving Average | -0.0955 | -13.16 | 100% | 2 | -5.89% | ✅ consistent |
+| d_Performance (YTD) | -0.0926 | -7.68 | 100% | 2 | -4.75% | ✅ consistent |
+| true_ret | -0.0916 | -10.81 | 100% | 2 | -5.25% | ✅ consistent |
+| d_200-Day Simple Moving Average | -0.0889 | -11.97 | 100% | 2 | -6.03% | ✅ consistent |
+| d_50-Day Simple Moving Average | -0.0856 | -31.36 | 100% | 2 | -5.86% | ✅ consistent |
+| d_Price | -0.0853 | -5.17 | 100% | 2 | -5.25% | ✅ consistent |
+| upside_pct | +0.0735 | +1.20 | 100% | 3 | +1.82% | ✅ consistent |
+| upside_pct_lvl | +0.0735 | +1.20 | 100% | 3 | +1.81% | ✅ consistent |
+| Performance (Week) | +0.0623 | +0.51 | 67% | 3 | -5.20% | ✅ consistent |
+| Total Debt/Equity | -0.0590 | -1.71 | 100% | 2 | n/a | ✅ consistent |
+| Analyst Recom | -0.0582 | -6.94 | 100% | 3 | n/a | ✅ consistent |
+| d_Performance (Quarter) | -0.0559 | -1.77 | 100% | 2 | -7.33% | ✅ consistent |
+| d_Relative Strength Index (14) | -0.0553 | -3.35 | 100% | 2 | -6.75% | ✅ consistent |
+| Beta | -0.0534 | -0.52 | 50% | 2 | +1.57% | ⚠️ flips / too few dates |
+| Profit Margin | -0.0504 | -0.86 | 67% | 3 | -8.02% | ✅ consistent |
+| d_Forward P/E | -0.0491 | -3.99 | 100% | 2 | -0.24% | ✅ consistent |
+| 20-Day Simple Moving Average | +0.0457 | +0.66 | 67% | 3 | -3.95% | ✅ consistent |
+| d_Market Cap | -0.0444 | -4.28 | 100% | 2 | -6.97% | ✅ consistent |
+| d_Volatility (Month) | +0.0440 | +nan | 100% | 1 | +0.20% | ⚠️ flips / too few dates |
+| Sales Growth Quarter Over Quarter | +0.0438 | +2.89 | 100% | 3 | -1.04% | ✅ consistent |
+| Short Float | +0.0428 | +0.42 | 67% | 3 | n/a | ✅ consistent |
+| Sales Year Over Year TTM | +0.0421 | +3.96 | 100% | 3 | +0.44% | ✅ consistent |
+| price_score | -0.0403 | -1.69 | 100% | 2 | -6.20% | ✅ consistent |
+| catalyst_score | +0.0386 | +1.02 | 67% | 3 | -0.75% | ✅ consistent |
+| n_catalysts | +0.0385 | +1.02 | 67% | 3 | n/a | ✅ consistent |
+| d_Institutional Ownership | +0.0339 | +1.52 | 100% | 2 | +0.45% | ✅ consistent |
+| Performance (Quarter) | -0.0324 | -0.76 | 67% | 3 | -3.29% | ✅ consistent |
+| cat_copper_metals | +0.0321 | +0.98 | 67% | 3 | n/a | ✅ consistent |
+| Forward P/E | +0.0281 | +0.66 | 67% | 3 | n/a | ✅ consistent |
 
 ## Factor ranking — 2d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
-| Performance (Week) | +0.1820 | +nan | 100% | 1 | -9.34% | ⚠️ flips / too few dates |
-| 20-Day Simple Moving Average | +0.1492 | +nan | 100% | 1 | -7.86% | ⚠️ flips / too few dates |
-| upside_pct_lvl | +0.1357 | +nan | 100% | 1 | +3.84% | ⚠️ flips / too few dates |
-| upside_pct | +0.1357 | +nan | 100% | 1 | +3.88% | ⚠️ flips / too few dates |
-| Relative Strength Index (14) | +0.1102 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Profit Margin | -0.1013 | +nan | 100% | 1 | -20.12% | ⚠️ flips / too few dates |
-| Analyst Recom | -0.0965 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| technical_score | +0.0857 | +nan | 100% | 1 | -12.16% | ⚠️ flips / too few dates |
-| cat_copper_metals | +0.0684 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| total_score | +0.0636 | +nan | 100% | 1 | -1.74% | ⚠️ flips / too few dates |
-| Sales Year Over Year TTM | +0.0621 | +nan | 100% | 1 | -0.41% | ⚠️ flips / too few dates |
-| w_pos | +0.0618 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| n_neg | -0.0590 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Sales Growth Quarter Over Quarter | +0.0584 | +nan | 100% | 1 | -2.52% | ⚠️ flips / too few dates |
-| Performance (Month) | +0.0570 | +nan | 100% | 1 | -7.90% | ⚠️ flips / too few dates |
-| Short Float | +0.0551 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Institutional Ownership | -0.0503 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| n_pos | +0.0459 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Performance (YTD) | -0.0440 | +nan | 100% | 1 | -8.70% | ⚠️ flips / too few dates |
-| Performance (Quarter) | -0.0440 | +nan | 100% | 1 | -7.63% | ⚠️ flips / too few dates |
-| 50-Day Simple Moving Average | +0.0421 | +nan | 100% | 1 | -7.53% | ⚠️ flips / too few dates |
-| w_neg | -0.0389 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Target Price | -0.0387 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Gross Margin | +0.0340 | +nan | 100% | 1 | -8.66% | ⚠️ flips / too few dates |
-| cat_data_center_power | -0.0303 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| cat_defense | +0.0298 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| 200-Day Simple Moving Average | -0.0296 | +nan | 100% | 1 | -8.22% | ⚠️ flips / too few dates |
-| catalyst_score | +0.0282 | +nan | 100% | 1 | -2.17% | ⚠️ flips / too few dates |
-| n_catalysts | +0.0281 | +nan | 100% | 1 | +nan% | ⚠️ flips / too few dates |
-| Institutional Transactions | +0.0251 | +nan | 100% | 1 | +10.87% | ⚠️ flips / too few dates |
+| Beta | -0.0989 | +nan | 100% | 1 | +3.12% | ⚠️ flips / too few dates |
+| Total Debt/Equity | -0.0901 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| upside_pct_lvl | +0.0885 | +1.87 | 100% | 2 | +3.52% | ✅ consistent |
+| upside_pct | +0.0885 | +1.87 | 100% | 2 | +3.55% | ✅ consistent |
+| d_Price | -0.0872 | +nan | 100% | 1 | -11.85% | ⚠️ flips / too few dates |
+| Analyst Recom | -0.0827 | -5.99 | 100% | 2 | n/a | ✅ consistent |
+| d_Performance (Week) | -0.0814 | +nan | 100% | 1 | -7.20% | ⚠️ flips / too few dates |
+| Performance (Week) | +0.0814 | +0.81 | 50% | 2 | -12.18% | ⚠️ flips / too few dates |
+| Relative Strength Index (14) | +0.0811 | +2.79 | 100% | 2 | n/a | ✅ consistent |
+| 20-Day Simple Moving Average | +0.0787 | +1.11 | 100% | 2 | -9.15% | ✅ consistent |
+| d_20-Day Simple Moving Average | -0.0772 | +nan | 100% | 1 | -12.55% | ⚠️ flips / too few dates |
+| d_200-Day Simple Moving Average | -0.0758 | +nan | 100% | 1 | -13.15% | ⚠️ flips / too few dates |
+| d_50-Day Simple Moving Average | -0.0733 | +nan | 100% | 1 | -12.98% | ⚠️ flips / too few dates |
+| d_Performance (YTD) | -0.0713 | +nan | 100% | 1 | -10.32% | ⚠️ flips / too few dates |
+| true_ret | -0.0711 | +nan | 100% | 1 | -11.85% | ⚠️ flips / too few dates |
+| Profit Margin | -0.0641 | -1.72 | 100% | 2 | -19.90% | ✅ consistent |
+| Sales Growth Quarter Over Quarter | +0.0571 | +42.78 | 100% | 2 | -2.45% | ✅ consistent |
+| Sales Year Over Year TTM | +0.0529 | +5.82 | 100% | 2 | +0.82% | ✅ consistent |
+| Performance (Month) | +0.0525 | +11.75 | 100% | 2 | -7.82% | ✅ consistent |
+| Institutional Ownership | -0.0522 | -26.39 | 100% | 2 | n/a | ✅ consistent |
+| cat_copper_metals | +0.0474 | +2.25 | 100% | 2 | n/a | ✅ consistent |
+| d_Relative Strength Index (14) | -0.0437 | +nan | 100% | 1 | -14.56% | ⚠️ flips / too few dates |
+| d_Performance (Quarter) | -0.0424 | +nan | 100% | 1 | -15.47% | ⚠️ flips / too few dates |
+| 50-Day Simple Moving Average | +0.0368 | +6.90 | 100% | 2 | -7.81% | ✅ consistent |
+| n_neg | -0.0318 | -1.17 | 100% | 2 | n/a | ✅ consistent |
+| d_Market Cap | -0.0317 | +nan | 100% | 1 | -14.90% | ⚠️ flips / too few dates |
+| d_Gross Margin | +0.0309 | +nan | 100% | 1 | +0.85% | ⚠️ flips / too few dates |
+| d_Forward P/E | -0.0299 | +nan | 100% | 1 | -0.20% | ⚠️ flips / too few dates |
+| Volatility (Month) | -0.0288 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| d_Sales Growth Quarter Over Quarter | +0.0273 | +nan | 100% | 1 | +1.54% | ⚠️ flips / too few dates |
+
+## Factor ranking — 3d forward returns
+
+| Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
+|---|---|---|---|---|---|---|
+| Performance (Week) | +0.2028 | +nan | 100% | 1 | -9.54% | ⚠️ flips / too few dates |
+| upside_pct | +0.1338 | +nan | 100% | 1 | +4.20% | ⚠️ flips / too few dates |
+| upside_pct_lvl | +0.1337 | +nan | 100% | 1 | +4.16% | ⚠️ flips / too few dates |
+| 20-Day Simple Moving Average | +0.1224 | +nan | 100% | 1 | -8.29% | ⚠️ flips / too few dates |
+| Profit Margin | -0.1143 | +nan | 100% | 1 | -21.36% | ⚠️ flips / too few dates |
+| Analyst Recom | -0.1084 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| w_pos | +0.0836 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| total_score | +0.0815 | +nan | 100% | 1 | -1.78% | ⚠️ flips / too few dates |
+| technical_score | +0.0757 | +nan | 100% | 1 | -12.71% | ⚠️ flips / too few dates |
+| n_pos | +0.0743 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Short Float | +0.0737 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| n_neg | -0.0658 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Sales Growth Quarter Over Quarter | +0.0643 | +nan | 100% | 1 | -2.04% | ⚠️ flips / too few dates |
+| Relative Strength Index (14) | +0.0623 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Sales Year Over Year TTM | +0.0607 | +nan | 100% | 1 | +0.16% | ⚠️ flips / too few dates |
+| cat_copper_metals | +0.0591 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Performance (Quarter) | -0.0537 | +nan | 100% | 1 | -8.14% | ⚠️ flips / too few dates |
+| catalyst_score | +0.0531 | +nan | 100% | 1 | -1.56% | ⚠️ flips / too few dates |
+| n_catalysts | +0.0530 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| valuation_score | +0.0525 | +nan | 100% | 1 | +4.54% | ⚠️ flips / too few dates |
+| w_neg | -0.0486 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Institutional Transactions | +0.0453 | +nan | 100% | 1 | +10.78% | ⚠️ flips / too few dates |
+| Forward P/E | +0.0449 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Institutional Ownership | -0.0432 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Target Price | -0.0376 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| Average Volume | +0.0372 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| cat_defense | +0.0372 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| cat_hbm_memory | +0.0270 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
+| 200-Day Simple Moving Average | -0.0238 | +nan | 100% | 1 | -8.66% | ⚠️ flips / too few dates |
+| cat_nuclear_smr | +0.0235 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
 
 ## What to do with this
 
