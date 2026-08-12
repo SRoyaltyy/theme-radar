@@ -5,8 +5,8 @@ on:
     inputs:
       scan_date:
         description: >
-          Scan date to grade (YYYY-MM-DD). Leave empty to backfill+attribute ALL
-          feature dates that have later snapshots.
+          Signal as-of date (YYYY-MM-DD). Leave empty to backfill+attribute+suggestion-check
+          ALL feature dates that have later snapshots.
         required: false
         default: ""
       ensure_features:
@@ -62,7 +62,7 @@ jobs:
           set -e
           python - <<'PY'
           from pathlib import Path
-          from src.score_engine import snapshot_dates
+          from src.snapshots import snapshot_dates
           from src.feature_log import FEATURES_DIR
           import subprocess, sys
           dates = sorted(snapshot_dates().keys())
@@ -75,10 +75,10 @@ jobs:
               print(f"[run] score_engine --date {d}")
               r = subprocess.run([sys.executable, "-m", "src.score_engine", "--date", d])
               if r.returncode != 0:
-                  print(f"[warn] score failed for {d} (missing prior pair is OK for oldest day)")
+                  raise SystemExit(r.returncode)
           PY
 
-      - name: Label backfill (forward returns)
+      - name: Label backfill (forward returns after signal)
         run: |
           set -e
           DATE="${{ github.event.inputs.scan_date }}"
@@ -102,6 +102,18 @@ jobs:
             python -m src.attribution
           fi
 
+      - name: Suggestion check (top/bottom score vs forward returns)
+        run: |
+          set -e
+          DATE="${{ github.event.inputs.scan_date }}"
+          if [ -n "$DATE" ]; then
+            echo "=== suggestion_check --scan-date $DATE ==="
+            python -m src.suggestion_check --scan-date "$DATE"
+          else
+            echo "=== suggestion_check (all eligible signal dates) ==="
+            python -m src.suggestion_check
+          fi
+
       - name: Aggregate factor report + weight learning
         run: |
           python -m src.attribution_aggregate
@@ -120,7 +132,8 @@ jobs:
               data/labels/${DATE}_fwd.meta.json \
               data/attribution/${DATE}_ic.csv \
               data/attribution/${DATE}_summary.json \
-              01_daily/${DATE}_attribution.md
+              01_daily/${DATE}_attribution.md \
+              01_daily/${DATE}_suggestion_check.md
             do
               if [ -f "$f" ]; then
                 echo "======== $f ========"
@@ -135,7 +148,7 @@ jobs:
               fi
             done
           else
-            for f in 01_daily/*_attribution.md; do
+            for f in 01_daily/*_attribution.md 01_daily/*_suggestion_check.md 01_daily/_suggestion_check_BOARD.md; do
               [ -f "$f" ] || continue
               echo "======== $f ========"
               cat "$f"
