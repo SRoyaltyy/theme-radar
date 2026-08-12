@@ -1,0 +1,51 @@
+name: Composite Rank
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Snapshot as-of date (YYYY-MM-DD). Empty = latest."
+        required: false
+        default: ""
+  schedule:
+    - cron: "20 21 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  rank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Run composite rank
+        run: |
+          set -e
+          DATE="${{ github.event.inputs.date }}"
+          if [ -n "$DATE" ]; then
+            python -m src.composite_rank --date "$DATE"
+          else
+            python -m src.composite_rank
+          fi
+          echo "======== report ========"
+          ls -la 01_daily/*_composite_rank.md 2>/dev/null | tail -5
+          f=$(ls -1t 01_daily/*_composite_rank.md 2>/dev/null | head -1)
+          if [ -n "$f" ]; then head -80 "$f"; fi
+
+      - name: Commit
+        run: |
+          git config user.name "Theme-Radar-Bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add 01_daily/*_composite_rank.md data/composite/ || true
+          git commit -m "auto: composite residual rank" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin main
