@@ -1,4 +1,8 @@
-"""Theme Radar score engine — bootstrap from known-good commit."""
+"""Theme Radar score engine — bootstrap known-good core, then explicit scan.md.
+
+Core implementation is loaded from commit 64eafa9 (stable scoring).
+scan_report.brief overrides the old brief so daily scan.md is layman-explicit.
+"""
 from __future__ import annotations
 
 import urllib.request
@@ -25,3 +29,6 @@ def _ensure() -> str:
 
 
 exec(compile(_ensure(), str(_CACHE), "exec"), globals())
+
+# Override human report with explicit pair / Ret% / driver wording
+from .scan_report import brief as brief  # noqa: E402, F811
