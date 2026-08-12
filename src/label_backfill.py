@@ -20,7 +20,7 @@ import pandas as pd
 
 from . import config
 from .finviz_delta import normalize_frame
-from .score_engine import snapshot_dates
+from .snapshots import snapshot_dates
 
 LABELS_DIR = config.DATA / "labels"
 FEATURES_DIR = config.DATA / "features"
@@ -48,7 +48,6 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
     except ValueError:
         return None
 
-    # next snapshot dates = prediction days for 1d / 2d / 3d horizons
     forward = sorted_dates[idx + 1: idx + 4]
     if not forward:
         print(f"[labels] {scan_date}: no later snapshots yet — skip "
@@ -64,11 +63,10 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
         entry = p0.get(t, np.nan)
         row = {
             "Ticker": t,
-            # canonical
             "scan_date": scan_date,
             "signal_asof": scan_date,
             "entry_price": entry,
-            "price_T": entry,  # legacy alias
+            "price_T": entry,
         }
         for i, (pred_day, mp) in enumerate(zip(forward, maps), start=1):
             exit_px = mp.get(t, np.nan)
@@ -78,10 +76,10 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
                 else np.nan
             )
             row[f"prediction_day_{i}d"] = pred_day
-            row[f"label_date_{i}"] = pred_day  # legacy
+            row[f"label_date_{i}"] = pred_day
             row[f"exit_price_{i}d"] = exit_px
-            row[f"price_T{i}"] = exit_px  # legacy
-            row[f"fwd_{i}d"] = long_ret  # long return entry->exit
+            row[f"price_T{i}"] = exit_px
+            row[f"fwd_{i}d"] = long_ret
             row[f"short_fwd_{i}d"] = (-long_ret) if long_ret == long_ret else np.nan
         for i in range(len(forward) + 1, 4):
             row[f"prediction_day_{i}d"] = ""
