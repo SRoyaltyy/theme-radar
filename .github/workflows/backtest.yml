@@ -43,17 +43,12 @@ jobs:
           ls -la data/features/ 2>/dev/null || true
           echo "=== labels ==="
           ls -la data/labels/ 2>/dev/null || true
-          if [ -f data/snapshots/manifest.json ]; then
-            echo "=== manifest ==="
-            cat data/snapshots/manifest.json
-          fi
 
       - name: Ensure features (score_engine) for scan_date
         if: ${{ github.event.inputs.ensure_features == 'true' && github.event.inputs.scan_date != '' }}
         run: |
           set -e
           DATE="${{ github.event.inputs.scan_date }}"
-          echo "=== score_engine --date $DATE (writes scores + features) ==="
           python -m src.score_engine --date "$DATE"
 
       - name: Ensure features for all dated snapshots (no scan_date)
@@ -61,7 +56,6 @@ jobs:
         run: |
           set -e
           python - <<'PY'
-          from pathlib import Path
           from src.snapshots import snapshot_dates
           from src.feature_log import FEATURES_DIR
           import subprocess, sys
@@ -83,10 +77,8 @@ jobs:
           set -e
           DATE="${{ github.event.inputs.scan_date }}"
           if [ -n "$DATE" ]; then
-            echo "=== label_backfill --scan-date $DATE ==="
             python -m src.label_backfill --scan-date "$DATE"
           else
-            echo "=== label_backfill (all feature dates) ==="
             python -m src.label_backfill
           fi
 
@@ -95,22 +87,18 @@ jobs:
           set -e
           DATE="${{ github.event.inputs.scan_date }}"
           if [ -n "$DATE" ]; then
-            echo "=== attribution --scan-date $DATE ==="
             python -m src.attribution --scan-date "$DATE"
           else
-            echo "=== attribution (all) ==="
             python -m src.attribution
           fi
 
-      - name: Suggestion check (top/bottom score vs forward returns)
+      - name: Suggestion check (full universe accuracy)
         run: |
           set -e
           DATE="${{ github.event.inputs.scan_date }}"
           if [ -n "$DATE" ]; then
-            echo "=== suggestion_check --scan-date $DATE ==="
             python -m src.suggestion_check --scan-date "$DATE"
           else
-            echo "=== suggestion_check (all eligible signal dates) ==="
             python -m src.suggestion_check
           fi
 
@@ -119,39 +107,22 @@ jobs:
           python -m src.attribution_aggregate
           python -m src.weight_learner
 
+      - name: Predictive audit (accuracy + factors + combos)
+        run: |
+          python -m src.predictive_audit --horizon 1d
+          python -m src.predictive_audit --horizon 2d || true
+          python -m src.predictive_audit --horizon 3d || true
+
       - name: Print results to log
         run: |
           DATE="${{ github.event.inputs.scan_date }}"
-          echo "=== labels ==="
-          ls -la data/labels/ 2>/dev/null || true
-          echo "=== attribution ==="
-          ls -la data/attribution/ 2>/dev/null || true
           if [ -n "$DATE" ]; then
-            for f in \
-              data/labels/${DATE}_fwd.csv \
-              data/labels/${DATE}_fwd.meta.json \
-              data/attribution/${DATE}_ic.csv \
-              data/attribution/${DATE}_summary.json \
-              01_daily/${DATE}_attribution.md \
-              01_daily/${DATE}_suggestion_check.md
-            do
-              if [ -f "$f" ]; then
-                echo "======== $f ========"
-                if [[ "$f" == *.csv ]]; then
-                  head -5 "$f"
-                  echo "...(rows: $(wc -l < "$f"))"
-                else
-                  cat "$f"
-                fi
-              else
-                echo "(missing) $f"
-              fi
+            for f in 01_daily/${DATE}_suggestion_check.md data/attribution/${DATE}_suggestion_check.csv; do
+              [ -f "$f" ] && echo "======== $f ========" && head -80 "$f"
             done
           else
-            for f in 01_daily/*_attribution.md 01_daily/*_suggestion_check.md 01_daily/_suggestion_check_BOARD.md; do
-              [ -f "$f" ] || continue
-              echo "======== $f ========"
-              cat "$f"
+            for f in 01_daily/_suggestion_check_BOARD.md 03_scoreboard/predictive_audit.md 03_scoreboard/factor_report.md; do
+              [ -f "$f" ] && echo "======== $f ========" && cat "$f"
             done
           fi
 
