@@ -1,18 +1,16 @@
-"""Did high/low score names actually move the expected way *after* the signal?
+"""Full-universe suggestion check: did scores predict forward direction?
 
-This is the non-circular check the scan.md table cannot answer:
-  - Signal = scores on day T (data through T only)
-  - Outcome = price change from T → later snapshot(s)
-  - Top scores are treated as long suggestions; bottom as short/avoid
+Every ticker with a score + forward label is graded (not only top/bottom).
+Top/bottom tables remain as a readable slice.
 
 CLI:
   python -m src.suggestion_check [--scan-date YYYY-MM-DD] [--top 15] [--bottom 10]
-  (empty scan-date = every date that has scores + labels)
+  empty scan-date = every date with scores + labels
 
 Writes:
   01_daily/<signal>_suggestion_check.md
-  data/attribution/<signal>_suggestion_check.csv
-  01_daily/_suggestion_check_BOARD.md   (when running all dates)
+  data/attribution/<signal>_suggestion_check.csv   (ALL tickers)
+  01_daily/_suggestion_check_BOARD.md
 """
 from __future__ import annotations
 
@@ -32,7 +30,6 @@ ATTR_DIR = config.DATA / "attribution"
 def _load_scores(signal: str) -> pd.DataFrame | None:
     path = SCORES_DIR / f"{signal}_1d.csv"
     if not path.exists():
-        # fall back to features if scores missing but total_score present
         alt = config.DATA / "features" / f"{signal}_1d.csv"
         if not alt.exists():
             return None
@@ -54,25 +51,11 @@ def _pred_day(lab: pd.DataFrame, h: str) -> str:
     col = f"prediction_day_{h}"
     if col in lab.columns and lab[col].astype(str).str.len().gt(0).any():
         return str(lab[col].mode().iloc[0])
-    legacy = f"label_date_{h[0]}" if h.endswith("d") else ""
-    # label_date_1 for 1d
     n = h.replace("d", "")
     leg = f"label_date_{n}"
     if leg in lab.columns and lab[leg].notna().any():
         return str(lab[leg].mode().iloc[0])
     return "?"
-
-
-def _hit_long(fwd) -> bool | None:
-    if fwd is None or (isinstance(fwd, float) and fwd != fwd):
-        return None
-    return bool(fwd > 0)
-
-
-def _hit_short(fwd) -> bool | None:
-    if fwd is None or (isinstance(fwd, float) and fwd != fwd):
-        return None
-    return bool(fwd < 0)
 
 
 def check_one(signal: str, top_n: int = 15, bottom_n: int = 10,
@@ -89,10 +72,7 @@ def check_one(signal: str, top_n: int = 15, bottom_n: int = 10,
         return None
 
     j = j.sort_values("total_score", ascending=False)
-    top = j.head(top_n).copy()
-    bot = j.tail(bottom_n).copy()
-    top["bucket"] = "TOP_LONG"
-    bot["bucket"] = "BOTTOM_SHORT"
+    entry_col = "entry_price" if "entry_price" in j.columns else "price_T"
 
     rows_out = []
     summary_h = {}
@@ -102,50 +82,59 @@ def check_one(signal: str, top_n: int = 15, bottom_n: int = 10,
         if fcol not in j.columns or j[fcol].notna().sum() < 5:
             continue
         pred = _pred_day(lab, h)
-        entry_col = "entry_price" if "entry_price" in j.columns else "price_T"
-        exit_col = f"exit_price_{h}" if f"exit_price_{h}" in j.columns else f"price_T{h[0]}"
+        exit_col = f"exit_price_{h}" if f"exit_price_{h}" in j.columns else None
 
-        def pack(part: pd.DataFrame, side: str):
-            local = []
-            hits = []
-            for _, r in part.iterrows():
-                fwd = r.get(fcol)
-                if side == "long":
-                    hit = _hit_long(fwd)
-                else:
-                    hit = _hit_short(fwd)
-                if hit is not None:
-                    hits.append(hit)
-                local.append({
-                    "signal_asof": signal,
-                    "prediction_day": pred,
-                    "horizon": h,
-                    "bucket": r["bucket"],
-                    "Ticker": r["Ticker"],
-                    "Industry": r.get("Industry", ""),
-                    "total_score": r.get("total_score"),
-                    "entry_price": r.get(entry_col),
-                    "exit_price": r.get(exit_col),
-                    "fwd": fwd,
-                    "expected": "UP" if side == "long" else "DOWN",
-                    "hit": hit,
-                })
-            return local, hits
+        sub = j[j[fcol].notna() & j["total_score"].notna()].copy()
+        # expected direction from score sign (0 = neutral, skip for hit rate)
+        sub["expected"] = np.where(
+            sub["total_score"] > 2, "UP",
+            np.where(sub["total_score"] < -2, "DOWN", "NEUTRAL"),
+        )
+        sub["hit"] = np.where(
+            sub["expected"] == "UP", sub[fcol] > 0,
+            np.where(sub["expected"] == "DOWN", sub[fcol] < 0, np.nan),
+        )
 
-        t_rows, t_hits = pack(top, "long")
-        b_rows, b_hits = pack(bot, "short")
-        rows_out.extend(t_rows)
-        rows_out.extend(b_rows)
+        actionable = sub[sub["expected"] != "NEUTRAL"]
+        hits = actionable["hit"].dropna().astype(bool)
+        long_m = actionable["expected"] == "UP"
+        short_m = actionable["expected"] == "DOWN"
 
         summary_h[h] = {
             "prediction_day": pred,
-            "top_n": len(t_hits),
-            "top_hit_rate": float(np.mean(t_hits)) if t_hits else float("nan"),
-            "top_mean_fwd": float(top[fcol].mean()) if top[fcol].notna().any() else float("nan"),
-            "bottom_n": len(b_hits),
-            "bottom_hit_rate": float(np.mean(b_hits)) if b_hits else float("nan"),
-            "bottom_mean_fwd": float(bot[fcol].mean()) if bot[fcol].notna().any() else float("nan"),
+            "n_universe": int(len(sub)),
+            "n_actionable": int(len(actionable)),
+            "n_long": int(long_m.sum()),
+            "n_short": int(short_m.sum()),
+            "accuracy_actionable": float(hits.mean()) if len(hits) else float("nan"),
+            "accuracy_long": float(actionable.loc[long_m, "hit"].mean()) if long_m.any() else float("nan"),
+            "accuracy_short": float(actionable.loc[short_m, "hit"].mean()) if short_m.any() else float("nan"),
+            "mean_fwd_long": float(actionable.loc[long_m, fcol].mean()) if long_m.any() else float("nan"),
+            "mean_fwd_short": float(actionable.loc[short_m, fcol].mean()) if short_m.any() else float("nan"),
+            "ic_score_fwd": float(
+                sub["total_score"].rank().corr(sub[fcol].rank())
+            ) if len(sub) >= 30 else float("nan"),
         }
+
+        for _, r in sub.iterrows():
+            hit = r["hit"]
+            if hit == hit:  # not nan
+                hit_v = bool(hit)
+            else:
+                hit_v = None
+            rows_out.append({
+                "signal_asof": signal,
+                "prediction_day": pred,
+                "horizon": h,
+                "Ticker": r["Ticker"],
+                "Industry": r.get("Industry", ""),
+                "total_score": r.get("total_score"),
+                "entry_price": r.get(entry_col),
+                "exit_price": r.get(exit_col) if exit_col else None,
+                "fwd": r.get(fcol),
+                "expected": r["expected"],
+                "hit": hit_v,
+            })
 
     if not summary_h:
         print(f"[suggest] {signal}: no forward horizons with data")
@@ -157,9 +146,10 @@ def check_one(signal: str, top_n: int = 15, bottom_n: int = 10,
         "bottom_n": bottom_n,
         "horizons": summary_h,
         "rows": rows_out,
+        "ranked": j,
     }
     _write(result)
-    return result
+    return {k: v for k, v in result.items() if k != "ranked"}
 
 
 def _pct(x) -> str:
@@ -184,80 +174,104 @@ def _write(result: dict) -> None:
     pdf.to_csv(csv_path, index=False)
 
     L = [
-        f"# Suggestion check — signal **{signal}**",
+        f"# Suggestion check — signal **{signal}** (full universe)",
         "",
-        "## What this is (not the scan.md Ret% table)",
+        "## What this measures",
         "",
-        f"- **Signal as-of:** **{signal}** — scores ranked using only data through this day.",
-        "- **TOP_LONG:** highest `total_score` → we *expected* price **up** after the signal.",
-        "- **BOTTOM_SHORT:** lowest `total_score` → we *expected* price **down** after the signal.",
-        "- **Hit:** long and forward return > 0, or short and forward return < 0.",
-        "- **fwd** uses **entry = Price @ signal**, **exit = Price @ prediction day** "
-        "(later snapshot). This is *after* the signal — not the same-day Ret% on the scan.",
+        f"- **Signal as-of:** **{signal}** — `total_score` from data through this day only.",
+        "- **Expected UP** if score > +2; **Expected DOWN** if score < −2; else NEUTRAL (excluded from accuracy).",
+        "- **Hit** = expected UP and fwd>0, or expected DOWN and fwd<0.",
+        "- **fwd** = exit/entry − 1 using a **later** snapshot (not scan.md same-window Ret%).",
+        f"- CSV has **every** ticker: `{csv_path.as_posix()}`",
         "",
-        "## Summary by horizon",
+        "## Prediction accuracy (full universe, actionable scores only)",
         "",
-        "| Horizon | Prediction day | Top hit rate | Top mean fwd | Bottom hit rate | Bottom mean fwd |",
-        "|---------|----------------|--------------|--------------|-----------------|-----------------|",
+        "| Horizon | Pred day | n universe | n actionable | Accuracy | Long acc | Short acc | IC(score,fwd) | Mean fwd long | Mean fwd short |",
+        "|---------|----------|------------|--------------|----------|----------|-----------|---------------|---------------|----------------|",
     ]
     for h, s in result["horizons"].items():
         L.append(
-            f"| {h} | {s['prediction_day']} | {_pct(s['top_hit_rate'])} "
-            f"(n={s['top_n']}) | {_fwd_pct(s['top_mean_fwd'])} | "
-            f"{_pct(s['bottom_hit_rate'])} (n={s['bottom_n']}) | "
-            f"{_fwd_pct(s['bottom_mean_fwd'])} |"
+            f"| {h} | {s['prediction_day']} | {s['n_universe']} | {s['n_actionable']} | "
+            f"**{_pct(s['accuracy_actionable'])}** | {_pct(s['accuracy_long'])} | "
+            f"{_pct(s['accuracy_short'])} | "
+            f"{s['ic_score_fwd']:+.4f}" if s['ic_score_fwd'] == s['ic_score_fwd'] else "n/a"
+            + f" | {_fwd_pct(s['mean_fwd_long'])} | {_fwd_pct(s['mean_fwd_short'])} |"
         )
 
-    # detail for 1d if present else first horizon
+    # fix botched IC line - rewrite loop more carefully
+    L = L[: L.index(
+        "| Horizon | Pred day | n universe | n actionable | Accuracy | Long acc | Short acc | IC(score,fwd) | Mean fwd long | Mean fwd short |"
+    ) + 2]
+    for h, s in result["horizons"].items():
+        ic = s["ic_score_fwd"]
+        ic_s = f"{ic:+.4f}" if ic == ic else "n/a"
+        L.append(
+            f"| {h} | {s['prediction_day']} | {s['n_universe']} | {s['n_actionable']} | "
+            f"**{_pct(s['accuracy_actionable'])}** | {_pct(s['accuracy_long'])} | "
+            f"{_pct(s['accuracy_short'])} | {ic_s} | "
+            f"{_fwd_pct(s['mean_fwd_long'])} | {_fwd_pct(s['mean_fwd_short'])} |"
+        )
+
+    ranked = result["ranked"]
     h0 = "1d" if "1d" in result["horizons"] else next(iter(result["horizons"]))
     pred = result["horizons"][h0]["prediction_day"]
-    L += ["", f"## Detail — horizon {h0} (prediction day **{pred}**)", ""]
+    fcol = f"fwd_{h0}"
+    top = ranked.head(result["top_n"])
+    bot = ranked.tail(result["bottom_n"])
 
-    for bucket, title in (("TOP_LONG", "Top scores (expected UP)"),
-                          ("BOTTOM_SHORT", "Bottom scores (expected DOWN)")):
-        sub = pdf[(pdf["bucket"] == bucket) & (pdf["horizon"] == h0)]
+    L += ["", f"## Readable slice — horizon {h0} (pred day **{pred}**)",
+          "_(full list is in the CSV)_", ""]
+
+    for part, title, exp in (
+        (top, f"Top {result['top_n']} scores (expected UP if score>+2)", "UP"),
+        (bot, f"Bottom {result['bottom_n']} scores (expected DOWN if score<-2)", "DOWN"),
+    ):
         L.append(f"### {title}")
         L.append("")
-        L.append(
-            "| Ticker | Score | Entry @ signal | Exit @ pred day | fwd | Expected | Hit? |"
-        )
-        L.append("|---|---|---|---|---|---|---|")
-        for _, r in sub.iterrows():
-            hit = r["hit"]
+        L.append("| Ticker | Score | Entry | Exit | fwd | Hit? |")
+        L.append("|---|---|---|---|---|---|")
+        for _, r in part.iterrows():
+            fwd = r.get(fcol)
+            if exp == "UP":
+                hit = (fwd > 0) if fwd == fwd else None
+            else:
+                hit = (fwd < 0) if fwd == fwd else None
             hit_s = "YES" if hit is True else ("NO" if hit is False else "n/a")
+            entry = r.get("entry_price", r.get("price_T"))
+            exit_p = r.get(f"exit_price_{h0}", r.get(f"price_T{h0[0]}"))
             L.append(
-                f"| {r['Ticker']} | {r['total_score']:+.1f} | "
-                f"{r.get('entry_price')} | {r.get('exit_price')} | "
-                f"{_fwd_pct(r.get('fwd'))} | {r['expected']} | **{hit_s}** |"
+                f"| {r['Ticker']} | {r['total_score']:+.1f} | {entry} | {exit_p} | "
+                f"{_fwd_pct(fwd)} | **{hit_s}** |"
             )
         L.append("")
 
-    L.append(f"CSV: `data/attribution/{signal}_suggestion_check.csv`")
-    L.append("")
     path = config.DAILY / f"{signal}_suggestion_check.md"
     path.write_text("\n".join(L), encoding="utf-8")
-    print(f"[suggest] {signal} -> {path.name} + {csv_path.name}")
+    print(f"[suggest] {signal} universe rows={len(pdf)} -> {path.name}")
 
 
 def write_board(results: list[dict]) -> Path:
     L = [
-        "# Suggestion check — all eligible signal dates",
+        "# Suggestion check board — full universe accuracy",
         "",
-        "Each row: scores on **signal_asof**, graded on a **later** prediction day.",
+        "Score on **signal_asof**; grade on later **prediction day**. "
+        "Accuracy = share of actionable names (score >+2 or <-2) whose forward "
+        "return matched the expected direction.",
         "",
-        "| Signal as-of | Pred day (1d) | Top hit | Top mean fwd | Bottom hit | Bottom mean fwd |",
-        "|--------------|---------------|---------|--------------|------------|-----------------|",
+        "| Signal | Pred day (1d) | n actionable | Accuracy | Long acc | Short acc | IC |",
+        "|--------|---------------|--------------|----------|----------|-----------|----|",
     ]
     for r in results:
         h = r["horizons"].get("1d") or next(iter(r["horizons"].values()))
+        ic = h.get("ic_score_fwd")
+        ic_s = f"{ic:+.4f}" if ic == ic else "n/a"
         L.append(
             f"| {r['signal_asof']} | {h.get('prediction_day')} | "
-            f"{_pct(h.get('top_hit_rate'))} | {_fwd_pct(h.get('top_mean_fwd'))} | "
-            f"{_pct(h.get('bottom_hit_rate'))} | {_fwd_pct(h.get('bottom_mean_fwd'))} |"
+            f"{h.get('n_actionable')} | **{_pct(h.get('accuracy_actionable'))}** | "
+            f"{_pct(h.get('accuracy_long'))} | {_pct(h.get('accuracy_short'))} | {ic_s} |"
         )
-    L.append("")
-    L.append("Per-date detail: `01_daily/<signal>_suggestion_check.md`")
-    L.append("")
+    L += ["", "Detail: `01_daily/<signal>_suggestion_check.md`",
+          "All tickers: `data/attribution/<signal>_suggestion_check.csv`", ""]
     path = config.DAILY / "_suggestion_check_BOARD.md"
     config.DAILY.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(L), encoding="utf-8")
@@ -267,7 +281,7 @@ def write_board(results: list[dict]) -> Path:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scan-date", default=None, help="Signal as-of date; empty = all")
+    ap.add_argument("--scan-date", default=None)
     ap.add_argument("--top", type=int, default=15)
     ap.add_argument("--bottom", type=int, default=10)
     args = ap.parse_args()
@@ -276,10 +290,7 @@ def main() -> None:
         check_one(args.scan_date, top_n=args.top, bottom_n=args.bottom)
         return
 
-    signals = sorted(
-        p.name.replace("_fwd.csv", "")
-        for p in LABELS_DIR.glob("*_fwd.csv")
-    )
+    signals = sorted(p.name.replace("_fwd.csv", "") for p in LABELS_DIR.glob("*_fwd.csv"))
     results = []
     for s in signals:
         r = check_one(s, top_n=args.top, bottom_n=args.bottom)
