@@ -9,6 +9,7 @@ CLI: python -m src.predictive_audit [--horizon 1d]
 
 Writes:
   03_scoreboard/predictive_audit.md
+  03_scoreboard/predictive_audit_<horizon>.md
   03_scoreboard/predictive_audit.json
 """
 from __future__ import annotations
@@ -17,7 +18,6 @@ import argparse
 import itertools
 import json
 from datetime import datetime
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -29,37 +29,64 @@ FEATURES_DIR = config.DATA / "features"
 LABELS_DIR = config.DATA / "labels"
 OUT_DIR = config.SCOREBOARD_DIR
 MIN_N = 50
-MIN_DATES = 1  # raise to 2+ when more history exists
 
 SKIP = {
     "Ticker", "Company", "Sector", "Industry", "Index", "scan_date", "pair_date",
     "n_universe", "price_then", "true_ret_dir", "score_100", "confidence", "ret_H",
     "status_extension", "status_trend", "status_short", "status_street", "kill_flags",
-    "mcap_bucket", "beta_bucket", "entry_price", "signal_asof",
+    "mcap_bucket", "beta_bucket", "entry_price", "signal_asof", "_signal",
 }
+
+SKIP_PREFIXES = (
+    "fwd_", "label_date_", "price_T", "prediction_day", "exit_price",
+    "short_fwd", "dir_",
+)
 
 
 def _spearman(a: pd.Series, b: pd.Series) -> float:
+    a = pd.to_numeric(a, errors="coerce")
+    b = pd.to_numeric(b, errors="coerce")
     m = a.notna() & b.notna()
     if m.sum() < MIN_N:
         return float("nan")
-    return float(a[m].rank().corr(b[m].rank()))
+    aa, bb = a[m], b[m]
+    if aa.nunique(dropna=True) < 2 or bb.nunique(dropna=True) < 2:
+        return float("nan")
+    try:
+        return float(aa.rank().corr(bb.rank()))
+    except Exception:
+        return float("nan")
+
+
+def _is_usable_numeric(s: pd.Series) -> bool:
+    if s.dtype == object or str(s.dtype) == "string":
+        # try coerce — keep only if enough numbers
+        num = pd.to_numeric(s, errors="coerce")
+        return int(num.notna().sum()) >= MIN_N and num.nunique(dropna=True) >= 2
+    if not np.issubdtype(s.dtype, np.number):
+        return False
+    return int(s.notna().sum()) >= MIN_N and s.nunique(dropna=True) >= 2
 
 
 def _factor_cols(df: pd.DataFrame) -> list[str]:
     cols = []
     for c in df.columns:
-        if c in SKIP or c.startswith("dir_"):
+        if c in SKIP:
             continue
-        if c.startswith(("fwd_", "label_date_", "price_T", "prediction_day",
-                         "exit_price", "short_fwd")):
+        if any(c.startswith(p) for p in SKIP_PREFIXES):
             continue
         if c in ("up_3d", "down_3d"):
             continue
-        if df[c].dtype == object:
+        try:
+            if _is_usable_numeric(df[c]):
+                cols.append(c)
+        except Exception:
             continue
-        cols.append(c)
     return cols
+
+
+def _num(df: pd.DataFrame, col: str) -> pd.Series:
+    return pd.to_numeric(df[col], errors="coerce")
 
 
 def _load_joined(signal: str) -> pd.DataFrame | None:
@@ -70,20 +97,22 @@ def _load_joined(signal: str) -> pd.DataFrame | None:
     f = pd.read_csv(fp, low_memory=False)
     l = pd.read_csv(lp, low_memory=False)
     j = f.merge(l, on="Ticker", how="inner", suffixes=("", "_lbl"))
-    j["_signal"] = signal
+    # single assign avoids fragmentation warning from repeated inserts
+    j = j.assign(_signal=signal)
     return j
 
 
 def _score_accuracy(j: pd.DataFrame, y: pd.Series) -> dict:
     if "total_score" not in j.columns:
         return {}
-    m = y.notna() & j["total_score"].notna()
-    sub = j.loc[m].copy()
-    y2 = y.loc[m]
-    exp_up = sub["total_score"] > 2
-    exp_dn = sub["total_score"] < -2
+    score = _num(j, "total_score")
+    y = pd.to_numeric(y, errors="coerce")
+    m = y.notna() & score.notna()
+    score, y2 = score[m], y[m]
+    exp_up = score > 2
+    exp_dn = score < -2
     act = exp_up | exp_dn
-    hit = pd.Series(np.nan, index=sub.index)
+    hit = pd.Series(np.nan, index=score.index, dtype=float)
     hit.loc[exp_up] = (y2.loc[exp_up] > 0).astype(float)
     hit.loc[exp_dn] = (y2.loc[exp_dn] < 0).astype(float)
     h = hit.loc[act].dropna()
@@ -93,29 +122,25 @@ def _score_accuracy(j: pd.DataFrame, y: pd.Series) -> dict:
         "accuracy": float(h.mean()) if len(h) else float("nan"),
         "accuracy_long": float(hit.loc[exp_up].mean()) if exp_up.any() else float("nan"),
         "accuracy_short": float(hit.loc[exp_dn].mean()) if exp_dn.any() else float("nan"),
-        "ic": _spearman(sub["total_score"], y2),
+        "ic": _spearman(score, y2),
     }
 
 
 def _combo_edge(df: pd.DataFrame, a: str, b: str, y: pd.Series) -> list[dict]:
-    """Four quadrants of sign(A) x sign(B)."""
     out = []
-    for sa, sb, name in (
+    sa = _num(df, a)
+    sb = _num(df, b)
+    y = pd.to_numeric(y, errors="coerce")
+    for sga, sgb, name in (
         (1, 1, f"{a}↑ & {b}↑"),
         (1, -1, f"{a}↑ & {b}↓"),
         (-1, 1, f"{a}↓ & {b}↑"),
         (-1, -1, f"{a}↓ & {b}↓"),
     ):
-        if sa > 0:
-            ma = df[a] > 0
-        else:
-            ma = df[a] < 0
-        if sb > 0:
-            mb = df[b] > 0
-        else:
-            mb = df[b] < 0
+        ma = sa > 0 if sga > 0 else sa < 0
+        mb = sb > 0 if sgb > 0 else sb < 0
         m = ma & mb & y.notna()
-        if m.sum() < MIN_N:
+        if int(m.sum()) < MIN_N:
             continue
         yy = y[m]
         out.append({
@@ -137,8 +162,8 @@ def run(horizon: str = "1d") -> dict:
         j = _load_joined(s)
         if j is None or lab not in j.columns:
             continue
-        y = j[lab]
-        if y.notna().sum() < MIN_N:
+        y = pd.to_numeric(j[lab], errors="coerce")
+        if int(y.notna().sum()) < MIN_N:
             continue
         acc = _score_accuracy(j, y)
         acc["signal_asof"] = s
@@ -149,46 +174,47 @@ def run(horizon: str = "1d") -> dict:
         print("[audit] no labeled joins")
         return {}
 
-    all_df = pd.concat(frames, ignore_index=True)
-    y_all = all_df[lab]
+    all_df = pd.concat(frames, ignore_index=True, copy=False)
+    y_all = pd.to_numeric(all_df[lab], errors="coerce")
     overall = _score_accuracy(all_df, y_all)
 
-    # single-factor ICs on pooled panel
     fcols = _factor_cols(all_df)
     factor_rows = []
     for c in fcols:
-        ic = _spearman(all_df[c], y_all)
+        series = _num(all_df, c)
+        ic = _spearman(series, y_all)
         if ic != ic:
             continue
-        pos = (all_df[c] > 0) & y_all.notna()
-        neg = (all_df[c] < 0) & y_all.notna()
+        pos = (series > 0) & y_all.notna()
+        neg = (series < 0) & y_all.notna()
+        mu = float(y_all[pos].mean()) if int(pos.sum()) else float("nan")
+        md = float(y_all[neg].mean()) if int(neg.sum()) else float("nan")
+        spread = (mu - md) if (mu == mu and md == md) else float("nan")
         factor_rows.append({
             "factor": c,
             "ic": ic,
-            "n": int((all_df[c].notna() & y_all.notna()).sum()),
-            "mean_fwd_when_up": float(y_all[pos].mean()) if pos.sum() else float("nan"),
-            "mean_fwd_when_down": float(y_all[neg].mean()) if neg.sum() else float("nan"),
-            "spread": (
-                float(y_all[pos].mean() - y_all[neg].mean())
-                if pos.sum() and neg.sum() else float("nan")
-            ),
+            "n": int((series.notna() & y_all.notna()).sum()),
+            "mean_fwd_when_up": mu,
+            "mean_fwd_when_down": md,
+            "spread": spread,
         })
     factor_rows.sort(key=lambda r: abs(r["ic"]), reverse=True)
 
-    # combinations among top |IC| delta-like or score-related factors
     cand = [r["factor"] for r in factor_rows[:12]]
-    # prefer d_* and total_score style
-    preferred = [c for c in cand if c.startswith("d_") or c in (
-        "total_score", "Relative Volume", "true_ret",
-        "Relative Strength Index (14)")]
+    preferred = [
+        c for c in cand
+        if c.startswith("d_") or c in (
+            "total_score", "Relative Volume", "true_ret",
+            "Relative Strength Index (14)",
+        )
+    ]
     if len(preferred) < 4:
         preferred = cand[:8]
     combo_rows = []
     for a, b in itertools.combinations(preferred[:8], 2):
         combo_rows.extend(_combo_edge(all_df, a, b, y_all))
-    # rank combos by |mean_fwd| * sqrt(n) as a rough score
     for r in combo_rows:
-        r["score"] = abs(r["mean_fwd"]) * np.sqrt(r["n"])
+        r["score"] = abs(r["mean_fwd"]) * float(np.sqrt(r["n"]))
     combo_rows.sort(key=lambda r: r["score"], reverse=True)
 
     report = {
@@ -203,9 +229,13 @@ def run(horizon: str = "1d") -> dict:
     }
     _write_md(report)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUT_DIR / "predictive_audit.json").write_text(
+    (OUT_DIR / f"predictive_audit_{horizon}.json").write_text(
         json.dumps(report, indent=2, default=str), encoding="utf-8")
-    print(f"[audit] wrote {OUT_DIR / 'predictive_audit.md'}")
+    if horizon == "1d":
+        (OUT_DIR / "predictive_audit.json").write_text(
+            json.dumps(report, indent=2, default=str), encoding="utf-8")
+    print(f"[audit] wrote predictive_audit_{horizon}.md "
+          f"(factors={len(factor_rows)} combos={len(combo_rows)})")
     return report
 
 
@@ -216,7 +246,7 @@ def _pct(x) -> str:
 
 
 def _write_md(report: dict) -> None:
-    o = report["overall_score_accuracy"]
+    o = report.get("overall_score_accuracy") or {}
     h = report["horizon"]
     L = [
         f"# Predictive audit — horizon **{h}**",
@@ -229,8 +259,8 @@ def _write_md(report: dict) -> None:
         "",
         "Rule: score > +2 → expect UP; score < −2 → expect DOWN; else neutral.",
         "",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Names graded | {o.get('n')} |",
         f"| Actionable (|score|>2) | {o.get('n_actionable')} |",
         f"| **Accuracy (actionable)** | **{_pct(o.get('accuracy'))}** |",
@@ -257,27 +287,31 @@ def _write_md(report: dict) -> None:
         "",
         "## 2. Top correlating factors (pooled across dates)",
         "",
-        "IC = Spearman(factor, forward return). Sign-agnostic ranking by |IC|. "
+        "IC = Spearman(factor, forward return). Ranked by |IC|. "
         "Spread = mean fwd when factor>0 minus mean fwd when factor<0.",
         "",
         "| Rank | Factor | IC | n | Mean fwd if ↑ | Mean fwd if ↓ | Spread |",
         "|------|--------|----|---|---------------|---------------|--------|",
     ]
     for i, r in enumerate(report["top_factors"][:25], 1):
-        L.append(
-            f"| {i} | {r['factor']} | {r['ic']:+.4f} | {r['n']} | "
-            f"{r['mean_fwd_when_up']*100:+.2f}% | {r['mean_fwd_when_down']*100:+.2f}% | "
-            f"{r['spread']*100:+.2f}% |"
-            if r["spread"] == r["spread"] else
-            f"| {i} | {r['factor']} | {r['ic']:+.4f} | {r['n']} | n/a | n/a | n/a |"
-        )
+        if r.get("spread") == r.get("spread"):
+            L.append(
+                f"| {i} | {r['factor']} | {r['ic']:+.4f} | {r['n']} | "
+                f"{r['mean_fwd_when_up']*100:+.2f}% | "
+                f"{r['mean_fwd_when_down']*100:+.2f}% | "
+                f"{r['spread']*100:+.2f}% |"
+            )
+        else:
+            L.append(
+                f"| {i} | {r['factor']} | {r['ic']:+.4f} | {r['n']} | n/a | n/a | n/a |"
+            )
 
     L += [
         "",
         "## 3. Factor combinations (sign quadrants)",
         "",
-        "Among stronger single factors: test A↑B↑ / A↑B↓ / A↓B↑ / A↓B↓. "
-        "**Score** = |mean_fwd| × √n (ranking aid, not a probability).",
+        "Among stronger single factors: A↑B↑ / A↑B↓ / A↓B↑ / A↓B↓. "
+        "**Score** = |mean_fwd| × √n (ranking aid only).",
         "",
         "| Rank | Combination | n | Mean fwd | % up | % down | Score |",
         "|------|-------------|---|----------|------|--------|-------|",
@@ -294,11 +328,14 @@ def _write_md(report: dict) -> None:
         "",
         "- With few signal dates, treat rankings as **exploratory**.",
         "- `d_*` = day-over-day delta on the signal pair; bare names = levels.",
-        "- Machine dump: `03_scoreboard/predictive_audit.json`",
+        f"- JSON: `03_scoreboard/predictive_audit_{h}.json`",
         "",
     ]
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUT_DIR / "predictive_audit.md").write_text("\n".join(L), encoding="utf-8")
+    body = "\n".join(L)
+    (OUT_DIR / f"predictive_audit_{h}.md").write_text(body, encoding="utf-8")
+    if h == "1d":
+        (OUT_DIR / "predictive_audit.md").write_text(body, encoding="utf-8")
 
 
 def main() -> None:
