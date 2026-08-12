@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import date
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -47,7 +48,6 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
     except ValueError:
         return None
 
-    # next snapshot dates as T+1, T+2, T+3 proxies
     forward = sorted_dates[idx + 1: idx + 4]
     if not forward:
         print(f"[labels] {scan_date}: no later snapshots yet — skip")
@@ -67,7 +67,6 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
             row[f"price_T{i}"] = px
             row[f"fwd_{i}d"] = (px / base - 1) if (base and base == base and px == px and base) else np.nan
             row[f"label_date_{i}"] = d
-        # pad missing horizons
         for i in range(len(forward) + 1, 4):
             row[f"price_T{i}"] = np.nan
             row[f"fwd_{i}d"] = np.nan
@@ -103,11 +102,17 @@ def main() -> None:
     args = ap.parse_args()
     dates = snapshot_dates()
     if args.scan_date:
-        backfill_one(args.scan_date, dates)
+        p = backfill_one(args.scan_date, dates)
+        if p is not None:
+            print(f"[labels] refresh scan.md with fwd cols: "
+                  f"python -m src.score_engine --date {args.scan_date} --skip-features")
         return
     feat_dates = sorted(p.stem.replace("_1d", "") for p in FEATURES_DIR.glob("*_1d.csv"))
     for d in feat_dates:
-        backfill_one(d, dates)
+        p = backfill_one(d, dates)
+        if p is not None:
+            print(f"[labels] refresh scan.md with fwd cols: "
+                  f"python -m src.score_engine --date {d} --skip-features")
 
 
 if __name__ == "__main__":
