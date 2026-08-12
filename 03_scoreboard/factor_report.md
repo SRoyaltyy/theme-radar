@@ -1,6 +1,6 @@
 # Factor report — multi-date aggregate
 
-_Generated 2026-08-11 17:37 EDT from 3 scan dates._
+_Generated 2026-08-12 03:57 EDT from 3 scan dates._
 
 How to read: **IC** = Spearman rank correlation between the factor and the forward return, computed per scan date then averaged (mean IC). **ICIR** = mean/std across dates — the consistency score; |ICIR| above ~0.5 with sign consistency ≥ 2/3 is what we call a real signal. **spread** = average forward return when the factor is positive minus when negative. Factors marked ⚠️ flips sign between dates — treat as noise.
 
@@ -27,6 +27,9 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
+| short_fwd_1d | -1.0000 | -15600926743107926.00 | 100% | 3 | -7.48% | ✅ consistent |
+| short_fwd_2d | -0.6321 | -17.54 | 100% | 2 | -7.46% | ✅ consistent |
+| short_fwd_3d | -0.5348 | +nan | 100% | 1 | -3.77% | ⚠️ flips / too few dates |
 | d_Performance (Week) | -0.1012 | -5.06 | 100% | 2 | -3.60% | ✅ consistent |
 | d_20-Day Simple Moving Average | -0.0955 | -13.16 | 100% | 2 | -5.89% | ✅ consistent |
 | d_Performance (YTD) | -0.0926 | -7.68 | 100% | 2 | -4.75% | ✅ consistent |
@@ -54,14 +57,14 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 | catalyst_score | +0.0386 | +1.02 | 67% | 3 | -0.75% | ✅ consistent |
 | n_catalysts | +0.0385 | +1.02 | 67% | 3 | n/a | ✅ consistent |
 | d_Institutional Ownership | +0.0339 | +1.52 | 100% | 2 | +0.45% | ✅ consistent |
-| Performance (Quarter) | -0.0324 | -0.76 | 67% | 3 | -3.29% | ✅ consistent |
-| cat_copper_metals | +0.0321 | +0.98 | 67% | 3 | n/a | ✅ consistent |
-| Forward P/E | +0.0281 | +0.66 | 67% | 3 | n/a | ✅ consistent |
 
 ## Factor ranking — 2d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
+| short_fwd_2d | -1.0000 | +nan | 100% | 2 | -12.48% | ✅ consistent |
+| short_fwd_3d | -0.7888 | +nan | 100% | 1 | -10.37% | ⚠️ flips / too few dates |
+| short_fwd_1d | -0.6321 | -17.54 | 100% | 2 | -5.04% | ✅ consistent |
 | Beta | -0.0989 | +nan | 100% | 1 | +3.12% | ⚠️ flips / too few dates |
 | Total Debt/Equity | -0.0901 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
 | upside_pct_lvl | +0.0885 | +1.87 | 100% | 2 | +3.52% | ✅ consistent |
@@ -89,14 +92,14 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 | n_neg | -0.0318 | -1.17 | 100% | 2 | n/a | ✅ consistent |
 | d_Market Cap | -0.0317 | +nan | 100% | 1 | -14.90% | ⚠️ flips / too few dates |
 | d_Gross Margin | +0.0309 | +nan | 100% | 1 | +0.85% | ⚠️ flips / too few dates |
-| d_Forward P/E | -0.0299 | +nan | 100% | 1 | -0.20% | ⚠️ flips / too few dates |
-| Volatility (Month) | -0.0288 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
-| d_Sales Growth Quarter Over Quarter | +0.0273 | +nan | 100% | 1 | +1.54% | ⚠️ flips / too few dates |
 
 ## Factor ranking — 3d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
+| short_fwd_3d | -1.0000 | +nan | 100% | 1 | -12.49% | ⚠️ flips / too few dates |
+| short_fwd_2d | -0.7888 | +nan | 100% | 1 | -11.09% | ⚠️ flips / too few dates |
+| short_fwd_1d | -0.5348 | +nan | 100% | 1 | +4.15% | ⚠️ flips / too few dates |
 | Performance (Week) | +0.2028 | +nan | 100% | 1 | -9.54% | ⚠️ flips / too few dates |
 | upside_pct | +0.1338 | +nan | 100% | 1 | +4.20% | ⚠️ flips / too few dates |
 | upside_pct_lvl | +0.1337 | +nan | 100% | 1 | +4.16% | ⚠️ flips / too few dates |
@@ -124,9 +127,6 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 | Target Price | -0.0376 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
 | Average Volume | +0.0372 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
 | cat_defense | +0.0372 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
-| cat_hbm_memory | +0.0270 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
-| 200-Day Simple Moving Average | -0.0238 | +nan | 100% | 1 | -8.66% | ⚠️ flips / too few dates |
-| cat_nuclear_smr | +0.0235 | +nan | 100% | 1 | n/a | ⚠️ flips / too few dates |
 
 ## What to do with this
 

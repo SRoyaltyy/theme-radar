@@ -1,9 +1,13 @@
 {
   "scan_date": "2026-08-10",
+  "signal_asof": "2026-08-10",
+  "prediction_day": "2026-08-11",
   "label": "fwd_1d",
   "n": 11533,
   "pair_date": "2026-08-07",
   "label_date": "2026-08-11",
+  "entry_field": "entry_price (Price on signal_asof)",
+  "exit_field": "exit_price_1d (Price on prediction_day)",
   "features": [
     {
       "feature": "d_Performance (YTD)",
@@ -417,38 +421,20 @@
       "n": 216,
       "mean_fwd": -0.004475964169670604,
       "hit_up": 0.2777777777777778
-    },
-    {
-      "name": "Month\u0394+ & Month<0",
-      "n": 778,
-      "mean_fwd": 0.0032457260211816,
-      "hit_up": 0.32390745501285345
-    },
-    {
-      "name": "Month\u0394+ & Month>0",
-      "n": 1387,
-      "mean_fwd": 0.0013755036159537268,
-      "hit_up": 0.22855082912761354
     }
   ],
   "risk": [
     {
-      "name": "Week>40%",
-      "n": 106,
-      "mean_fwd": -0.0052620334753413255,
-      "mean_fwd_if_score_top": 0.007041754789870366
+      "name": "EXTENDED",
+      "n": 349,
+      "mean_fwd": -0.0004447315141308442,
+      "mean_fwd_if_score_top": 0.0001700253398656269
     },
     {
-      "name": "Week>25%",
-      "n": 276,
-      "mean_fwd": 0.0009138957607481218,
-      "mean_fwd_if_score_top": 0.002752123572691632
-    },
-    {
-      "name": "RSI>75",
-      "n": 251,
-      "mean_fwd": -0.0010493684202175794,
-      "mean_fwd_if_score_top": NaN
+      "name": "WASHED",
+      "n": 639,
+      "mean_fwd": 0.03742785892474405,
+      "mean_fwd_if_score_top": 0.1583930859511191
     }
   ]
 }

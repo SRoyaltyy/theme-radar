@@ -1,14 +1,25 @@
-# Factor attribution — 2026-08-07
+# Factor attribution — signal 2026-08-07 → prediction day 2026-08-11
 
-**What this report measures, exactly:** features computed from the **2026-08-07** Finviz snapshot (deltas vs the **2026-08-06** snapshot), graded against `fwd_2d` = the return from **2026-08-07** to **2026-08-11** (n=11525 stocks with valid labels).
-Provisional until multiple scan dates agree.
+## Trade window (read this first)
 
-_Column guide: **IC** = Spearman rank correlation between the feature and the forward return (whole universe); **IC↑** = IC computed only among stocks that went UP; **IC↓** = IC only among stocks that went DOWN. A high IC↑ means the feature ranks winners among winners._
+| Role | Date | Meaning |
+|------|------|---------|
+| **Signal as-of** | **2026-08-07** | Features/scores formed from this snapshot (and deltas vs **2026-08-06**). Only data on/before this date. |
+| **Prediction day** | **2026-08-11** | The trading day the forward return is for (exit snapshot). |
+| **Entry price** | Price @ 2026-08-07 | Long: buy here; short: sell here. |
+| **Exit price** | Price @ 2026-08-11 | Close proxy on prediction day. |
+| **Return column** | `fwd_2d` | Long: exit/entry − 1; short = opposite. |
 
-## Score calibration
+Graded **n=11525** names with valid entry and exit prices.
+
+Provisional until multiple signal dates agree.
+
+_Column guide: **IC** = Spearman(feature, long forward return); **IC↑** / **IC↓** = IC among names that went up / down._
+
+## Score calibration (long fwd)
 - Spearman IC(total_score, fwd_2d) = **-0.0242**
 
-| Quintile | Mean fwd | Hit up>1.5% | n |
+| Quintile | Mean long fwd | Hit up>1.5% | n |
 |---|---|---|---|
 | 1 | 13.39% | 26.8% | 2323 |
 | 2 | 2.61% | 10.6% | 2579 |
@@ -16,7 +27,7 @@ _Column guide: **IC** = Spearman rank correlation between the feature and the fo
 | 4 | -0.15% | 15.8% | 2463 |
 | 5 | -0.07% | 30.6% | 2118 |
 
-## Top |IC| features (full universe)
+## Top |IC| features
 
 | Feature | IC | IC↑ | IC↓ | Mean fwd when + | Mean fwd when − | n+/n− |
 |---|---|---|---|---|---|---|
@@ -48,19 +59,15 @@ _Column guide: **IC** = Spearman rank correlation between the feature and the fo
 
 ## Combinations
 
-| Pattern | n | Mean fwd | Hit up |
+| Pattern | n | Mean long fwd | Hit up |
 |---|---|---|---|
 | true_ret>3% & DOWNTREND | 643 | -0.67% | 33.4% |
 | true_ret>3% & UPTREND | 649 | 0.04% | 34.1% |
 | true_ret>3% & MIXED | 466 | -0.58% | 33.0% |
-| MonthΔ+ & Month<0 | 938 | 1.03% | 33.0% |
-| MonthΔ+ & Month>0 | 1402 | -0.07% | 31.3% |
 
 ## Risk dominance probes
 
-| State | n | Mean fwd | Mean fwd if score top quintile |
+| State | n | Mean long fwd | Mean fwd if score top quintile |
 |---|---|---|---|
-| Week>40% | 173 | -2.17% | -1.76% |
-| Week>25% | 434 | -0.29% | -0.17% |
-| Week>100% | 18 | -15.72% | n/a |
-| RSI>75 | 217 | -0.48% | n/a |
+| EXTENDED | 368 | 0.13% | -1.33% |
+| WASHED | 578 | 63.83% | -1.75% |
