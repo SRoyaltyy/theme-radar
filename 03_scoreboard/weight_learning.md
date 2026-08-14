@@ -1,60 +1,60 @@
 # Weight learning — decision log
 
-_Generated 2026-08-13 17:36 EDT_
+_Generated 2026-08-14 17:17 EDT_
 
-- label dates per horizon: 1d: 5, 2d: 4, 3d: 3
-- primary horizon for promotion test: **1d** (5 dates)
-- existing overrides: {'Price|ret': 0.3248288034498433, 'Performance (Month)|delta': 1.0103895505289044, 'Average Volume|delta': 0.8235276528272834, 'Relative Strength Index (14)|delta': 0.5150254789401248, 'Short Float|delta': 1.305315557100349, 'Institutional Transactions|level': 1.2725452838291316, 'Institutional Ownership|delta': 1.4413457739206899, 'Insider Transactions|level': 0.9528252174933872, 'Target Price|delta': 0.9924352340489596, 'Analyst Recom|delta': 1.2007084256548959, 'Sales Growth Quarter Over Quarter|level': 1.665043855385312, 'Sales Year Over Year TTM|level': 1.6363786585013698, 'Profit Margin|delta': 0.8836091924780013, 'EPS Surprise|level': 0.9063591426451629, 'n_catalysts|level': 1.5595336313235404}
+- label dates per horizon: 1d: 6, 2d: 5, 3d: 4
+- primary horizon for promotion test: **1d** (6 dates)
+- existing overrides: {'Price|ret': 0.29272683324445287, 'Performance (Month)|delta': 1.0700234520405647, 'Average Volume|delta': 0.8072609742736847, 'Relative Strength Index (14)|delta': 0.47619737632065695, 'Short Float|delta': 1.3818772516930546, 'Institutional Transactions|level': 1.3036592858150235, 'Institutional Ownership|delta': 1.4974040975008407, 'Insider Transactions|level': 0.933695549851626, 'Target Price|delta': 0.9980625500420547, 'Analyst Recom|delta': 1.235762997242703, 'Sales Growth Quarter Over Quarter|level': 1.7809867581459398, 'Sales Year Over Year TTM|level': 1.7570521441500462, 'Profit Margin|delta': 0.8814432577905637, 'EPS Surprise|level': 0.9238154494799269, 'n_catalysts|level': 1.6252253723584686}
 
 ## Per-rule aligned IC (direction corrected for polarity)
 
 | Rule | Horizon | Mean aligned IC | Dates | Proposed × | Testable |
 |---|---|---|---|---|---|
-| Price|ret | 1d | -0.0494 | 4 | 0.293 | yes |
-| Price|ret | 2d | -0.0776 | 3 | 0.274 | yes |
-| Price|ret | 3d | -0.0966 | 2 | 0.262 | yes |
-| Performance (Month)|delta | 1d | +0.0295 | 4 | 1.070 | yes |
-| Performance (Month)|delta | 2d | -0.0076 | 3 | 0.995 | yes |
-| Performance (Month)|delta | 3d | -0.0873 | 2 | 0.834 | yes |
-| Average Volume|delta | 1d | -0.0099 | 4 | 0.807 | NO — logs only |
-| Average Volume|delta | 2d | -0.0205 | 3 | 0.790 | NO — logs only |
-| Average Volume|delta | 3d | -0.0187 | 2 | 0.793 | NO — logs only |
-| Relative Strength Index (14)|delta | 1d | -0.0377 | 4 | 0.476 | yes |
-| Relative Strength Index (14)|delta | 2d | -0.0592 | 3 | 0.454 | yes |
-| Relative Strength Index (14)|delta | 3d | -0.0914 | 2 | 0.421 | yes |
-| Short Float|delta | 1d | +0.0293 | 3 | 1.382 | NO — logs only |
-| Short Float|delta | 2d | +0.0044 | 2 | 1.317 | NO — logs only |
-| Short Float|delta | 3d | -0.0277 | 1 | 1.233 | NO — logs only |
-| Institutional Transactions|level | 1d | +0.0122 | 5 | 1.304 | NO — logs only |
-| Institutional Transactions|level | 2d | +0.0284 | 4 | 1.345 | NO — logs only |
-| Institutional Transactions|level | 3d | +0.0385 | 3 | 1.371 | NO — logs only |
-| Institutional Ownership|delta | 1d | +0.0194 | 4 | 1.497 | NO — logs only |
-| Institutional Ownership|delta | 2d | +0.0301 | 3 | 1.528 | NO — logs only |
-| Institutional Ownership|delta | 3d | +0.0277 | 2 | 1.521 | NO — logs only |
-| Insider Transactions|level | 1d | -0.0100 | 5 | 0.934 | NO — logs only |
-| Insider Transactions|level | 2d | -0.0138 | 4 | 0.927 | NO — logs only |
-| Insider Transactions|level | 3d | -0.0177 | 3 | 0.919 | NO — logs only |
-| Target Price|delta | 1d | +0.0028 | 4 | 0.998 | NO — logs only |
-| Target Price|delta | 2d | +0.0016 | 3 | 0.996 | NO — logs only |
-| Target Price|delta | 3d | -0.0014 | 2 | 0.990 | NO — logs only |
-| Analyst Recom|delta | 1d | +0.0146 | 4 | 1.236 | NO — logs only |
-| Analyst Recom|delta | 2d | +0.0051 | 3 | 1.213 | NO — logs only |
-| Analyst Recom|delta | 3d | +0.0145 | 2 | 1.236 | NO — logs only |
-| Sales Growth Quarter Over Quarter|level | 1d | +0.0348 | 5 | 1.781 | NO — logs only |
-| Sales Growth Quarter Over Quarter|level | 2d | +0.0505 | 4 | 1.833 | NO — logs only |
-| Sales Growth Quarter Over Quarter|level | 3d | +0.0689 | 3 | 1.895 | NO — logs only |
-| Sales Year Over Year TTM|level | 1d | +0.0369 | 5 | 1.757 | NO — logs only |
-| Sales Year Over Year TTM|level | 2d | +0.0559 | 4 | 1.819 | NO — logs only |
-| Sales Year Over Year TTM|level | 3d | +0.0675 | 3 | 1.857 | NO — logs only |
-| Profit Margin|delta | 1d | -0.0012 | 4 | 0.881 | NO — logs only |
-| Profit Margin|delta | 2d | -0.0082 | 3 | 0.869 | NO — logs only |
-| Profit Margin|delta | 3d | -0.0012 | 2 | 0.881 | NO — logs only |
-| EPS Surprise|level | 1d | +0.0096 | 5 | 0.924 | NO — logs only |
-| EPS Surprise|level | 2d | +0.0086 | 4 | 0.922 | NO — logs only |
-| EPS Surprise|level | 3d | +0.0117 | 3 | 0.928 | NO — logs only |
-| n_catalysts|level | 1d | +0.0211 | 5 | 1.625 | yes |
-| n_catalysts|level | 2d | +0.0266 | 4 | 1.643 | yes |
-| n_catalysts|level | 3d | +0.0441 | 3 | 1.697 | yes |
+| Price|ret | 1d | -0.0864 | 5 | 0.250 | yes |
+| Price|ret | 2d | -0.0465 | 4 | 0.266 | yes |
+| Price|ret | 3d | -0.0528 | 3 | 0.262 | yes |
+| Performance (Month)|delta | 1d | +0.0023 | 5 | 1.075 | yes |
+| Performance (Month)|delta | 2d | +0.0014 | 4 | 1.073 | yes |
+| Performance (Month)|delta | 3d | -0.0418 | 3 | 0.981 | yes |
+| Average Volume|delta | 1d | -0.0065 | 5 | 0.797 | NO — logs only |
+| Average Volume|delta | 2d | -0.0131 | 4 | 0.786 | NO — logs only |
+| Average Volume|delta | 3d | -0.0170 | 3 | 0.780 | NO — logs only |
+| Relative Strength Index (14)|delta | 1d | -0.0775 | 5 | 0.402 | yes |
+| Relative Strength Index (14)|delta | 2d | -0.0402 | 4 | 0.438 | yes |
+| Relative Strength Index (14)|delta | 3d | -0.0567 | 3 | 0.422 | yes |
+| Short Float|delta | 1d | +0.0218 | 4 | 1.442 | NO — logs only |
+| Short Float|delta | 2d | +0.0107 | 3 | 1.412 | NO — logs only |
+| Short Float|delta | 3d | -0.0139 | 2 | 1.343 | NO — logs only |
+| Institutional Transactions|level | 1d | +0.0209 | 6 | 1.358 | NO — logs only |
+| Institutional Transactions|level | 2d | +0.0259 | 5 | 1.371 | NO — logs only |
+| Institutional Transactions|level | 3d | +0.0397 | 4 | 1.407 | NO — logs only |
+| Institutional Ownership|delta | 1d | +0.0131 | 5 | 1.537 | NO — logs only |
+| Institutional Ownership|delta | 2d | +0.0263 | 4 | 1.576 | NO — logs only |
+| Institutional Ownership|delta | 3d | +0.0187 | 3 | 1.553 | NO — logs only |
+| Insider Transactions|level | 1d | -0.0172 | 6 | 0.902 | NO — logs only |
+| Insider Transactions|level | 2d | -0.0176 | 5 | 0.901 | NO — logs only |
+| Insider Transactions|level | 3d | -0.0285 | 4 | 0.880 | NO — logs only |
+| Target Price|delta | 1d | +0.0036 | 5 | 1.005 | NO — logs only |
+| Target Price|delta | 2d | +0.0028 | 4 | 1.004 | NO — logs only |
+| Target Price|delta | 3d | +0.0009 | 3 | 1.000 | NO — logs only |
+| Analyst Recom|delta | 1d | +0.0130 | 5 | 1.268 | NO — logs only |
+| Analyst Recom|delta | 2d | +0.0032 | 4 | 1.244 | NO — logs only |
+| Analyst Recom|delta | 3d | +0.0099 | 3 | 1.260 | NO — logs only |
+| Sales Growth Quarter Over Quarter|level | 1d | +0.0428 | 6 | 1.933 | NO — logs only |
+| Sales Growth Quarter Over Quarter|level | 2d | +0.0507 | 5 | 1.962 | NO — logs only |
+| Sales Growth Quarter Over Quarter|level | 3d | +0.0677 | 4 | 2.000 | NO — logs only |
+| Sales Year Over Year TTM|level | 1d | +0.0434 | 6 | 1.910 | NO — logs only |
+| Sales Year Over Year TTM|level | 2d | +0.0559 | 5 | 1.953 | NO — logs only |
+| Sales Year Over Year TTM|level | 3d | +0.0713 | 4 | 2.000 | NO — logs only |
+| Profit Margin|delta | 1d | +0.0020 | 5 | 0.885 | NO — logs only |
+| Profit Margin|delta | 2d | -0.0012 | 4 | 0.879 | NO — logs only |
+| Profit Margin|delta | 3d | -0.0016 | 3 | 0.879 | NO — logs only |
+| EPS Surprise|level | 1d | +0.0031 | 6 | 0.930 | NO — logs only |
+| EPS Surprise|level | 2d | +0.0155 | 5 | 0.953 | NO — logs only |
+| EPS Surprise|level | 3d | +0.0186 | 4 | 0.958 | NO — logs only |
+| n_catalysts|level | 1d | +0.0267 | 6 | 1.712 | yes |
+| n_catalysts|level | 2d | +0.0247 | 5 | 1.705 | yes |
+| n_catalysts|level | 3d | +0.0408 | 4 | 1.758 | yes |
 | Relative Volume|level | — | n/a (curved polarity) | — | 1.000 | not adjustable |
 | Relative Strength Index (14)|level | — | n/a (curved polarity) | — | 1.000 | not adjustable |
 | 50-Day Simple Moving Average|level | — | n/a (curved polarity) | — | 1.000 | not adjustable |
@@ -71,20 +71,23 @@ _Generated 2026-08-13 17:36 EDT_
 | 2026-08-06 | 1d | +0.0958 | +0.0963 | +0.0005 |
 | 2026-08-06 | 2d | +0.0636 | +0.0636 | +0.0000 |
 | 2026-08-06 | 3d | +0.0815 | +0.0818 | +0.0003 |
-| 2026-08-07 | 1d | -0.0339 | -0.0208 | +0.0132 |
-| 2026-08-07 | 2d | -0.0242 | -0.0155 | +0.0087 |
-| 2026-08-07 | 3d | -0.0009 | +0.0017 | +0.0026 |
-| 2026-08-10 | 1d | -0.0491 | -0.0298 | +0.0192 |
-| 2026-08-10 | 2d | -0.0596 | -0.0377 | +0.0220 |
-| 2026-08-10 | 3d | -0.1054 | -0.0921 | +0.0133 |
-| 2026-08-11 | 1d | +0.1007 | +0.1091 | +0.0084 |
-| 2026-08-11 | 2d | +0.0174 | +0.0150 | -0.0024 |
-| 2026-08-12 | 1d | -0.0472 | -0.0442 | +0.0030 |
+| 2026-08-07 | 1d | -0.0339 | -0.0189 | +0.0151 |
+| 2026-08-07 | 2d | -0.0242 | -0.0140 | +0.0101 |
+| 2026-08-07 | 3d | -0.0009 | +0.0016 | +0.0025 |
+| 2026-08-10 | 1d | -0.0491 | -0.0279 | +0.0212 |
+| 2026-08-10 | 2d | -0.0596 | -0.0352 | +0.0244 |
+| 2026-08-10 | 3d | -0.1054 | -0.0900 | +0.0154 |
+| 2026-08-11 | 1d | +0.1007 | +0.1105 | +0.0098 |
+| 2026-08-11 | 2d | +0.0174 | +0.0155 | -0.0018 |
+| 2026-08-11 | 3d | +0.0639 | +0.0590 | -0.0049 |
+| 2026-08-12 | 1d | -0.0472 | -0.0446 | +0.0026 |
+| 2026-08-12 | 2d | +0.0520 | +0.0515 | -0.0005 |
+| 2026-08-13 | 1d | -0.0908 | -0.0782 | +0.0126 |
 
-_Champion reconstruction check: mean |rebuilt price category − stored price_score| = 0.3933 (should be ~0; large values mean the learner's model of the engine has drifted from score_engine — distrust this run)._
+_Champion reconstruction check: mean |rebuilt price category − stored price_score| = 0.3505 (should be ~0; large values mean the learner's model of the engine has drifted from score_engine — distrust this run)._
 
 ## Decision
 
-PROMOTED — challenger mean IC gain +0.0089 on 1d, improved on 100% of 5 dates. New multipliers: Price|ret ×0.293, Performance (Month)|delta ×1.070, Average Volume|delta ×0.807, Relative Strength Index (14)|delta ×0.476, Short Float|delta ×1.382, Institutional Transactions|level ×1.304, Institutional Ownership|delta ×1.497, Insider Transactions|level ×0.934, Target Price|delta ×0.998, Analyst Recom|delta ×1.236, Sales Growth Quarter Over Quarter|level ×1.781, Sales Year Over Year TTM|level ×1.757, Profit Margin|delta ×0.881, EPS Surprise|level ×0.924, n_catalysts|level ×1.625
+PROMOTED — challenger mean IC gain +0.0103 on 1d, improved on 100% of 6 dates. New multipliers: Price|ret ×0.250, Performance (Month)|delta ×1.075, Average Volume|delta ×0.797, Relative Strength Index (14)|delta ×0.402, Short Float|delta ×1.442, Institutional Transactions|level ×1.358, Institutional Ownership|delta ×1.537, Insider Transactions|level ×0.902, Target Price|delta ×1.005, Analyst Recom|delta ×1.268, Sales Growth Quarter Over Quarter|level ×1.933, Sales Year Over Year TTM|level ×1.910, Profit Margin|delta ×0.885, EPS Surprise|level ×0.930, n_catalysts|level ×1.712
 
 _Note: curved-polarity rules (rvol/rsi/sma/short/upside/debt curves) are never auto-adjusted; change those in score_rubric.py by hand with git history as the audit trail._
