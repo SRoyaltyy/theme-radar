@@ -1,17 +1,20 @@
 {
-  "generated_at": "2026-08-12T05:19:35.266845-04:00",
+  "generated_at": "2026-08-15T04:32:55.976724-04:00",
   "horizon": "3d",
-  "n_signal_dates": 1,
+  "n_signal_dates": 4,
   "signal_dates": [
-    "2026-08-06"
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-11"
   ],
   "overall_score_accuracy": {
-    "n": 11518,
-    "n_actionable": 314,
-    "accuracy": 0.5764331210191083,
-    "accuracy_long": 0.6212121212121212,
-    "accuracy_short": 0.34,
-    "ic": 0.08146758206859278
+    "n": 46118,
+    "n_actionable": 12970,
+    "accuracy": 0.456360832690825,
+    "accuracy_long": 0.519131924614506,
+    "accuracy_short": 0.3826684545759303,
+    "ic": -0.009810395325858179
   },
   "per_date_accuracy": [
     {
@@ -22,570 +25,597 @@
       "accuracy_short": 0.34,
       "ic": 0.08146758206859278,
       "signal_asof": "2026-08-06"
+    },
+    {
+      "n": 11525,
+      "n_actionable": 4349,
+      "accuracy": 0.49896527937456886,
+      "accuracy_long": 0.5153819564465952,
+      "accuracy_short": 0.46634615384615385,
+      "ic": -0.0009475519445352021,
+      "signal_asof": "2026-08-07"
+    },
+    {
+      "n": 11533,
+      "n_actionable": 4490,
+      "accuracy": 0.3750556792873051,
+      "accuracy_long": 0.47705882352941176,
+      "accuracy_short": 0.31290322580645163,
+      "ic": -0.1053818501646766,
+      "signal_asof": "2026-08-10"
+    },
+    {
+      "n": 11542,
+      "n_actionable": 3817,
+      "accuracy": 0.4935813466072832,
+      "accuracy_long": 0.5449464368886818,
+      "accuracy_short": 0.4275449101796407,
+      "ic": 0.06387486243221739,
+      "signal_asof": "2026-08-11"
     }
   ],
   "top_factors": [
     {
-      "factor": "Performance (Week)",
-      "ic": 0.20283795931351134,
-      "n": 11470,
-      "mean_fwd_when_up": 0.015256850042116315,
-      "mean_fwd_when_down": 0.11067893664138172,
-      "spread": -0.0954220865992654
+      "factor": "d_Performance (Week)",
+      "ic": -0.16052120775005554,
+      "n": 34417,
+      "mean_fwd_when_up": 0.012227028950896302,
+      "mean_fwd_when_down": 0.028546623511134694,
+      "spread": -0.01631959456023839
     },
     {
-      "factor": "upside_pct",
-      "ic": 0.13375260161969213,
-      "n": 4648,
-      "mean_fwd_when_up": 0.04660806412183184,
-      "mean_fwd_when_down": 0.004570875586728924,
-      "spread": 0.042037188535102916
+      "factor": "d_Relative Strength Index (14)",
+      "ic": -0.1104460824243389,
+      "n": 34284,
+      "mean_fwd_when_up": 0.0075870705929539685,
+      "mean_fwd_when_down": 0.04177295293093651,
+      "spread": -0.034185882337982545
     },
     {
-      "factor": "upside_pct_lvl",
-      "ic": 0.1337484964210804,
-      "n": 4648,
-      "mean_fwd_when_up": 0.0466035106374727,
-      "mean_fwd_when_down": 0.005037860982124483,
-      "spread": 0.041565649655348216
+      "factor": "Performance (YTD)",
+      "ic": 0.10507037004142368,
+      "n": 46087,
+      "mean_fwd_when_up": 0.008333592589809546,
+      "mean_fwd_when_down": 0.055751306910826866,
+      "spread": -0.047417714321017324
     },
     {
-      "factor": "20-Day Simple Moving Average",
-      "ic": 0.12239171383324575,
-      "n": 11518,
-      "mean_fwd_when_up": 0.012994889050544465,
-      "mean_fwd_when_down": 0.0958610609533327,
-      "spread": -0.08286617190278824
+      "factor": "d_200-Day Simple Moving Average",
+      "ic": -0.09784364776540191,
+      "n": 34575,
+      "mean_fwd_when_up": 0.008468375851243149,
+      "mean_fwd_when_down": 0.038984628855697735,
+      "spread": -0.030516253004454586
     },
     {
-      "factor": "Profit Margin",
-      "ic": -0.11428566268076586,
-      "n": 4675,
-      "mean_fwd_when_up": 0.0048999924320176505,
-      "mean_fwd_when_down": 0.21850136997394734,
-      "spread": -0.21360137754192968
+      "factor": "d_50-Day Simple Moving Average",
+      "ic": -0.08871177079725528,
+      "n": 34575,
+      "mean_fwd_when_up": 0.00886107371993235,
+      "mean_fwd_when_down": 0.03852135991501972,
+      "spread": -0.029660286195087367
     },
     {
-      "factor": "Analyst Recom",
-      "ic": -0.10843139242551186,
-      "n": 4588,
-      "mean_fwd_when_up": 0.04336833885986723,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
+      "factor": "d_Performance (Quarter)",
+      "ic": -0.08833244478327533,
+      "n": 32689,
+      "mean_fwd_when_up": 0.007557781400080001,
+      "mean_fwd_when_down": 0.0392900161243664,
+      "spread": -0.0317322347242864
     },
     {
-      "factor": "w_pos",
-      "ic": 0.08362765251816336,
-      "n": 11518,
-      "mean_fwd_when_up": 0.04089018052257195,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
+      "factor": "d_Price",
+      "ic": -0.08554518583208777,
+      "n": 34575,
+      "mean_fwd_when_up": 0.007315655557646691,
+      "mean_fwd_when_down": 0.0367013676388558,
+      "spread": -0.02938571208120911
     },
     {
-      "factor": "total_score",
-      "ic": 0.08146758206859278,
-      "n": 11518,
-      "mean_fwd_when_up": 0.03744709160653415,
-      "mean_fwd_when_down": 0.05526442382169298,
-      "spread": -0.017817332215158826
+      "factor": "true_ret",
+      "ic": -0.08513015502583487,
+      "n": 34575,
+      "mean_fwd_when_up": 0.007315655557646691,
+      "mean_fwd_when_down": 0.0367013676388558,
+      "spread": -0.02938571208120911
     },
     {
-      "factor": "technical_score",
-      "ic": 0.07571185681001798,
-      "n": 11518,
-      "mean_fwd_when_up": 0.010697559639201196,
-      "mean_fwd_when_down": 0.1378130131924601,
-      "spread": -0.1271154535532589
+      "factor": "d_Forward P/E",
+      "ic": -0.08423664255322316,
+      "n": 9154,
+      "mean_fwd_when_up": 0.004435722564789336,
+      "mean_fwd_when_down": 0.011060602180558618,
+      "spread": -0.006624879615769281
     },
     {
-      "factor": "n_pos",
-      "ic": 0.07432287636949277,
-      "n": 11518,
-      "mean_fwd_when_up": 0.04089018052257195,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
+      "factor": "d_Performance (YTD)",
+      "ic": -0.08385007217265945,
+      "n": 34554,
+      "mean_fwd_when_up": 0.0059406935311750834,
+      "mean_fwd_when_down": 0.034306081452873775,
+      "spread": -0.028365387921698692
     },
     {
-      "factor": "Short Float",
-      "ic": 0.07366632401752568,
-      "n": 5741,
-      "mean_fwd_when_up": 0.08095023341861723,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "n_neg",
-      "ic": -0.06580388058568268,
-      "n": 11518,
-      "mean_fwd_when_up": 0.04443489006815577,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Sales Growth Quarter Over Quarter",
-      "ic": 0.06427438020263977,
-      "n": 4746,
-      "mean_fwd_when_up": 0.02454608239828008,
-      "mean_fwd_when_down": 0.04493273381720335,
-      "spread": -0.02038665141892327
-    },
-    {
-      "factor": "Relative Strength Index (14)",
-      "ic": 0.06229776048959024,
-      "n": 11422,
-      "mean_fwd_when_up": 0.04466327179508861,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Sales Year Over Year TTM",
-      "ic": 0.06074538571312634,
-      "n": 4536,
-      "mean_fwd_when_up": 0.07096713377525259,
-      "mean_fwd_when_down": 0.06931788612075694,
-      "spread": 0.0016492476544956447
-    },
-    {
-      "factor": "cat_copper_metals",
-      "ic": 0.05914995270042074,
-      "n": 11518,
-      "mean_fwd_when_up": 0.06181074539128665,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Performance (Quarter)",
-      "ic": -0.05372857712194233,
-      "n": 10887,
-      "mean_fwd_when_up": 0.006248522191644015,
-      "mean_fwd_when_down": 0.08761942191795288,
-      "spread": -0.08137089972630887
-    },
-    {
-      "factor": "catalyst_score",
-      "ic": 0.053098353133425376,
-      "n": 11518,
-      "mean_fwd_when_up": 0.029139864322192413,
-      "mean_fwd_when_down": 0.044773910776580224,
-      "spread": -0.01563404645438781
-    },
-    {
-      "factor": "n_catalysts",
-      "ic": 0.05303198112063495,
-      "n": 11518,
-      "mean_fwd_when_up": 0.029139864322192413,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "valuation_score",
-      "ic": 0.05253757564462073,
-      "n": 11518,
-      "mean_fwd_when_up": 0.050450200398162316,
-      "mean_fwd_when_down": 0.005037860982124483,
-      "spread": 0.04541233941603783
-    },
-    {
-      "factor": "w_neg",
-      "ic": -0.04864454846456438,
-      "n": 11518,
-      "mean_fwd_when_up": 0.04443489006815577,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Institutional Transactions",
-      "ic": 0.04534362111377922,
-      "n": 5059,
-      "mean_fwd_when_up": 0.14444565900902606,
-      "mean_fwd_when_down": 0.03667771412890502,
-      "spread": 0.10776794488012104
-    },
-    {
-      "factor": "Forward P/E",
-      "ic": 0.044855045269014376,
-      "n": 3061,
-      "mean_fwd_when_up": 0.0067647070790228005,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Institutional Ownership",
-      "ic": -0.043225575441388664,
-      "n": 5844,
-      "mean_fwd_when_up": 0.07614309482702587,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Target Price",
-      "ic": -0.037630635059160505,
-      "n": 4648,
-      "mean_fwd_when_up": 0.0431625509209949,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "Average Volume",
-      "ic": 0.037188857979755276,
-      "n": 11509,
-      "mean_fwd_when_up": 0.04435236122984711,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "cat_defense",
-      "ic": 0.03715266627482345,
-      "n": 11518,
-      "mean_fwd_when_up": 0.03459047888154803,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
-    },
-    {
-      "factor": "cat_hbm_memory",
-      "ic": 0.027037781821024197,
-      "n": 11518,
-      "mean_fwd_when_up": 0.04417751709616234,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
+      "factor": "Beta",
+      "ic": 0.0800622998149787,
+      "n": 29266,
+      "mean_fwd_when_up": 0.021750216050998264,
+      "mean_fwd_when_down": 0.04439755474167792,
+      "spread": -0.022647338690679655
     },
     {
       "factor": "200-Day Simple Moving Average",
-      "ic": -0.023776778283534885,
-      "n": 11518,
-      "mean_fwd_when_up": 0.007013825065674082,
-      "mean_fwd_when_down": 0.0935791049183915,
-      "spread": -0.08656527985271742
+      "ic": 0.07847467360213974,
+      "n": 46118,
+      "mean_fwd_when_up": 0.00729818231801504,
+      "mean_fwd_when_down": 0.055464300003798366,
+      "spread": -0.04816611768578333
     },
     {
-      "factor": "cat_nuclear_smr",
-      "ic": 0.02354082236083866,
-      "n": 11518,
-      "mean_fwd_when_up": 0.03535405306137417,
-      "mean_fwd_when_down": NaN,
-      "spread": NaN
+      "factor": "d_20-Day Simple Moving Average",
+      "ic": -0.07566925715565306,
+      "n": 34575,
+      "mean_fwd_when_up": 0.009610241972803489,
+      "mean_fwd_when_down": 0.03632580575763461,
+      "spread": -0.02671556378483112
     },
     {
-      "factor": "Performance (Month)",
-      "ic": 0.02209896069206307,
-      "n": 11341,
-      "mean_fwd_when_up": 0.009586074074860168,
-      "mean_fwd_when_down": 0.09298471012302739,
-      "spread": -0.08339863604816722
+      "factor": "Sales Year Over Year TTM",
+      "ic": 0.07045016586103921,
+      "n": 18168,
+      "mean_fwd_when_up": 0.045053998807244644,
+      "mean_fwd_when_down": 0.044135461322196395,
+      "spread": 0.0009185374850482486
     },
     {
-      "factor": "Short Ratio",
-      "ic": 0.021612750877976674,
-      "n": 11392,
-      "mean_fwd_when_up": 0.03414264682562608,
+      "factor": "Sales Growth Quarter Over Quarter",
+      "ic": 0.0676004270160385,
+      "n": 18983,
+      "mean_fwd_when_up": 0.020394840758045926,
+      "mean_fwd_when_down": 0.034888419700346236,
+      "spread": -0.01449357894230031
+    },
+    {
+      "factor": "d_Market Cap",
+      "ic": -0.06452490464834978,
+      "n": 17683,
+      "mean_fwd_when_up": 0.014216850871952642,
+      "mean_fwd_when_down": 0.060422802669037164,
+      "spread": -0.04620595179708452
+    },
+    {
+      "factor": "Volatility (Month)",
+      "ic": 0.05731237448389276,
+      "n": 34042,
+      "mean_fwd_when_up": 0.021924306967997232,
       "mean_fwd_when_down": NaN,
       "spread": NaN
     },
     {
       "factor": "Price",
-      "ic": -0.020389041751089697,
-      "n": 11518,
-      "mean_fwd_when_up": 0.04426897369713654,
+      "ic": 0.056682305011823746,
+      "n": 46118,
+      "mean_fwd_when_up": 0.027487689436096297,
       "mean_fwd_when_down": NaN,
       "spread": NaN
     },
     {
-      "factor": "cat_semiconductor_equip",
-      "ic": 0.01703577423747969,
-      "n": 11518,
-      "mean_fwd_when_up": 0.054314382065507635,
+      "factor": "d_Institutional Ownership",
+      "ic": 0.047181187831390706,
+      "n": 17536,
+      "mean_fwd_when_up": 0.013969163317229239,
+      "mean_fwd_when_down": 0.028174086386411966,
+      "spread": -0.014204923069182727
+    },
+    {
+      "factor": "Short Float",
+      "ic": 0.046695999792922875,
+      "n": 23017,
+      "mean_fwd_when_up": 0.04704981353435231,
       "mean_fwd_when_down": NaN,
       "spread": NaN
     },
     {
-      "factor": "Performance (YTD)",
-      "ic": -0.016299367304515526,
-      "n": 11509,
-      "mean_fwd_when_up": 0.00685177715137734,
-      "mean_fwd_when_down": 0.09721638801194941,
-      "spread": -0.09036461086057207
+      "factor": "Analyst Recom",
+      "ic": -0.04533376516629112,
+      "n": 18359,
+      "mean_fwd_when_up": 0.025193740627992678,
+      "mean_fwd_when_down": NaN,
+      "spread": NaN
+    },
+    {
+      "factor": "d_Performance (Month)",
+      "ic": -0.044790792312248556,
+      "n": 34064,
+      "mean_fwd_when_up": 0.012233346328983373,
+      "mean_fwd_when_down": 0.03323344779552813,
+      "spread": -0.021000101466544754
     },
     {
       "factor": "Market Cap",
-      "ic": -0.015387384147280704,
-      "n": 5890,
-      "mean_fwd_when_up": 0.07837602603418069,
+      "ic": 0.04191059739104347,
+      "n": 23585,
+      "mean_fwd_when_up": 0.0455726339682157,
       "mean_fwd_when_down": NaN,
       "spread": NaN
     },
     {
-      "factor": "EPS Surprise",
-      "ic": -0.013272149041558058,
-      "n": 4166,
-      "mean_fwd_when_up": 0.01015385705159906,
-      "mean_fwd_when_down": 0.03810070044466441,
-      "spread": -0.02794684339306535
+      "factor": "50-Day Simple Moving Average",
+      "ic": -0.041181050127959515,
+      "n": 46118,
+      "mean_fwd_when_up": 0.004978221946809327,
+      "mean_fwd_when_down": 0.058634063229326766,
+      "spread": -0.053655841282517436
     },
     {
-      "factor": "Relative Volume",
-      "ic": 0.008764400115113185,
-      "n": 11509,
-      "mean_fwd_when_up": 0.045454028209196806,
+      "factor": "catalyst_score",
+      "ic": 0.040147213659947986,
+      "n": 46118,
+      "mean_fwd_when_up": 0.02787337707329566,
+      "mean_fwd_when_down": 0.027474266914380766,
+      "spread": 0.0003991101589148928
+    },
+    {
+      "factor": "n_catalysts",
+      "ic": 0.04011126179086765,
+      "n": 46118,
+      "mean_fwd_when_up": 0.02787337707329566,
       "mean_fwd_when_down": NaN,
       "spread": NaN
     },
     {
-      "factor": "cat_data_center_power",
-      "ic": -0.00759470351576403,
-      "n": 11518,
-      "mean_fwd_when_up": 0.009191910898259383,
+      "factor": "Institutional Transactions",
+      "ic": 0.0386777289477482,
+      "n": 20266,
+      "mean_fwd_when_up": 0.07372735851474857,
+      "mean_fwd_when_down": 0.031070411055395254,
+      "spread": 0.04265694745935332
+    },
+    {
+      "factor": "Performance (Month)",
+      "ic": -0.036820323984391036,
+      "n": 45440,
+      "mean_fwd_when_up": 0.006426732797074515,
+      "mean_fwd_when_down": 0.05756224098356789,
+      "spread": -0.05113550818649337
+    },
+    {
+      "factor": "upside_pct_lvl",
+      "ic": 0.036325636098978924,
+      "n": 18595,
+      "mean_fwd_when_up": 0.027508817270817627,
+      "mean_fwd_when_down": 0.0003606652080549668,
+      "spread": 0.02714815206276266
+    },
+    {
+      "factor": "upside_pct",
+      "ic": 0.03631978044641909,
+      "n": 18595,
+      "mean_fwd_when_up": 0.02752771023247642,
+      "mean_fwd_when_down": 0.0002860624738838278,
+      "spread": 0.027241647758592592
+    },
+    {
+      "factor": "price_score",
+      "ic": -0.033310878156010144,
+      "n": 46118,
+      "mean_fwd_when_up": 0.013611473245726074,
+      "mean_fwd_when_down": 0.06242618473754223,
+      "spread": -0.048814711491816154
+    },
+    {
+      "factor": "Forward P/E",
+      "ic": 0.03166316189939017,
+      "n": 12223,
+      "mean_fwd_when_up": 0.007446775157285218,
       "mean_fwd_when_down": NaN,
       "spread": NaN
     },
     {
-      "factor": "flow_score",
-      "ic": -0.0041510944494687315,
-      "n": 11518,
-      "mean_fwd_when_up": 0.12133754196072723,
-      "mean_fwd_when_down": 0.03816986498165272,
-      "spread": 0.08316767697907451
+      "factor": "Insider Transactions",
+      "ic": -0.028438520623634663,
+      "n": 21542,
+      "mean_fwd_when_up": 0.008079847012131767,
+      "mean_fwd_when_down": 0.01345749698468773,
+      "spread": -0.005377649972555963
+    },
+    {
+      "factor": "Institutional Ownership",
+      "ic": 0.02647815706512944,
+      "n": 23387,
+      "mean_fwd_when_up": 0.043472720291785553,
+      "mean_fwd_when_down": NaN,
+      "spread": NaN
+    },
+    {
+      "factor": "Total Debt/Equity",
+      "ic": 0.025394089036444464,
+      "n": 15134,
+      "mean_fwd_when_up": 0.025773084502476826,
+      "mean_fwd_when_down": NaN,
+      "spread": NaN
+    },
+    {
+      "factor": "d_Beta",
+      "ic": -0.025271355111837007,
+      "n": 19510,
+      "mean_fwd_when_up": 0.021426079607511552,
+      "mean_fwd_when_down": 0.03160597365455155,
+      "spread": -0.010179894047039995
+    },
+    {
+      "factor": "cat_hbm_memory",
+      "ic": 0.024478728598807092,
+      "n": 46118,
+      "mean_fwd_when_up": 0.053990606091098604,
+      "mean_fwd_when_down": NaN,
+      "spread": NaN
+    },
+    {
+      "factor": "20-Day Simple Moving Average",
+      "ic": 0.0244737328730968,
+      "n": 46118,
+      "mean_fwd_when_up": 0.008386307579775206,
+      "mean_fwd_when_down": 0.0636929730105811,
+      "spread": -0.055306665430805896
+    },
+    {
+      "factor": "valuation_score",
+      "ic": 0.023257815649993307,
+      "n": 46118,
+      "mean_fwd_when_up": 0.02944212836391736,
+      "mean_fwd_when_down": 0.0003606652080549668,
+      "spread": 0.029081463155862394
+    },
+    {
+      "factor": "Target Price",
+      "ic": 0.023226130027960444,
+      "n": 18595,
+      "mean_fwd_when_up": 0.025286135002654433,
+      "mean_fwd_when_down": NaN,
+      "spread": NaN
     }
   ],
   "top_combinations": [
     {
-      "combo": "Performance (Week)\u2193 & Profit Margin\u2193",
-      "n": 695,
-      "mean_fwd": 0.5628943623501074,
-      "hit_up": 0.5280575539568345,
-      "hit_down": 0.44028776978417267,
-      "score": 14.83950113379982
+      "combo": "d_Relative Strength Index (14)\u2193 & d_Performance (Quarter)\u2193",
+      "n": 10552,
+      "mean_fwd": 0.050242222807709916,
+      "hit_up": 0.7013836239575436,
+      "hit_down": 0.2798521607278241,
+      "score": 5.161028251469251
     },
     {
-      "combo": "20-Day Simple Moving Average\u2193 & Profit Margin\u2193",
-      "n": 947,
-      "mean_fwd": 0.4252677716219144,
-      "hit_up": 0.5659978880675819,
-      "hit_down": 0.38753959873284055,
-      "score": 13.086920404301178
+      "combo": "d_50-Day Simple Moving Average\u2193 & d_Performance (Quarter)\u2193",
+      "n": 10648,
+      "mean_fwd": 0.048201078332552605,
+      "hit_up": 0.7092411720510894,
+      "hit_down": 0.27169421487603307,
+      "score": 4.973828143932744
     },
     {
-      "combo": "Profit Margin\u2193 & total_score\u2193",
-      "n": 647,
-      "mean_fwd": 0.39336306822432826,
-      "hit_up": 0.5378670788253478,
-      "hit_down": 0.4095826893353941,
-      "score": 10.005659584831417
+      "combo": "d_200-Day Simple Moving Average\u2193 & d_Performance (Quarter)\u2193",
+      "n": 10838,
+      "mean_fwd": 0.04773764118937584,
+      "hit_up": 0.7118472042812327,
+      "hit_down": 0.2696992064956634,
+      "score": 4.9697612923556775
     },
     {
-      "combo": "Profit Margin\u2193 & w_pos\u2191",
-      "n": 1794,
-      "mean_fwd": 0.18806438596061759,
-      "hit_up": 0.5797101449275363,
-      "hit_down": 0.38684503901895206,
-      "score": 7.9655868961765135
+      "combo": "d_Relative Strength Index (14)\u2193 & d_200-Day Simple Moving Average\u2193",
+      "n": 14068,
+      "mean_fwd": 0.041800210521023035,
+      "hit_up": 0.6897213534262155,
+      "hit_down": 0.2908729030423656,
+      "score": 4.957864450668126
     },
     {
-      "combo": "Performance (Week)\u2193 & 20-Day Simple Moving Average\u2193",
-      "n": 2794,
-      "mean_fwd": 0.13964968848701115,
-      "hit_up": 0.49606299212598426,
-      "hit_down": 0.4681460272011453,
-      "score": 7.381645288937067
+      "combo": "d_Relative Strength Index (14)\u2193 & d_50-Day Simple Moving Average\u2193",
+      "n": 13790,
+      "mean_fwd": 0.04203160341160657,
+      "hit_up": 0.6891950688905004,
+      "hit_down": 0.29122552574329225,
+      "score": 4.935806104476193
     },
     {
-      "combo": "Performance (Week)\u2193 & w_pos\u2191",
-      "n": 2593,
-      "mean_fwd": 0.11838427162576068,
-      "hit_up": 0.4936367142306209,
-      "hit_down": 0.47898187427689937,
-      "score": 6.028305661407886
+      "combo": "d_200-Day Simple Moving Average\u2193 & d_50-Day Simple Moving Average\u2193",
+      "n": 14571,
+      "mean_fwd": 0.04007539655752357,
+      "hit_up": 0.695834191201702,
+      "hit_down": 0.2816553428042001,
+      "score": 4.837517037703995
     },
     {
-      "combo": "20-Day Simple Moving Average\u2193 & w_pos\u2191",
-      "n": 3007,
-      "mean_fwd": 0.10923826189949247,
-      "hit_up": 0.5447289657465912,
-      "hit_down": 0.42068506817426005,
-      "score": 5.990202381681781
+      "combo": "d_Performance (Week)\u2193 & d_Relative Strength Index (14)\u2193",
+      "n": 12567,
+      "mean_fwd": 0.04088427194862978,
+      "hit_up": 0.699371369459696,
+      "hit_down": 0.2807352590116973,
+      "score": 4.583234474367911
     },
     {
-      "combo": "Performance (Week)\u2193 & total_score\u2193",
-      "n": 1927,
-      "mean_fwd": 0.12972085097433325,
-      "hit_up": 0.5049299429164504,
-      "hit_down": 0.44992215879605607,
-      "score": 5.694435083048403
+      "combo": "d_Performance (Week)\u2193 & d_50-Day Simple Moving Average\u2193",
+      "n": 13009,
+      "mean_fwd": 0.03979570784304834,
+      "hit_up": 0.7072027058190483,
+      "hit_down": 0.27281113075563074,
+      "score": 4.53897918047053
     },
     {
-      "combo": "20-Day Simple Moving Average\u2193 & total_score\u2193",
-      "n": 2584,
-      "mean_fwd": 0.10228560132916006,
-      "hit_up": 0.5425696594427245,
-      "hit_down": 0.4075077399380805,
-      "score": 5.1994901206049216
+      "combo": "d_Performance (Week)\u2193 & d_200-Day Simple Moving Average\u2193",
+      "n": 13083,
+      "mean_fwd": 0.039502460390366256,
+      "hit_up": 0.7115340518229764,
+      "hit_down": 0.268745700527402,
+      "score": 4.518328649277738
     },
     {
-      "combo": "Profit Margin\u2193 & total_score\u2191",
-      "n": 1149,
-      "mean_fwd": 0.14329475121160495,
-      "hit_up": 0.5996518711923412,
-      "hit_down": 0.37597911227154046,
-      "score": 4.857248212495459
+      "combo": "d_Performance (Quarter)\u2193 & d_Price\u2193",
+      "n": 10341,
+      "mean_fwd": 0.0437956664918601,
+      "hit_up": 0.702446571898269,
+      "hit_down": 0.2799535828256455,
+      "score": 4.453612312746178
     },
     {
-      "combo": "upside_pct\u2191 & Profit Margin\u2193",
-      "n": 1501,
-      "mean_fwd": 0.11870471265200681,
-      "hit_up": 0.5996002664890073,
-      "hit_down": 0.37241838774150565,
-      "score": 4.598945968099544
+      "combo": "d_Performance (Quarter)\u2193 & true_ret\u2193",
+      "n": 10341,
+      "mean_fwd": 0.0437956664918601,
+      "hit_up": 0.702446571898269,
+      "hit_down": 0.2799535828256455,
+      "score": 4.453612312746178
     },
     {
-      "combo": "upside_pct_lvl\u2191 & Profit Margin\u2193",
-      "n": 1501,
-      "mean_fwd": 0.11870471265200681,
-      "hit_up": 0.5996002664890073,
-      "hit_down": 0.37241838774150565,
-      "score": 4.598945968099544
+      "combo": "d_Relative Strength Index (14)\u2193 & d_Price\u2193",
+      "n": 14173,
+      "mean_fwd": 0.036930594682799085,
+      "hit_up": 0.6835532350243421,
+      "hit_down": 0.2974670147463487,
+      "score": 4.39660241973729
     },
     {
-      "combo": "Profit Margin\u2193 & Analyst Recom\u2191",
-      "n": 1575,
-      "mean_fwd": 0.11197195627777856,
-      "hit_up": 0.5904761904761905,
-      "hit_down": 0.38222222222222224,
-      "score": 4.443749251865994
+      "combo": "d_Relative Strength Index (14)\u2193 & true_ret\u2193",
+      "n": 14173,
+      "mean_fwd": 0.036930594682799085,
+      "hit_up": 0.6835532350243421,
+      "hit_down": 0.2974670147463487,
+      "score": 4.39660241973729
     },
     {
-      "combo": "20-Day Simple Moving Average\u2193 & total_score\u2191",
-      "n": 1532,
-      "mean_fwd": 0.09948409388968514,
-      "hit_up": 0.5469973890339426,
-      "hit_down": 0.42689295039164493,
-      "score": 3.893884194934819
+      "combo": "d_Price\u2193 & true_ret\u2193",
+      "n": 14291,
+      "mean_fwd": 0.0367013676388558,
+      "hit_up": 0.6836470505912813,
+      "hit_down": 0.297040095164789,
+      "score": 4.387463916018455
     },
     {
-      "combo": "upside_pct\u2191 & total_score\u2193",
-      "n": 747,
-      "mean_fwd": 0.13835941231491683,
-      "hit_up": 0.5220883534136547,
-      "hit_down": 0.4457831325301205,
-      "score": 3.7815427078334687
+      "combo": "d_Performance (Week)\u2193 & d_Performance (Quarter)\u2193",
+      "n": 11724,
+      "mean_fwd": 0.0404073640070426,
+      "hit_up": 0.7166496076424429,
+      "hit_down": 0.26467076083248037,
+      "score": 4.375205183046431
     },
     {
-      "combo": "upside_pct_lvl\u2191 & total_score\u2193",
-      "n": 748,
-      "mean_fwd": 0.13821075626357113,
-      "hit_up": 0.5227272727272727,
-      "hit_down": 0.4451871657754011,
-      "score": 3.780007332521632
+      "combo": "d_50-Day Simple Moving Average\u2193 & d_Price\u2193",
+      "n": 13662,
+      "mean_fwd": 0.0369996737396856,
+      "hit_up": 0.6892841458058849,
+      "hit_down": 0.29197774849948765,
+      "score": 4.324690527215968
     },
     {
-      "combo": "upside_pct\u2191 & 20-Day Simple Moving Average\u2193",
-      "n": 1869,
-      "mean_fwd": 0.08720558011082902,
-      "hit_up": 0.5243445692883895,
-      "hit_down": 0.45264847512038525,
-      "score": 3.770065765395792
+      "combo": "d_50-Day Simple Moving Average\u2193 & true_ret\u2193",
+      "n": 13662,
+      "mean_fwd": 0.0369996737396856,
+      "hit_up": 0.6892841458058849,
+      "hit_down": 0.29197774849948765,
+      "score": 4.324690527215968
     },
     {
-      "combo": "upside_pct_lvl\u2191 & 20-Day Simple Moving Average\u2193",
-      "n": 1870,
-      "mean_fwd": 0.08717347268077419,
-      "hit_up": 0.5245989304812835,
-      "hit_down": 0.45240641711229945,
-      "score": 3.769685771301373
+      "combo": "d_200-Day Simple Moving Average\u2193 & d_Price\u2193",
+      "n": 13923,
+      "mean_fwd": 0.03625656414950576,
+      "hit_up": 0.6890038066508655,
+      "hit_down": 0.29225023342670403,
+      "score": 4.278120937374115
     },
     {
-      "combo": "Performance (Week)\u2193 & total_score\u2191",
-      "n": 1415,
-      "mean_fwd": 0.10001571758272386,
-      "hit_up": 0.4826855123674912,
-      "hit_down": 0.49823321554770317,
-      "score": 3.762239814987324
+      "combo": "d_200-Day Simple Moving Average\u2193 & true_ret\u2193",
+      "n": 13923,
+      "mean_fwd": 0.03625656414950576,
+      "hit_up": 0.6890038066508655,
+      "hit_down": 0.29225023342670403,
+      "score": 4.278120937374115
     },
     {
-      "combo": "Performance (Week)\u2193 & upside_pct\u2191",
-      "n": 1554,
-      "mean_fwd": 0.09447707380717166,
-      "hit_up": 0.4749034749034749,
-      "hit_down": 0.5083655083655083,
-      "score": 3.72436246308111
+      "combo": "d_Performance (Week)\u2193 & d_Price\u2193",
+      "n": 12330,
+      "mean_fwd": 0.03562738617720473,
+      "hit_up": 0.6995133819951338,
+      "hit_down": 0.28158961881589617,
+      "score": 3.956083955499003
     },
     {
-      "combo": "Performance (Week)\u2193 & upside_pct_lvl\u2191",
-      "n": 1555,
-      "mean_fwd": 0.09443378609791196,
-      "hit_up": 0.4752411575562701,
-      "hit_down": 0.5080385852090032,
-      "score": 3.7238535998079363
+      "combo": "d_Performance (Week)\u2193 & true_ret\u2193",
+      "n": 12330,
+      "mean_fwd": 0.03562738617720473,
+      "hit_up": 0.6995133819951338,
+      "hit_down": 0.28158961881589617,
+      "score": 3.956083955499003
     },
     {
-      "combo": "20-Day Simple Moving Average\u2193 & Analyst Recom\u2191",
-      "n": 1913,
-      "mean_fwd": 0.08459960166523646,
-      "hit_up": 0.5206481965499216,
-      "hit_down": 0.45844223732357553,
-      "score": 3.700205149375722
+      "combo": "d_Performance (Week)\u2191 & d_Relative Strength Index (14)\u2193",
+      "n": 1931,
+      "mean_fwd": 0.04883615629334569,
+      "hit_up": 0.5753495598135681,
+      "hit_down": 0.40031071983428274,
+      "score": 2.1460143014136968
     },
     {
-      "combo": "Performance (Week)\u2193 & Analyst Recom\u2191",
-      "n": 1631,
-      "mean_fwd": 0.08926892474258295,
-      "hit_up": 0.4727161250766401,
-      "hit_down": 0.5119558553034947,
-      "score": 3.605182748236309
+      "combo": "d_Performance (Week)\u2191 & d_Price\u2193",
+      "n": 1865,
+      "mean_fwd": 0.045038310941628475,
+      "hit_up": 0.5774798927613941,
+      "hit_down": 0.40214477211796246,
+      "score": 1.9450085421060552
     },
     {
-      "combo": "Analyst Recom\u2191 & total_score\u2193",
-      "n": 1044,
-      "mean_fwd": 0.0998900652677224,
-      "hit_up": 0.5181992337164751,
-      "hit_down": 0.4578544061302682,
-      "score": 3.2275467843726435
+      "combo": "d_Performance (Week)\u2191 & true_ret\u2193",
+      "n": 1865,
+      "mean_fwd": 0.045038310941628475,
+      "hit_up": 0.5774798927613941,
+      "hit_down": 0.40214477211796246,
+      "score": 1.9450085421060552
     },
     {
-      "combo": "w_pos\u2191 & total_score\u2193",
-      "n": 3881,
-      "mean_fwd": 0.050796193831315645,
-      "hit_up": 0.6781757279051791,
-      "hit_down": 0.28600876062870395,
-      "score": 3.1644846479912454
+      "combo": "d_Performance (Week)\u2191 & d_Performance (Quarter)\u2193",
+      "n": 2699,
+      "mean_fwd": 0.03635689141432587,
+      "hit_up": 0.5594664690626158,
+      "hit_down": 0.4079288625416821,
+      "score": 1.888809617296568
     },
     {
-      "combo": "upside_pct\u2191 & w_pos\u2191",
-      "n": 4240,
-      "mean_fwd": 0.04699015222648641,
-      "hit_up": 0.5591981132075472,
-      "hit_down": 0.4247641509433962,
-      "score": 3.05977703151355
+      "combo": "d_Performance (Week)\u2191 & d_200-Day Simple Moving Average\u2193",
+      "n": 1988,
+      "mean_fwd": 0.03935392592950697,
+      "hit_up": 0.5840040241448692,
+      "hit_down": 0.39134808853118713,
+      "score": 1.7546732443100228
     },
     {
-      "combo": "upside_pct_lvl\u2191 & w_pos\u2191",
-      "n": 4240,
-      "mean_fwd": 0.04699015222648641,
-      "hit_up": 0.5591981132075472,
-      "hit_down": 0.4247641509433962,
-      "score": 3.05977703151355
+      "combo": "d_Performance (Week)\u2191 & d_50-Day Simple Moving Average\u2193",
+      "n": 2014,
+      "mean_fwd": 0.0342069514165928,
+      "hit_up": 0.573982125124131,
+      "hit_down": 0.3972194637537239,
+      "score": 1.5351262709586206
     },
     {
-      "combo": "upside_pct\u2191 & upside_pct_lvl\u2191",
-      "n": 4269,
-      "mean_fwd": 0.04660806412183184,
-      "hit_up": 0.5577418599203561,
-      "hit_down": 0.42632935113609743,
-      "score": 3.0452583463834166
+      "combo": "d_200-Day Simple Moving Average\u2191 & d_50-Day Simple Moving Average\u2191",
+      "n": 18188,
+      "mean_fwd": 0.00852796391783453,
+      "hit_up": 0.5687266329447987,
+      "hit_down": 0.39762480756542773,
+      "score": 1.1501058882571418
     },
     {
-      "combo": "upside_pct_lvl\u2191 & Analyst Recom\u2191",
-      "n": 4217,
-      "mean_fwd": 0.04683986593028673,
-      "hit_up": 0.5584538771638605,
-      "hit_down": 0.42613232155560826,
-      "score": 3.0417074664123493
+      "combo": "d_200-Day Simple Moving Average\u2191 & d_Price\u2193",
+      "n": 314,
+      "mean_fwd": 0.06284470282289373,
+      "hit_up": 0.4872611464968153,
+      "hit_down": 0.4745222929936306,
+      "score": 1.1136109712506956
     },
     {
-      "combo": "upside_pct\u2191 & Analyst Recom\u2191",
-      "n": 4216,
-      "mean_fwd": 0.046844532718717,
-      "hit_up": 0.5583491461100569,
-      "hit_down": 0.4262333965844402,
-      "score": 3.0416498147546402
+      "combo": "d_200-Day Simple Moving Average\u2191 & true_ret\u2193",
+      "n": 314,
+      "mean_fwd": 0.06284470282289373,
+      "hit_up": 0.4872611464968153,
+      "hit_down": 0.4745222929936306,
+      "score": 1.1136109712506956
     }
   ]
 }
