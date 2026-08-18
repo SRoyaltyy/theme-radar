@@ -1,19 +1,17 @@
 {
-  "signal_asof": "2026-08-14",
-  "scan_date": "2026-08-14",
-  "n_rows": 11586,
+  "signal_asof": "2026-08-17",
+  "scan_date": "2026-08-17",
+  "n_rows": 11573,
   "prediction_days": [
-    "2026-08-17",
     "2026-08-18"
   ],
   "forward_snapshots": [
-    "2026-08-17",
     "2026-08-18"
   ],
   "entry_definition": "Finviz Price on signal_asof snapshot (long buy / short sell entry)",
   "exit_definition": "Finviz Price on prediction_day snapshot (close proxy)",
   "fwd_definition": "long: exit/entry - 1; short_fwd: opposite sign",
-  "n_fwd_1d_valid": 11551,
+  "n_fwd_1d_valid": 11559,
   "n_fwd_3d_valid": 0,
   "wording": {
     "signal_asof": "Snapshot that formed the score (only data on/before this date).",
