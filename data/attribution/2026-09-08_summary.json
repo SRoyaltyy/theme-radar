@@ -1,115 +1,115 @@
 {
   "scan_date": "2026-09-08",
   "signal_asof": "2026-09-08",
-  "prediction_day": "2026-09-09",
-  "label": "fwd_1d",
-  "n": 11595,
+  "prediction_day": "2026-09-10",
+  "label": "fwd_2d",
+  "n": 11593,
   "pair_date": "?",
-  "label_date": "2026-09-09",
+  "label_date": "2026-09-10",
   "entry_field": "entry_price (Price on signal_asof)",
-  "exit_field": "exit_price_1d (Price on prediction_day)",
+  "exit_field": "exit_price_2d (Price on prediction_day)",
   "features": [
     {
       "feature": "Short Float",
-      "ic": -0.2673193400174988,
-      "ic_within_up": 0.11503594437726447,
-      "ic_within_down": -0.27840646066289315,
-      "mean_fwd_when_pos": 0.000809138425199327,
+      "ic": -0.2766703087520446,
+      "ic_within_up": 0.10789206581239362,
+      "ic_within_down": -0.2838543091396042,
+      "mean_fwd_when_pos": -0.007245750567627385,
       "mean_fwd_when_neg": NaN,
-      "n_pos": 5687,
+      "n_pos": 5685,
       "n_neg": 0
     },
     {
       "feature": "upside_pct_lvl",
-      "ic": -0.21215608083172277,
-      "ic_within_up": 0.3261986123025691,
-      "ic_within_down": -0.4055579276609874,
-      "mean_fwd_when_pos": 0.0031784407170036715,
-      "mean_fwd_when_neg": -0.007886105957856783,
-      "n_pos": 4349,
+      "ic": -0.26293034740990945,
+      "ic_within_up": 0.3527135027982482,
+      "ic_within_down": -0.41000438785006293,
+      "mean_fwd_when_pos": -0.009266929051996393,
+      "mean_fwd_when_neg": -0.015208753979775884,
+      "n_pos": 4348,
       "n_neg": 297
     },
     {
       "feature": "Performance (Month)",
-      "ic": 0.18849505119908413,
-      "ic_within_up": -0.008842689918234345,
-      "ic_within_down": 0.21588106734996376,
-      "mean_fwd_when_pos": -0.006970917170363001,
-      "mean_fwd_when_neg": 0.002536368650447527,
+      "ic": 0.11344866903651317,
+      "ic_within_up": -0.02968387753934771,
+      "ic_within_down": 0.14243448299592174,
+      "mean_fwd_when_pos": -0.01636440200168374,
+      "mean_fwd_when_neg": -0.00247264007538707,
       "n_pos": 4384,
-      "n_neg": 7002
-    },
-    {
-      "feature": "Relative Strength Index (14)",
-      "ic": 0.1435231052045412,
-      "ic_within_up": -0.09998101651969961,
-      "ic_within_down": 0.1013439141092672,
-      "mean_fwd_when_pos": -0.0011588929306864423,
-      "mean_fwd_when_neg": NaN,
-      "n_pos": 11506,
-      "n_neg": 0
+      "n_neg": 7000
     },
     {
       "feature": "Relative Volume",
-      "ic": -0.07889533520982675,
-      "ic_within_up": 0.0619459009815834,
-      "ic_within_down": -0.12068236715868362,
-      "mean_fwd_when_pos": -0.0011151108065312232,
+      "ic": -0.08131865792394206,
+      "ic_within_up": 0.06669433780052873,
+      "ic_within_down": -0.10697351018324458,
+      "mean_fwd_when_pos": -0.007954338601312757,
       "mean_fwd_when_neg": NaN,
-      "n_pos": 11352,
+      "n_pos": 11350,
+      "n_neg": 0
+    },
+    {
+      "feature": "Institutional Transactions",
+      "ic": -0.0754324672127531,
+      "ic_within_up": 0.05860068369592446,
+      "ic_within_down": -0.11663731441968701,
+      "mean_fwd_when_pos": -0.016004083979226116,
+      "mean_fwd_when_neg": 0.009475162379468476,
+      "n_pos": 3198,
+      "n_neg": 1830
+    },
+    {
+      "feature": "Relative Strength Index (14)",
+      "ic": 0.06965430358348819,
+      "ic_within_up": -0.10337693185637624,
+      "ic_within_down": 0.03915810126102252,
+      "mean_fwd_when_pos": -0.00786595662016797,
+      "mean_fwd_when_neg": NaN,
+      "n_pos": 11504,
       "n_neg": 0
     },
     {
       "feature": "Performance (Week)",
-      "ic": 0.0722551804034573,
-      "ic_within_up": 0.028326554819721975,
-      "ic_within_down": 0.05880713188110128,
-      "mean_fwd_when_pos": -0.006164898174721585,
-      "mean_fwd_when_neg": 0.00303573773674058,
+      "ic": 0.0032252591112301473,
+      "ic_within_up": -0.00406036864835722,
+      "ic_within_down": -0.013042583041687508,
+      "mean_fwd_when_pos": -0.017282139105977715,
+      "mean_fwd_when_neg": -0.00018777935638604804,
       "n_pos": 5077,
-      "n_neg": 6297
-    },
-    {
-      "feature": "Institutional Transactions",
-      "ic": -0.07091411570492674,
-      "ic_within_up": 0.06755004025269186,
-      "ic_within_down": -0.09130521997231894,
-      "mean_fwd_when_pos": -0.011616462741150246,
-      "mean_fwd_when_neg": 0.024008316619960907,
-      "n_pos": 3199,
-      "n_neg": 1830
+      "n_neg": 6295
     }
   ],
-  "score_ic": -0.08489701586850465,
+  "score_ic": -0.12761243096242988,
   "score_calibration": [
     {
       "quintile": 1,
-      "mean_fwd": 0.01993547080814867,
-      "hit_up": 0.06027104136947218,
-      "n": 2804
+      "mean_fwd": 0.021903863298358202,
+      "hit_up": 0.07673090649536046,
+      "n": 2802
     },
     {
       "quintile": 2,
-      "mean_fwd": -0.004981289863928439,
-      "hit_up": 0.04809052333804809,
+      "mean_fwd": -0.013095155184201249,
+      "hit_up": 0.05198019801980198,
       "n": 2828
     },
     {
       "quintile": 3,
-      "mean_fwd": -0.0077143399959263455,
-      "hit_up": 0.06691871455576559,
+      "mean_fwd": -0.015333270433653927,
+      "hit_up": 0.06313799621928166,
       "n": 2645
     },
     {
       "quintile": 4,
-      "mean_fwd": -0.01336550570501961,
-      "hit_up": 0.08807482462977397,
+      "mean_fwd": -0.022293928779394023,
+      "hit_up": 0.09353078721745908,
       "n": 1283
     },
     {
       "quintile": 5,
-      "mean_fwd": -0.00874031270657649,
-      "hit_up": 0.10122850122850123,
+      "mean_fwd": -0.023196914219500726,
+      "hit_up": 0.08992628992628993,
       "n": 2035
     }
   ],
@@ -118,14 +118,14 @@
     {
       "name": "EXTENDED",
       "n": 232,
-      "mean_fwd": -0.02027914000073998,
-      "mean_fwd_if_score_top": -0.025832843456607635
+      "mean_fwd": -0.042130458092504625,
+      "mean_fwd_if_score_top": -0.06910976541221651
     },
     {
       "name": "WASHED",
       "n": 775,
-      "mean_fwd": 0.07383288101750234,
-      "mean_fwd_if_score_top": -0.0042199590008584345
+      "mean_fwd": 0.06705128136381201,
+      "mean_fwd_if_score_top": -0.0093892671764732
     }
   ]
 }
