@@ -1,116 +1,116 @@
 {
   "scan_date": "2026-09-08",
   "signal_asof": "2026-09-08",
-  "prediction_day": "2026-09-10",
-  "label": "fwd_2d",
-  "n": 11593,
+  "prediction_day": "2026-09-11",
+  "label": "fwd_3d",
+  "n": 11592,
   "pair_date": "?",
-  "label_date": "2026-09-10",
+  "label_date": "2026-09-11",
   "entry_field": "entry_price (Price on signal_asof)",
-  "exit_field": "exit_price_2d (Price on prediction_day)",
+  "exit_field": "exit_price_3d (Price on prediction_day)",
   "features": [
     {
-      "feature": "Short Float",
-      "ic": -0.2766703087520446,
-      "ic_within_up": 0.10789206581239362,
-      "ic_within_down": -0.2838543091396042,
-      "mean_fwd_when_pos": -0.007245750567627385,
-      "mean_fwd_when_neg": NaN,
-      "n_pos": 5685,
-      "n_neg": 0
-    },
-    {
       "feature": "upside_pct_lvl",
-      "ic": -0.26293034740990945,
-      "ic_within_up": 0.3527135027982482,
-      "ic_within_down": -0.41000438785006293,
-      "mean_fwd_when_pos": -0.009266929051996393,
-      "mean_fwd_when_neg": -0.015208753979775884,
-      "n_pos": 4348,
+      "ic": -0.24728529051718323,
+      "ic_within_up": 0.29700195357242987,
+      "ic_within_down": -0.406110467982912,
+      "mean_fwd_when_pos": 0.009465507732887304,
+      "mean_fwd_when_neg": -0.009603267894004962,
+      "n_pos": 4347,
       "n_neg": 297
     },
     {
-      "feature": "Performance (Month)",
-      "ic": 0.11344866903651317,
-      "ic_within_up": -0.02968387753934771,
-      "ic_within_down": 0.14243448299592174,
-      "mean_fwd_when_pos": -0.01636440200168374,
-      "mean_fwd_when_neg": -0.00247264007538707,
-      "n_pos": 4384,
-      "n_neg": 7000
-    },
-    {
-      "feature": "Relative Volume",
-      "ic": -0.08131865792394206,
-      "ic_within_up": 0.06669433780052873,
-      "ic_within_down": -0.10697351018324458,
-      "mean_fwd_when_pos": -0.007954338601312757,
+      "feature": "Short Float",
+      "ic": -0.1995728389839196,
+      "ic_within_up": 0.17022035914071693,
+      "ic_within_down": -0.2649195201965782,
+      "mean_fwd_when_pos": 0.007171992933126506,
       "mean_fwd_when_neg": NaN,
-      "n_pos": 11350,
+      "n_pos": 5684,
       "n_neg": 0
     },
     {
+      "feature": "Relative Strength Index (14)",
+      "ic": 0.12453528894124097,
+      "ic_within_up": -0.15860080796733617,
+      "ic_within_down": 0.07819336512190758,
+      "mean_fwd_when_pos": 0.0019392941489842581,
+      "mean_fwd_when_neg": NaN,
+      "n_pos": 11503,
+      "n_neg": 0
+    },
+    {
+      "feature": "Performance (Month)",
+      "ic": 0.08602562516418664,
+      "ic_within_up": -0.05492103905444462,
+      "ic_within_down": 0.12020506190901117,
+      "mean_fwd_when_pos": 0.0005443466173942818,
+      "mean_fwd_when_neg": 0.0029430287671190383,
+      "n_pos": 4384,
+      "n_neg": 6999
+    },
+    {
       "feature": "Institutional Transactions",
-      "ic": -0.0754324672127531,
-      "ic_within_up": 0.05860068369592446,
-      "ic_within_down": -0.11663731441968701,
-      "mean_fwd_when_pos": -0.016004083979226116,
-      "mean_fwd_when_neg": 0.009475162379468476,
-      "n_pos": 3198,
+      "ic": -0.0726755649961869,
+      "ic_within_up": 0.06102659515716018,
+      "ic_within_down": -0.11005453779222345,
+      "mean_fwd_when_pos": 0.002039175500688061,
+      "mean_fwd_when_neg": 0.011645924264852222,
+      "n_pos": 3197,
       "n_neg": 1830
     },
     {
-      "feature": "Relative Strength Index (14)",
-      "ic": 0.06965430358348819,
-      "ic_within_up": -0.10337693185637624,
-      "ic_within_down": 0.03915810126102252,
-      "mean_fwd_when_pos": -0.00786595662016797,
+      "feature": "Relative Volume",
+      "ic": -0.0715653420792805,
+      "ic_within_up": 0.12865237071301888,
+      "ic_within_down": -0.10981095209190571,
+      "mean_fwd_when_pos": 0.001966904555567328,
       "mean_fwd_when_neg": NaN,
-      "n_pos": 11504,
+      "n_pos": 11349,
       "n_neg": 0
     },
     {
       "feature": "Performance (Week)",
-      "ic": 0.0032252591112301473,
-      "ic_within_up": -0.00406036864835722,
-      "ic_within_down": -0.013042583041687508,
-      "mean_fwd_when_pos": -0.017282139105977715,
-      "mean_fwd_when_neg": -0.00018777935638604804,
-      "n_pos": 5077,
+      "ic": 0.04340451473468962,
+      "ic_within_up": 0.006813426960770978,
+      "ic_within_down": 0.029403590865660512,
+      "mean_fwd_when_pos": -0.00271380917523972,
+      "mean_fwd_when_neg": 0.005952461396294906,
+      "n_pos": 5076,
       "n_neg": 6295
     }
   ],
-  "score_ic": -0.12761243096242988,
+  "score_ic": -0.06192392200238083,
   "score_calibration": [
     {
       "quintile": 1,
-      "mean_fwd": 0.021903863298358202,
-      "hit_up": 0.07673090649536046,
+      "mean_fwd": 0.022881814362218065,
+      "hit_up": 0.09564596716630978,
       "n": 2802
     },
     {
       "quintile": 2,
-      "mean_fwd": -0.013095155184201249,
-      "hit_up": 0.05198019801980198,
+      "mean_fwd": -0.007839264265219987,
+      "hit_up": 0.06930693069306931,
       "n": 2828
     },
     {
       "quintile": 3,
-      "mean_fwd": -0.015333270433653927,
-      "hit_up": 0.06313799621928166,
+      "mean_fwd": -0.009560192301212099,
+      "hit_up": 0.09905482041587901,
       "n": 2645
     },
     {
       "quintile": 4,
-      "mean_fwd": -0.022293928779394023,
-      "hit_up": 0.09353078721745908,
+      "mean_fwd": 0.04278229232539009,
+      "hit_up": 0.14731098986749805,
       "n": 1283
     },
     {
       "quintile": 5,
-      "mean_fwd": -0.023196914219500726,
-      "hit_up": 0.08992628992628993,
-      "n": 2035
+      "mean_fwd": -0.024840261292960804,
+      "hit_up": 0.13126843657817108,
+      "n": 2034
     }
   ],
   "interactions": [],
@@ -118,14 +118,14 @@
     {
       "name": "EXTENDED",
       "n": 232,
-      "mean_fwd": -0.042130458092504625,
-      "mean_fwd_if_score_top": -0.06910976541221651
+      "mean_fwd": -0.03590462115896985,
+      "mean_fwd_if_score_top": -0.07331778804419925
     },
     {
       "name": "WASHED",
       "n": 775,
-      "mean_fwd": 0.06705128136381201,
-      "mean_fwd_if_score_top": -0.0093892671764732
+      "mean_fwd": 0.06556857516385292,
+      "mean_fwd_if_score_top": -0.006231798015199464
     }
   ]
 }
