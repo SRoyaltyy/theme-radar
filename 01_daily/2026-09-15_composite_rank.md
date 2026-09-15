@@ -1,6 +1,6 @@
 # Composite residual rank — **2026-09-15**
 
-Generated: 2026-09-15T16:53:01.300239-04:00
+Generated: 2026-09-15T19:33:29.473448-04:00
 Prior snapshot (for returns): **2026-09-14**
 
 ## Y snapshot (v1 — breadth only)
@@ -54,18 +54,18 @@ CSV: `data/composite/2026-09-15_composite_rank.csv`
 | VERI | Technology | -1.790 | 0.95 | 0.00 | -3.04% | high |
 | CRDF | Healthcare | -1.690 | 0.85 | 0.00 | +2.72% | high |
 | SDGR | Healthcare | -1.670 | 0.95 | 0.00 | +12.48% | high |
-| FLWS | Consumer Cyclical | -1.630 | 0.85 | 0.00 | +0.76% | high |
-| BNGO | Healthcare | -1.630 | 0.85 | 0.00 | +17.73% | high |
 | KLC | Consumer Defensive | -1.630 | 0.85 | 0.00 | -2.09% | high |
 | AIRS | Healthcare | -1.630 | 0.85 | 0.00 | -10.07% | high |
 | FGI | Consumer Cyclical | -1.630 | 0.85 | 0.00 | +11.61% | high |
-| TJGC | Communication Serv | -1.630 | 0.85 | 0.00 | -4.25% | high |
 | PLAY | Communication Serv | -1.630 | 0.85 | 0.00 | -18.57% | high |
+| BNGO | Healthcare | -1.630 | 0.85 | 0.00 | +17.73% | high |
+| FLWS | Consumer Cyclical | -1.630 | 0.85 | 0.00 | +0.76% | high |
+| TJGC | Communication Serv | -1.630 | 0.85 | 0.00 | -4.25% | high |
 | MYGN | Healthcare | -1.610 | 0.95 | 0.00 | +2.81% | high |
 | ACVA | Consumer Cyclical | -1.610 | 0.95 | 0.00 | +0.63% | high |
+| CRBU | Healthcare | -1.570 | 0.85 | 0.00 | -1.12% | high |
 | LODE | Basic Materials | -1.570 | 0.85 | 0.00 | -4.42% | high |
-| ARMP | Healthcare | -1.570 | 0.85 | 0.00 | -20.29% | high |
-| FHTX | Healthcare | -1.570 | 0.85 | 0.00 | -5.07% | high |
+| CRBP | Healthcare | -1.570 | 0.85 | 0.00 | -13.92% | high |
 
 ## Sector median pressure
 
@@ -77,7 +77,7 @@ CSV: `data/composite/2026-09-15_composite_rank.csv`
 | Consumer Defensive | 242 | -0.440 | -0.65% |
 | Real Estate | 248 | -0.505 | -0.12% |
 | Industrials | 717 | -0.530 | -0.07% |
-| Consumer Cyclical | 528 | -0.565 | -1.36% |
+| Consumer Cyclical | 528 | -0.560 | -1.36% |
 | Basic Materials | 291 | -0.580 | +0.08% |
 | Communication Services | 256 | -0.700 | -0.67% |
 | Technology | 794 | -0.700 | -0.59% |
