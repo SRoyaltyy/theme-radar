@@ -1,6 +1,6 @@
 # Factor report — multi-date aggregate
 
-_Generated 2026-09-15 16:49 EDT from 26 scan dates._
+_Generated 2026-09-15 19:21 EDT from 26 scan dates._
 
 How to read: **IC** = Spearman rank correlation between the factor and the forward return, computed per scan date then averaged (mean IC). **ICIR** = mean/std across dates — the consistency score; |ICIR| above ~0.5 with sign consistency ≥ 2/3 is what we call a real signal. **spread** = average forward return when the factor is positive minus when negative. Factors marked ⚠️ flips sign between dates — treat as noise.
 
