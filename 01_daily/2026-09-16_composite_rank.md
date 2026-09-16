@@ -1,6 +1,6 @@
 # Composite residual rank — **2026-09-16**
 
-Generated: 2026-09-16T17:11:43.859126-04:00
+Generated: 2026-09-16T19:40:42.391295-04:00
 Prior snapshot (for returns): **2026-09-15**
 
 ## Y snapshot (v1 — breadth only)
