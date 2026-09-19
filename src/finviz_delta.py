@@ -103,6 +103,23 @@ def load_snapshot(path: Path) -> pd.DataFrame:
     return normalize_frame(pd.read_csv(path, low_memory=False))
 
 
+def list_dates() -> list[str]:
+    """Available YYYY-MM-DD snapshot labels from the shared date index."""
+    from .snapshots import snapshot_dates
+
+    return list(snapshot_dates())
+
+
+def load_by_date(date_str: str) -> pd.DataFrame:
+    """Load and normalize the dated Finviz snapshot for ``date_str``."""
+    from .snapshots import load_dated, snapshot_dates
+
+    dates = snapshot_dates()
+    if date_str not in dates:
+        raise FileNotFoundError(f"No Finviz snapshot for {date_str}. Have: {list(dates)}")
+    return load_dated(dates[date_str])
+
+
 def load_current_previous() -> tuple[pd.DataFrame, Optional[pd.DataFrame]]:
     if not CURRENT.exists():
         from .finviz_mapper import _load_universe
