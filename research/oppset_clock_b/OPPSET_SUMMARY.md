@@ -1,6 +1,6 @@
 # Clock-B Opportunity Set — Summary
 
-Per `join_morning` (T): features from `finviz_asof` = prior date in list (T−1).
+Per `join_morning` (T): features from `finviz_asof` = prior trading date (T−1); the 2026-09-22 row is the next legal open backed by the 2026-09-21 close.
 
 | join_morning | finviz_asof | n_clean | n_flagged | top5 by rvol | top5 by \|chg\| |
 |---|---|---:|---:|---|---|
@@ -28,8 +28,10 @@ Per `join_morning` (T): features from `finviz_asof` = prior date in list (T−1)
 | 2026-09-16 | 2026-09-15 | 2172 | 242 | TRMD rvol=10.68, PLAY rvol=9.26, BWIN rvol=6.81, ALHC rvol=5.60, VERA rvol=4.78 | HQ chg=+27.66%, ALHC chg=-19.86%, PLAY chg=-19.01%, SION chg=-16.71%, BBNX chg=+14.94% |
 | 2026-09-17 | 2026-09-16 | 2171 | 261 | BWIN rvol=10.04, FANG rvol=7.55, BBNX rvol=6.19, JBHT rvol=5.05, ALHC rvol=4.44 | ALHC chg=-16.01%, BBNX chg=+15.34%, JBHT chg=-13.30%, BRUN chg=+11.72%, BTGO chg=-11.59% |
 | 2026-09-18 | 2026-09-17 | 2180 | 451 | GNRC rvol=7.64, SDGR rvol=7.30, QSR rvol=5.58, ALHC rvol=4.43, FLNC rvol=4.40 | SDGR chg=+26.37%, USDE chg=+24.35%, GNRC chg=+18.34%, VICR chg=+17.66%, VITL chg=+16.65% |
+| 2026-09-21 | 2026-09-18 | 2177 | 933 | P rvol=24.30, XENE rvol=16.43, TAP rvol=16.36, ILMN rvol=16.14, CORT rvol=16.01 | USDE chg=+32.17%, GEMI chg=+31.15%, XENE chg=-30.69%, FWDI chg=+24.19%, SECZ chg=+21.61% |
+| 2026-09-22 | 2026-09-21 | 2186 | 294 | WBD rvol=11.06, CRML rvol=9.01, ZTO rvol=6.44, PSKY rvol=5.36, GRAL rvol=4.93 | CRML chg=+38.63%, GRAL chg=+33.68%, NUAI chg=+30.55%, SECZ chg=+24.31%, USDE chg=+23.65% |
 
-**Totals:** clean rows=53,014 · flagged=7,370 · join mornings=24
+**Totals:** clean rows=57,377 · flagged=8,597 · join mornings=26
 
 ## Taskforce proof mornings (09-16/17/18)
 
