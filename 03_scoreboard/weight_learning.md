@@ -1,6 +1,6 @@
 # Weight learning — decision log
 
-_Generated 2026-09-21 16:55 EDT_
+_Generated 2026-09-21 19:46 EDT_
 
 - label dates per horizon: 1d: 30, 2d: 29, 3d: 28
 - primary horizon for promotion test: **1d** (30 dates)
