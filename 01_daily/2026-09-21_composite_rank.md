@@ -1,6 +1,6 @@
 # Composite residual rank — **2026-09-21**
 
-Generated: 2026-09-21T16:57:22.679143-04:00
+Generated: 2026-09-21T20:10:53.910946-04:00
 Prior snapshot (for returns): **2026-09-18**
 
 ## Y snapshot (v1 — breadth only)
@@ -27,25 +27,25 @@ CSV: `data/composite/2026-09-21_composite_rank.csv`
 | Ticker | Sector | pressure | SPEC | QUAL | CROWD | SIZE | resid | beta | short |
 |--------|--------|----------|------|------|-------|------|-------|------|-------|
 | VUZI | Technology | +0.514 | 0.95 | 0.00 | 0.80 | 1.00 | +10.10% | high | very_high |
-| EAF | Industrials | +0.497 | 0.95 | 0.00 | 0.60 | 1.00 | +13.42% | high | elevated |
 | LTRX | Technology | +0.497 | 0.95 | 0.00 | 0.60 | 1.00 | +5.20% | high | elevated |
-| DAIC | Technology | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | +0.96% | high | very_high |
-| KAZR | Industrials | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | +8.08% | high | very_high |
+| EAF | Industrials | +0.497 | 0.95 | 0.00 | 0.60 | 1.00 | +13.42% | high | elevated |
 | CRDF | Healthcare | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | -0.44% | high | very_high |
+| DAIC | Technology | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | +0.96% | high | very_high |
 | GRML | Basic Materials | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | +230.08% | high | very_high |
+| KAZR | Industrials | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | +8.08% | high | very_high |
 | NCPL | Financial | +0.485 | 0.85 | 0.00 | 0.80 | 1.00 | +36.04% | high | very_high |
+| LVWR | Consumer Cyclical | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | -6.58% | high | very_high |
 | GEMI | Financial | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | +2.65% | high | very_high |
+| ABSI | Healthcare | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | +1.32% | high | very_high |
 | BBNX | Healthcare | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | +0.24% | high | very_high |
 | CRML | Basic Materials | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | +38.19% | high | very_high |
-| ABSI | Healthcare | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | +1.32% | high | very_high |
-| LVWR | Consumer Cyclical | +0.480 | 0.95 | 0.00 | 0.80 | 0.80 | -6.58% | high | very_high |
-| CHOW | Technology | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | -8.38% | high | elevated |
-| SRFM | Industrials | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | -4.73% | high | elevated |
-| IMCC | Healthcare | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | -27.40% | high | elevated |
+| KLC | Consumer Defensive | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +1.79% | high | very_high |
+| XGN | Healthcare | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +2.05% | high | elevated |
+| NAKA | Financial | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +9.15% | high | elevated |
 | FLWS | Consumer Cyclical | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +3.18% | high | very_high |
-| SKIL | Consumer Defensive | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | -4.48% | high | elevated |
-| EXOD | Technology | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +17.98% | high | elevated |
-| CAN | Technology | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +13.07% | high | elevated |
+| HRTX | Healthcare | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | -13.35% | high | very_high |
+| TJGC | Communication Serv | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | +3.95% | high | elevated |
+| CHOW | Technology | +0.468 | 0.85 | 0.00 | 0.60 | 1.00 | -8.38% | high | elevated |
 
 ## Bottom 15 (lowest pressure)
 
