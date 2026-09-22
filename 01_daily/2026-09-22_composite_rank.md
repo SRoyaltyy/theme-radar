@@ -1,6 +1,6 @@
 # Composite residual rank — **2026-09-22**
 
-Generated: 2026-09-22T16:48:25.756778-04:00
+Generated: 2026-09-22T19:38:00.794098-04:00
 Prior snapshot (for returns): **2026-09-21**
 
 ## Y snapshot (v1 — breadth only)
@@ -26,26 +26,26 @@ CSV: `data/composite/2026-09-22_composite_rank.csv`
 
 | Ticker | Sector | pressure | SPEC | QUAL | CROWD | SIZE | resid | beta | short |
 |--------|--------|----------|------|------|-------|------|-------|------|-------|
-| LVWR | Consumer Cyclical | +0.006 | 0.95 | 0.00 | 0.80 | 1.00 | -5.29% | high | very_high |
 | GDC | Communication Serv | +0.006 | 0.95 | 0.00 | 0.80 | 1.00 | +9.53% | high | very_high |
 | GLSI | Healthcare | +0.006 | 0.95 | 0.00 | 0.80 | 1.00 | +4.72% | high | very_high |
+| LVWR | Consumer Cyclical | +0.006 | 0.95 | 0.00 | 0.80 | 1.00 | -5.29% | high | very_high |
 | EU | Energy | +0.006 | 0.95 | 0.00 | 0.80 | 1.00 | +15.18% | high | very_high |
 | EAF | Industrials | +0.006 | 0.95 | 0.00 | 0.60 | 1.00 | +19.70% | high | elevated |
-| MRAM | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +2.91% | high | very_high |
-| FIRY | Communication Serv | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +17.69% | high | very_high |
-| YFOR | Industrials | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +5.96% | high | very_high |
-| GEMI | Financial | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | -0.73% | high | very_high |
-| NCPL | Financial | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | -4.02% | high | very_high |
-| ABSI | Healthcare | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +9.00% | high | very_high |
-| GRML | Basic Materials | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +50.15% | high | very_high |
 | KAZR | Industrials | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +9.44% | high | very_high |
-| BTBT | Financial | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +2.13% | high | very_high |
-| AEMD | Healthcare | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +3.89% | high | very_high |
-| WYFI | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +1.80% | high | very_high |
-| BKKT | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +6.39% | high | very_high |
-| DAIC | Technology | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | -3.95% | high | very_high |
+| YFOR | Industrials | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +5.96% | high | very_high |
+| ABSI | Healthcare | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +9.00% | high | very_high |
+| GEMI | Financial | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | -0.73% | high | very_high |
+| GRML | Basic Materials | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +50.15% | high | very_high |
+| RXT | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +2.16% | high | very_high |
 | CRML | Basic Materials | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | -8.53% | high | very_high |
-| QCLS | Technology | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +14.04% | high | very_high |
+| WYFI | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +1.80% | high | very_high |
+| DAIC | Technology | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | -3.95% | high | very_high |
+| AEMD | Healthcare | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +3.89% | high | very_high |
+| FIRY | Communication Serv | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | +17.69% | high | very_high |
+| BTBT | Financial | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +2.13% | high | very_high |
+| NCPL | Financial | +0.006 | 0.85 | 0.00 | 0.80 | 1.00 | -4.02% | high | very_high |
+| MRAM | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +2.91% | high | very_high |
+| BKKT | Technology | +0.006 | 0.95 | 0.00 | 0.80 | 0.80 | +6.39% | high | very_high |
 
 ## Bottom 15 (lowest pressure)
 
