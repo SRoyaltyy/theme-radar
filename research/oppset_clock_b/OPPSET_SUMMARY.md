@@ -1,6 +1,6 @@
 # Clock-B Opportunity Set — Summary
 
-Per `join_morning` (T): features from `finviz_asof` = prior trading date (T−1); includes join_morning 2026-09-22 (asof 2026-09-21) and 2026-09-23 (asof 2026-09-22).
+Per `join_morning` (T): features from `finviz_asof` = prior date in list (T−1).
 
 | join_morning | finviz_asof | n_clean | n_flagged | top5 by rvol | top5 by \|chg\| |
 |---|---|---:|---:|---|---|
@@ -30,14 +30,10 @@ Per `join_morning` (T): features from `finviz_asof` = prior trading date (T−1)
 | 2026-09-18 | 2026-09-17 | 2180 | 451 | GNRC rvol=7.64, SDGR rvol=7.30, QSR rvol=5.58, ALHC rvol=4.43, FLNC rvol=4.40 | SDGR chg=+26.37%, USDE chg=+24.35%, GNRC chg=+18.34%, VICR chg=+17.66%, VITL chg=+16.65% |
 | 2026-09-21 | 2026-09-18 | 2177 | 933 | P rvol=24.30, XENE rvol=16.43, TAP rvol=16.36, ILMN rvol=16.14, CORT rvol=16.01 | USDE chg=+32.17%, GEMI chg=+31.15%, XENE chg=-30.69%, FWDI chg=+24.19%, SECZ chg=+21.61% |
 | 2026-09-22 | 2026-09-21 | 2186 | 311 | WBD rvol=11.09, CRML rvol=9.06, ZTO rvol=6.48, PSKY rvol=5.49, GRAL rvol=4.94 | CRML chg=+38.63%, GRAL chg=+33.68%, NUAI chg=+30.55%, SECZ chg=+24.31%, USDE chg=+23.65% |
-| 2026-09-23 | 2026-09-22 | 2187 | 349 | XNDU rvol=22.84, VKTX rvol=17.76, CLDX rvol=12.86, PRTH rvol=10.77, TBPH rvol=9.62 | VKTX chg=+35.67%, MAZE chg=+26.75%, BFLY chg=+21.99%, XNDU chg=-21.57%, VICR chg=+19.85% |
+| 2026-09-23 | 2026-09-22 | 2187 | 363 | XNDU rvol=23.12, VKTX rvol=17.88, CLDX rvol=12.86, PRTH rvol=10.77, TBPH rvol=9.67 | VKTX chg=+35.67%, MAZE chg=+26.75%, BFLY chg=+21.99%, XNDU chg=-21.57%, VICR chg=+19.85% |
+| 2026-09-24 | 2026-09-23 | 2173 | 373 | TBPH rvol=13.94, XNDU rvol=8.76, VOYG rvol=7.26, GRFS rvol=6.99, FSLY rvol=5.15 | TJGC chg=+37.75%, CGEM chg=-22.15%, ALKT chg=-19.29%, VOYG chg=-16.33%, FSLY chg=+13.69% |
 
-**Totals:** clean rows=59,564 · flagged=8,963 · join mornings=27
-
-## Focus mornings (09-22 / 09-23)
-
-- **2026-09-22** (asof 2026-09-21): n_clean=2186, n_flagged=311; sample flagged (by rvol): WBD, CRML, ZTO, PSKY, GRAL, NVO, HLN, NUAI
-- **2026-09-23** (asof 2026-09-22): n_clean=2187, n_flagged=349; sample flagged (by rvol): XNDU, VKTX, CLDX, PRTH, TBPH, DBRG, MAZE, ONON
+**Totals:** clean rows=61,737 · flagged=9,350 · join mornings=28
 
 ## Taskforce proof mornings (09-16/17/18)
 

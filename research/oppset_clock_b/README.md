@@ -6,8 +6,8 @@
 
 - `join_morning` = **T** = open of morning session (decision time).
 - `finviz_asof` = **T−1** = prior trading session in the theme-radar date list.
-- Latest: `join_morning=2026-09-23` uses `finviz_asof=2026-09-22` (T−1 close).
-- Also includes `join_morning=2026-09-22` with `finviz_asof=2026-09-21`.
+- Latest: `join_morning=2026-09-24` uses `finviz_asof=2026-09-23` (T−1 close).
+- Also includes `join_morning=2026-09-23` with `finviz_asof=2026-09-22`, and `join_morning=2026-09-22` with `finviz_asof=2026-09-21`.
 - All features come from the after-close raw Finviz snapshot dated `finviz_asof`.
 - Do **not** use same-day Gap / RelVol / Change from snapshot T (those are after-T outcomes).
 
