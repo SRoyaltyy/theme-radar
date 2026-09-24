@@ -32,8 +32,9 @@ Per `join_morning` (T): features from `finviz_asof` = prior date in list (T−1)
 | 2026-09-22 | 2026-09-21 | 2186 | 311 | WBD rvol=11.09, CRML rvol=9.06, ZTO rvol=6.48, PSKY rvol=5.49, GRAL rvol=4.94 | CRML chg=+38.63%, GRAL chg=+33.68%, NUAI chg=+30.55%, SECZ chg=+24.31%, USDE chg=+23.65% |
 | 2026-09-23 | 2026-09-22 | 2187 | 363 | XNDU rvol=23.12, VKTX rvol=17.88, CLDX rvol=12.86, PRTH rvol=10.77, TBPH rvol=9.67 | VKTX chg=+35.67%, MAZE chg=+26.75%, BFLY chg=+21.99%, XNDU chg=-21.57%, VICR chg=+19.85% |
 | 2026-09-24 | 2026-09-23 | 2173 | 373 | TBPH rvol=13.94, XNDU rvol=8.76, VOYG rvol=7.26, GRFS rvol=6.99, FSLY rvol=5.15 | TJGC chg=+37.75%, CGEM chg=-22.15%, ALKT chg=-19.29%, VOYG chg=-16.33%, FSLY chg=+13.69% |
+| 2026-09-25 | 2026-09-24 | 2173 | 242 | GLND rvol=25.44, VKTX rvol=9.38, MGM rvol=7.76, GIL rvol=7.00, XNDU rvol=6.62 | GLND chg=+83.85%, TJGC chg=+21.13%, DNA chg=+19.46%, TWST chg=+16.11%, SECZ chg=+15.11% |
 
-**Totals:** clean rows=61,737 · flagged=9,350 · join mornings=28
+**Totals:** clean rows=63,910 · flagged=9,592 · join mornings=29
 
 ## Taskforce proof mornings (09-16/17/18)
 
