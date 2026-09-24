@@ -7,7 +7,10 @@ Writes (append-only history):
   data/snapshots/YYYY-MM-DD.csv          ← canonical snapshot for that ET date
   data/snapshots/archive/YYYY-MM-DD_HHMMSS.csv  ← prior version if same day re-run
   data/snapshots/current.csv / previous.csv     ← convenience pointers only
-  data/snapshots/manifest.json
+  data/snapshots/manifest.json                  ← runs[].scrape_ts_utc = export time
+
+Dated CSV columns: META + numeric fields, then News URL, scrape_ts (UTC) appended
+at the end (from 2026-09-25; older files lack them).
 
 IMPORTANT: dated files are NEVER deleted. Same-day re-fetch archives the
 old file under archive/ before replacing YYYY-MM-DD.csv.
@@ -124,6 +127,10 @@ def save_dated_snapshot(
 
     raw_path.write_bytes(content)
     df = pd.read_csv(raw_path, low_memory=False)
+    # Explicit export time (UTC ISO) on every row; normalize_frame puts it
+    # (and News URL) at the END of the column list.
+    scrape_ts = datetime.now(ZoneInfo("UTC")).isoformat(timespec="seconds")
+    df["scrape_ts"] = scrape_ts
     norm = normalize_frame(df)
     norm.to_csv(path, index=False)
 
@@ -160,6 +167,7 @@ def save_dated_snapshot(
             "canonical": path.name,
             "archive": run_archive.name,
             "bytes": len(content),
+            "scrape_ts_utc": scrape_ts,
         }
     )
     data["runs"] = runs[-90:]  # keep last ~90 runs in manifest

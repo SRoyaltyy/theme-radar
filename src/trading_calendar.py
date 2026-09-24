@@ -77,3 +77,10 @@ def trading_days_between(start: date, end: date) -> list[date]:
             out.append(x)
         x += timedelta(days=1)
     return out
+
+
+def previous_trading_day(d: date) -> date:
+    x = d - timedelta(days=1)
+    while not is_trading_day(x):
+        x -= timedelta(days=1)
+    return x

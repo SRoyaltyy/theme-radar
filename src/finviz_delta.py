@@ -18,6 +18,7 @@ Extracted layers (all feed Channel 1 / scoring):
 """
 from __future__ import annotations
 
+import functools
 from pathlib import Path
 from typing import Optional
 
@@ -25,6 +26,7 @@ import numpy as np
 import pandas as pd
 
 from . import config
+from .trading_calendar import previous_trading_day
 
 SNAPSHOT_DIR = config.DATA / "snapshots"
 CURRENT = SNAPSHOT_DIR / "current.csv"
@@ -56,6 +58,11 @@ META = [
     "Index", "Finviz_Description", "News Title", "Daily Digest", "News Time",
 ]
 
+# Appended AFTER META + DELTA_NUMERIC so positional readers of the dated
+# snapshot CSV keep their column indexes. scrape_ts = export time (UTC ISO),
+# written by finviz_fetch; absent on snapshots before 2026-09-25.
+TAIL = ["News URL", "scrape_ts"]
+
 CATALYST_PATTERNS: dict[str, str] = {
     "nuclear_smr": r"nuclear|smr|small modular|uranium|reactor|\boklo\b|cameco",
     "optics_transceiver": r"optical|transceiver|photonic|coherent optics|lumentum|fiber.?optic|laser diode",
@@ -80,7 +87,7 @@ def _to_float(s):
 
 
 def normalize_frame(df: pd.DataFrame) -> pd.DataFrame:
-    keep = [c for c in META + DELTA_NUMERIC if c in df.columns]
+    keep = [c for c in META + DELTA_NUMERIC + TAIL if c in df.columns]
     out = df[keep].copy()
     out = out[out["Ticker"].notna()]
     out["Ticker"] = out["Ticker"].astype(str).str.upper().str.strip()
@@ -199,6 +206,96 @@ def _add_catalyst_flags(df: pd.DataFrame) -> pd.DataFrame:
     ).str.lower()
     for name, pat in CATALYST_PATTERNS.items():
         df[f"cat_{name}"] = blob.str.contains(pat, regex=True, na=False)
+    try:  # additive research columns must never break live scoring
+        _add_fresh_catalyst_flags(df)
+    except Exception as e:  # noqa: BLE001
+        print(f"[finviz_delta] fresh_cat_* skipped: {e}")
+        df["news_age_h"] = np.nan
+        for name in CATALYST_PATTERNS:
+            df[f"{FRESH_PREFIX}{name}"] = False
+    return df
+
+
+# ---------------------------------------------------------------------------
+# Dated ("fresh") catalyst flags — ADDITIVE, research only.
+#
+# cat_* above are unchanged and still feed n_catalysts / scores. Finviz
+# exports only each ticker's latest headline plus its own "News Time" (ET);
+# cat_* ignore that time and also match the undated Daily Digest, so a
+# months-old headline can set cat_* every day. fresh_cat_<name> is set only
+# when the HEADLINE matches and its News Time is after the previous trading
+# day's snapshot (so Friday-evening/weekend news counts on Monday) and not
+# after this snapshot. Names deliberately do NOT start with "cat_" because
+# the score engine sums cat_* into n_catalysts.
+#
+# Anchors (naive ET): a snapshot's time is its scrape_ts column when present,
+# else the newest News Time in that file. If the previous trading day's file
+# is missing, the lower bound is FRESH_FALLBACK_H hours before this anchor.
+# ---------------------------------------------------------------------------
+FRESH_PREFIX = "fresh_cat_"
+FRESH_FALLBACK_H = 72.0
+
+
+def _to_et_naive(ts: pd.Series) -> pd.Series:
+    """scrape_ts strings (UTC ISO) -> naive America/New_York timestamps."""
+    t = pd.to_datetime(ts, errors="coerce", utc=True)
+    return t.dt.tz_convert(config.TZ).dt.tz_localize(None)
+
+
+def snapshot_anchor(df: pd.DataFrame) -> Optional[pd.Timestamp]:
+    """Export time of a snapshot frame (naive ET), see block comment above."""
+    if "scrape_ts" in df.columns:
+        st = _to_et_naive(df["scrape_ts"]).dropna()
+        if len(st):
+            return st.max()
+    if "News Time" in df.columns:
+        nt = pd.to_datetime(df["News Time"], errors="coerce").dropna()
+        if len(nt):
+            return nt.max()
+    return None
+
+
+@functools.lru_cache(maxsize=16)
+def _anchor_of_file(path_str: str, mtime: float) -> Optional[pd.Timestamp]:
+    cols = {"News Time", "scrape_ts"}
+    df = pd.read_csv(path_str, low_memory=False, usecols=lambda c: c in cols)
+    return snapshot_anchor(df)
+
+
+def previous_snapshot_anchor(asof: pd.Timestamp,
+                             snapshot_dir: Path | None = None) -> Optional[pd.Timestamp]:
+    """Anchor of the previous trading day's dated snapshot, or None if missing."""
+    folder = snapshot_dir or SNAPSHOT_DIR
+    prev = previous_trading_day(asof.date())
+    path = folder / f"{prev.isoformat()}.csv"
+    if not path.exists():
+        return None
+    return _anchor_of_file(str(path), path.stat().st_mtime)
+
+
+def _add_fresh_catalyst_flags(
+    df: pd.DataFrame,
+    asof: Optional[pd.Timestamp] = None,
+    prev_anchor: Optional[pd.Timestamp] = None,
+    snapshot_dir: Path | None = None,
+) -> pd.DataFrame:
+    """Adds news_age_h + fresh_cat_<name>. Never touches cat_* columns."""
+    nt = pd.to_datetime(df.get("News Time", pd.Series(pd.NaT, index=df.index)),
+                        errors="coerce")
+    asof = asof if asof is not None else snapshot_anchor(df)
+    if asof is None:
+        df["news_age_h"] = np.nan
+        for name in CATALYST_PATTERNS:
+            df[f"{FRESH_PREFIX}{name}"] = False
+        return df
+    if prev_anchor is None:
+        prev_anchor = previous_snapshot_anchor(asof, snapshot_dir)
+    lower = prev_anchor if prev_anchor is not None else asof - pd.Timedelta(hours=FRESH_FALLBACK_H)
+    df["news_age_h"] = ((asof - nt).dt.total_seconds() / 3600).round(2)
+    fresh = (nt > lower) & (nt <= asof)            # NaT (undated) -> False
+    title = df.get("News Title", pd.Series("", index=df.index)).fillna("").astype(str).str.lower()
+    for name, pat in CATALYST_PATTERNS.items():
+        df[f"{FRESH_PREFIX}{name}"] = title.str.contains(pat, regex=True, na=False) & fresh
     return df
 
 
