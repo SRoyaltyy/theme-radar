@@ -34,8 +34,9 @@ Append-only since 2026-09-25: each refresh adds one morning; earlier rows are fi
 | 2026-09-23 | 2026-09-22 | 2187 | 349 | XNDU rvol=22.84, VKTX rvol=17.76, CLDX rvol=12.86, PRTH rvol=10.77, TBPH rvol=9.62 | VKTX chg=+35.67%, MAZE chg=+26.75%, BFLY chg=+21.99%, XNDU chg=-21.57%, VICR chg=+19.85% |
 | 2026-09-24 | 2026-09-23 | 2173 | 373 | TBPH rvol=13.94, XNDU rvol=8.76, VOYG rvol=7.26, GRFS rvol=6.99, FSLY rvol=5.15 | TJGC chg=+37.75%, CGEM chg=-22.15%, ALKT chg=-19.29%, VOYG chg=-16.33%, FSLY chg=+13.69% |
 | 2026-09-25 | 2026-09-24 | 2173 | 242 | GLND rvol=25.44, VKTX rvol=9.38, MGM rvol=7.76, GIL rvol=7.00, XNDU rvol=6.62 | GLND chg=+83.85%, TJGC chg=+21.13%, DNA chg=+19.46%, TWST chg=+16.11%, SECZ chg=+15.11% |
+| 2026-09-28 | 2026-09-25 | 2172 | 172 | GLND rvol=13.69, AKAM rvol=8.80, GEN rvol=4.93, CM rvol=4.31, MGM rvol=4.00 | USDE chg=+21.31%, ONT chg=-16.77%, AESI chg=+13.47%, BRVE chg=-11.77%, PPLI chg=+11.33% |
 
-**Totals:** clean rows=63,910 · flagged=9,561 · join mornings=29
+**Totals:** clean rows=66,082 · flagged=9,733 · join mornings=30
 
 ## Taskforce proof mornings (09-16/17/18)
 
