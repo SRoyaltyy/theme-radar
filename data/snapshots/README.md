@@ -8,6 +8,12 @@ data/snapshots/
   previous.csv       ← prior latest (compat pointer)
 ```
 
+## Tail columns (appended; earlier column positions never change)
+
+Dated `YYYY-MM-DD.csv` end with `News URL`, `scrape_ts` (export time, UTC ISO), `Open`, in that order.
+- `News URL`, `scrape_ts`: present from the 2026-09-24 rerun on, absent before.
+- `Open` (Finviz day open price, custom-screener column id 86): present from 2026-09-25 on, absent before (no backfill; past files are hash-locked).
+
 ## Automated daily fetch (Elite API)
 
 1. In Finviz Elite, open your **Custom** screener with the columns you want.

@@ -9,8 +9,11 @@ Writes (append-only history):
   data/snapshots/current.csv / previous.csv     ← convenience pointers only
   data/snapshots/manifest.json                  ← runs[].scrape_ts_utc = export time
 
-Dated CSV columns: META + numeric fields, then News URL, scrape_ts (UTC) appended
-at the end (from 2026-09-25; older files lack them).
+Dated CSV columns: META + numeric fields, then News URL, scrape_ts (UTC), Open
+appended at the end, in that order. News URL/scrape_ts are present from the
+2026-09-24 rerun; Open (Finviz day open, column id 86) from 2026-09-25 on.
+Older files lack them. The FINVIZ_EXPORT secret URL already exports "Open"
+(seen in every committed *.raw.csv); DEFAULT_COLS below is only the fallback.
 
 IMPORTANT: dated files are NEVER deleted. Same-day re-fetch archives the
 old file under archive/ before replacing YYYY-MM-DD.csv.
@@ -30,7 +33,8 @@ from .finviz_delta import SNAPSHOT_DIR, normalize_frame
 DEFAULT_COLS = (
     "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,"
     "26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,"
-    "49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70"
+    "49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,"
+    "86"  # 86 = Open (day open price)
 )
 
 EXPORT_URL = "https://elite.finviz.com/export.ashx"
@@ -127,8 +131,8 @@ def save_dated_snapshot(
 
     raw_path.write_bytes(content)
     df = pd.read_csv(raw_path, low_memory=False)
-    # Explicit export time (UTC ISO) on every row; normalize_frame puts it
-    # (and News URL) at the END of the column list.
+    # Explicit export time (UTC ISO) on every row; normalize_frame puts
+    # News URL, scrape_ts, Open (TAIL) at the END of the column list.
     scrape_ts = datetime.now(ZoneInfo("UTC")).isoformat(timespec="seconds")
     df["scrape_ts"] = scrape_ts
     norm = normalize_frame(df)

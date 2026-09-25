@@ -128,7 +128,8 @@ class FreshFlags(unittest.TestCase):
             float(out.loc[out.Ticker == "SAT", "news_age_h"].iloc[0]), 54.75, places=2)
 
     def test_old_file_anchor_is_newest_news_time(self):
-        df = fd.load_snapshot(SNAP / "2026-09-24.csv")
+        # 2026-09-23 predates scrape_ts (2026-09-24 was re-fetched with it)
+        df = fd.load_snapshot(SNAP / "2026-09-23.csv")
         self.assertNotIn("scrape_ts", df.columns)
         self.assertEqual(fd.snapshot_anchor(df),
                          pd.to_datetime(df["News Time"], errors="coerce").max())
@@ -143,10 +144,21 @@ class FetchWritesScrapeTs(unittest.TestCase):
                     mock.patch.object(ff, "ARCHIVE_DIR", tmp / "archive"):
                 path = ff.save_dated_snapshot(raw, as_of="2026-09-24")
             out = pd.read_csv(path, low_memory=False)
-            self.assertEqual(list(out.columns[-2:]), ["News URL", "scrape_ts"])
-            # every earlier column keeps its position vs the committed snapshot
+            self.assertEqual(list(out.columns[-3:]), ["News URL", "scrape_ts", "Open"])
+            # every earlier column keeps its position vs the committed snapshots:
+            # 2026-09-24 (has News URL + scrape_ts, no Open) and 2026-09-23 (neither)
             committed = pd.read_csv(SNAP / "2026-09-24.csv", nrows=0)
-            self.assertEqual(list(out.columns[:-2]), list(committed.columns))
+            self.assertEqual(list(out.columns[:-1]), list(committed.columns))
+            older = pd.read_csv(SNAP / "2026-09-23.csv", nrows=0)
+            self.assertEqual(list(out.columns[:-3]), list(older.columns))
+            # Open = Finviz day open, numeric, populated, equal to the raw export
+            raw_df = pd.read_csv(SNAP / "2026-09-24.raw.csv", low_memory=False)
+            raw_open = raw_df.drop_duplicates("Ticker").set_index("Ticker")["Open"]
+            self.assertTrue(pd.api.types.is_float_dtype(out["Open"]))
+            self.assertGreater(out["Open"].notna().mean(), 0.95)
+            got = out.set_index("Ticker")["Open"]
+            pd.testing.assert_series_equal(got, raw_open.reindex(got.index).astype(float),
+                                           check_names=False)
             ts = pd.to_datetime(out["scrape_ts"], utc=True)
             self.assertEqual(ts.nunique(), 1)
             run = json.loads((tmp / "manifest.json").read_text())["runs"][-1]

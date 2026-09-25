@@ -60,8 +60,13 @@ META = [
 
 # Appended AFTER META + DELTA_NUMERIC so positional readers of the dated
 # snapshot CSV keep their column indexes. scrape_ts = export time (UTC ISO),
-# written by finviz_fetch; absent on snapshots before 2026-09-25.
-TAIL = ["News URL", "scrape_ts"]
+# written by finviz_fetch; absent on snapshots before 2026-09-24's rerun.
+# Open = Finviz day open price (custom-screener column id 86, CSV header
+# "Open"); appended LAST, present from 2026-09-25 on, absent before.
+# New columns must only ever be appended to the end of TAIL.
+TAIL = ["News URL", "scrape_ts", "Open"]
+# TAIL columns coerced to float (DELTA_NUMERIC ones are coerced already).
+TAIL_NUMERIC = ["Open"]
 
 CATALYST_PATTERNS: dict[str, str] = {
     "nuclear_smr": r"nuclear|smr|small modular|uranium|reactor|\boklo\b|cameco",
@@ -91,7 +96,7 @@ def normalize_frame(df: pd.DataFrame) -> pd.DataFrame:
     out = df[keep].copy()
     out = out[out["Ticker"].notna()]
     out["Ticker"] = out["Ticker"].astype(str).str.upper().str.strip()
-    for c in DELTA_NUMERIC:
+    for c in DELTA_NUMERIC + TAIL_NUMERIC:
         if c in out.columns:
             out[c] = out[c].map(_to_float)
     if "Finviz_Description" in out.columns:
