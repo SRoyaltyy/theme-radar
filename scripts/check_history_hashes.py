@@ -35,6 +35,11 @@ Modes
                one run (one log line each; one --reason may cover all).
            Any other changed/deleted past entry -> exit 1, manifest untouched.
 
+  note     append one line to RESTATEMENTS.log for a data correction whose
+           kept record is already the manifest's record (nothing re-hashed,
+           manifests untouched): --file F (repeatable) --old TEXT --new TEXT
+           --reason TEXT. old/new describe the superseded and kept values.
+
 Usage
   python scripts/check_history_hashes.py verify
   python scripts/check_history_hashes.py add-new [--today YYYY-MM-DD]
@@ -269,10 +274,28 @@ def cmd_add_new(root: Path, today: str, restate: list[str] | None,
     return 0
 
 
+def cmd_note(root: Path, files: list[str] | None, old: str | None,
+             new: str | None, reason: str | None) -> int:
+    """Log-only entry (one-time data correction): no manifest is changed."""
+    if not files or not all((x or "").strip() for x in (old, new, reason)):
+        print("[history] note requires --file, --old, --new and --reason", file=sys.stderr)
+        return 2
+    missing = [f for f in files if not (root / f).exists()]
+    if missing:
+        print(f"[history] note: missing file(s) {missing}", file=sys.stderr)
+        return 2
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    clean = [" ".join(x.split()) for x in (old, new, reason)]
+    with open(root / RESTATE_LOG_REL, "a", encoding="utf-8") as fh:
+        fh.write(f"{now}\t{';'.join(files)}\t{clean[0]}\t{clean[1]}\t{clean[2]}\n")
+    print(f"[history] noted correction for {', '.join(files)} in {RESTATE_LOG_REL}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("mode", choices=["verify", "add-new"])
+    ap.add_argument("mode", choices=["verify", "add-new", "note"])
     ap.add_argument("--root", default=str(ROOT), help=argparse.SUPPRESS)
     ap.add_argument("--today", default=None,
                     help="Run date whose entries may be replaced (default: ET today)")
@@ -280,8 +303,14 @@ def main(argv: list[str] | None = None) -> int:
                     help="Past file to deliberately re-record (repeatable)")
     ap.add_argument("--reason", action="append", default=None,
                     help="Required with --restate (one for all, or one per --restate)")
+    ap.add_argument("--file", action="append", default=None, help="note: file(s) concerned")
+    ap.add_argument("--old", default=None, help="note: superseded value(s)")
+    ap.add_argument("--new", default=None, help="note: kept value(s)")
     a = ap.parse_args(argv)
     root = Path(a.root).resolve()
+    if a.mode == "note":
+        return cmd_note(root, a.file, a.old, a.new,
+                        (a.reason or [None])[-1] if a.reason else None)
     if a.mode == "verify":
         if a.restate:
             ap.error("--restate is only valid with add-new")

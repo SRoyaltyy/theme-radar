@@ -75,6 +75,99 @@ def keep_existing_past(paths, date_str: str, what: str,
     return False
 
 
+
+# ------------------------------------------------------- close-is-in guard
+# A grade (label fill / attribution) for horizon h is written once, and only
+# after the real close of its maturity day is in: the maturity-day snapshot
+# must have been scraped after 16:00 ET that day and before the next trading
+# day's 09:30 ET open. War room 2026-09-25 (pre-market 08-10 / wrong-day 08-28
+# snapshots produced first saves that later had to be corrected).
+
+ET_TZ = "America/New_York"
+
+
+def _git(cwd: Path, *args: str) -> tuple[int, str]:
+    import subprocess
+    try:
+        r = subprocess.run(["git", "-C", str(cwd), *args], capture_output=True,
+                           text=True, check=False)
+    except OSError:
+        return 1, ""
+    return r.returncode, r.stdout.strip()
+
+
+def snapshot_scrape_time(snap_dir: Path, day: str) -> tuple[datetime | None, str]:
+    """Export time of the maturity-day snapshot as on disk.
+
+    1. max ``scrape_ts`` (UTC ISO) in data/snapshots/<day>.csv or .raw.csv;
+    2. older files without scrape_ts: git commit time of the last commit of
+       <day>.csv, provided the file on disk is exactly that committed version.
+    Returns (aware datetime | None, source)."""
+    snap_dir = Path(snap_dir)
+    for name in (f"{day}.csv", f"{day}.raw.csv"):
+        p = snap_dir / name
+        if not p.exists():
+            continue
+        with open(p, newline="", encoding="utf-8") as fh:
+            rdr = csv.reader(fh)
+            try:
+                header = next(rdr)
+            except StopIteration:
+                continue
+            if "scrape_ts" not in header:
+                continue
+            i = header.index("scrape_ts")
+            best = None
+            for r in rdr:
+                if i < len(r) and r[i]:
+                    try:
+                        t = datetime.fromisoformat(r[i].replace("Z", "+00:00"))
+                    except ValueError:
+                        continue
+                    if t.tzinfo is None:
+                        t = t.replace(tzinfo=timezone.utc)
+                    best = t if best is None or t > best else best
+            if best is not None:
+                return best, f"scrape_ts in {name}"
+    p = snap_dir / f"{day}.csv"
+    if not p.exists():
+        return None, f"no snapshot {p.name}"
+    rc, top = _git(snap_dir, "rev-parse", "--show-toplevel")
+    if rc != 0:
+        return None, "no scrape_ts and not in git"
+    rel = p.resolve().relative_to(Path(top).resolve()).as_posix()
+    rc_d, _ = _git(Path(top), "diff", "--quiet", "HEAD", "--", rel)
+    rc_t, tracked = _git(Path(top), "ls-files", "--", rel)
+    if rc_d != 0 or not tracked:
+        return None, "no scrape_ts and file differs from its last commit"
+    rc, ts = _git(Path(top), "log", "-1", "--format=%cI", "--", rel)
+    if rc != 0 or not ts:
+        return None, "no scrape_ts and no commit"
+    return datetime.fromisoformat(ts), "git commit time (no scrape_ts)"
+
+
+def close_is_in(snap_dir: Path, day: str) -> tuple[bool, str]:
+    """True when the <day> snapshot was taken after 16:00 ET on <day> and
+    before the next trading day's 09:30 ET open."""
+    from datetime import date as _date, time as _time
+    from .trading_calendar import next_trading_day
+    ts, src = snapshot_scrape_time(snap_dir, day)
+    if ts is None:
+        return False, f"{day}: scrape time unknown ({src})"
+    tz = ZoneInfo(ET_TZ)
+    d = _date.fromisoformat(day)
+    close = datetime.combine(d, _time(16, 0), tz)
+    nxt_open = datetime.combine(next_trading_day(d), _time(9, 30), tz)
+    t_et = ts.astimezone(tz)
+    if t_et <= close:
+        return False, (f"{day}: snapshot taken {t_et:%Y-%m-%d %H:%M} ET ({src}), "
+                       f"not after the 16:00 ET close")
+    if t_et >= nxt_open:
+        return False, (f"{day}: snapshot taken {t_et:%Y-%m-%d %H:%M} ET ({src}), "
+                       f"after the next open {nxt_open:%Y-%m-%d %H:%M} ET")
+    return True, f"{day}: snapshot taken {t_et:%Y-%m-%d %H:%M} ET ({src})"
+
+
 # ---------------------------------------------------------------- csv helpers
 
 def read_csv_text(text: str) -> tuple[list[str], list[list[str]]]:

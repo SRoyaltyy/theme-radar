@@ -55,6 +55,30 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
               f"(cannot grade trades that need a close after signal_asof={scan_date})")
         return None
 
+    # Close-is-in guard: a horizon not yet filled (or filled today, same-day
+    # re-fetch) is graded only if its maturity-day snapshot was taken after
+    # that day's 16:00 ET close and before the next open. Stop at the first
+    # horizon that fails; already-filled past horizons stay fill-once.
+    path0 = LABELS_DIR / f"{scan_date}_fwd.csv"
+    filled: set[str] = set()
+    if path0.exists():
+        today = hg.today_et()
+        fo0 = hg.fp_labels(*hg.read_csv_text(path0.read_text(encoding="utf-8")),
+                           scan_date)["all"]
+        filled = {p for p, e in fo0.items() if p != "base" and e["asof"] != today}
+    allowed = []
+    for i, d in enumerate(forward, start=1):
+        if f"{i}d" not in filled:
+            ok, why = hg.close_is_in(Path(dates[d]).parent, d)
+            if not ok:
+                print(f"[labels] {scan_date}: REFUSE fwd_{i}d — close not in ({why}); "
+                      "grade is written once, only after the real close.")
+                break
+        allowed.append(d)
+    forward = allowed
+    if not forward:
+        return None
+
     feat = pd.read_csv(feat_path, low_memory=False)
     p0 = _price_map(dates[scan_date])
     maps = [_price_map(dates[d]) for d in forward]

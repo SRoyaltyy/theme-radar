@@ -364,6 +364,20 @@ def run(scan_date: str, horizon: str = "auto") -> None:
     label = pick_label(df, horizon)
     if _keep_existing_pointer(scan_date, label):
         return
+    # Close-is-in guard: grade horizon h only once its maturity-day snapshot
+    # was taken after 16:00 ET that day and before the next open.
+    k = hg.horizon_of(label)
+    pcol = f"prediction_day_{k}d"
+    if pcol in df.columns:
+        pred = df[pcol].dropna().astype(str)
+        pred = pred[pred != ""]
+        if pred.empty:
+            print(f"[attr] {scan_date}: REFUSE {label} — no prediction day")
+            return
+        ok, why = hg.close_is_in(config.DATA / "snapshots", pred.mode().iloc[0])
+        if not ok:
+            print(f"[attr] {scan_date}: REFUSE {label} — close not in ({why}); keep")
+            return
     result = analyze(scan_date, df, horizon=horizon)
     if result["n"] < 30:
         print(f"[attr] {scan_date}: label {result['label']} has only {result['n']} rows")
