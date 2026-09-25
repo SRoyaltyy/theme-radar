@@ -37,6 +37,10 @@ jobs:
               fh.write(f"et_date={d.isoformat()}\n")
           PY
 
+      - name: Verify past history unchanged (hash manifest)
+        if: steps.gate.outputs.trading == 'true'
+        run: python scripts/check_history_hashes.py verify
+
       - name: Fetch Finviz Elite export
         if: steps.gate.outputs.trading == 'true'
         env:
@@ -44,6 +48,10 @@ jobs:
           FINVIZ_EXPORT_URL: ${{ secrets.FINVIZ_EXPORT_URL }}
           FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
         run: python -m src.finviz_fetch
+
+      - name: Record hashes for new dated files
+        if: steps.gate.outputs.trading == 'true'
+        run: python scripts/check_history_hashes.py add-new --today "${{ steps.gate.outputs.et_date }}"
 
       - name: Commit snapshot
         if: steps.gate.outputs.trading == 'true'

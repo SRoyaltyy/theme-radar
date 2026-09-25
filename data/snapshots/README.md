@@ -39,3 +39,13 @@ print(format_delta_brief(compute_delta(cur, prev),
 ```
 
 Predict auto-picks latest vs ~30d earlier from the manifest.
+
+## History hash manifest (past days are immutable-by-check)
+
+`HASHES.json` holds the sha256 + first-recorded date of every dated file in
+`data/snapshots/` (`YYYY-MM-DD.csv`, `.raw.csv`), `data/features/` and `data/scores/`.
+The snapshot and score workflows run `python scripts/check_history_hashes.py verify`
+before writing (job fails if any recorded file changed or was deleted) and
+`add-new --today <ET date>` after writing. Only today's entries may be replaced
+(same-day rerun). A deliberate fix to a past file needs
+`add-new --restate FILE --reason "..."`, which is logged to `RESTATEMENTS.log`.

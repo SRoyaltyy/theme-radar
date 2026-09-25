@@ -65,6 +65,10 @@ jobs:
             echo "date=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Verify past history unchanged (hash manifest)
+        if: steps.gate.outputs.trading == 'true'
+        run: python scripts/check_history_hashes.py verify
+
       - name: Score + full-universe feature log
         if: steps.gate.outputs.trading == 'true'
         run: |
@@ -85,6 +89,10 @@ jobs:
         run: |
           DATE="${{ steps.date.outputs.date }}"
           python -m src.segments ${DATE:+--date "$DATE"}
+
+      - name: Record hashes for new dated files (only today's may be replaced)
+        if: steps.gate.outputs.trading == 'true'
+        run: python scripts/check_history_hashes.py add-new --today "$(TZ=America/New_York date +%F)"
 
       - name: Backfill forward labels (all scan dates with later snapshots)
         if: steps.gate.outputs.trading == 'true'
@@ -114,7 +122,7 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/scores/ data/features/ data/labels/ data/attribution/ data/universe/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
+          git add data/snapshots/HASHES.json data/snapshots/RESTATEMENTS.log data/scores/ data/features/ data/labels/ data/attribution/ data/universe/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
           git commit -m "auto: score+features+labels+attr ${{ steps.date.outputs.date }}" || echo "No changes"
           git pull --rebase origin main || true
           git push origin main
