@@ -1,6 +1,6 @@
 # Factor report — multi-date aggregate
 
-_Generated 2026-09-24 19:44 EDT from 33 scan dates._
+_Generated 2026-09-25 16:49 EDT from 34 scan dates._
 
 How to read: **IC** = Spearman rank correlation between the factor and the forward return, computed per scan date then averaged (mean IC). **ICIR** = mean/std across dates — the consistency score; |ICIR| above ~0.5 with sign consistency ≥ 2/3 is what we call a real signal. **spread** = average forward return when the factor is positive minus when negative. Factors marked ⚠️ flips sign between dates — treat as noise.
 
@@ -39,8 +39,9 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 | 2026-09-17 | 2026-09-16 | 2026-09-18 | 2026-09-21 | 2026-09-22 | 11636 |
 | 2026-09-18 | 2026-09-17 | 2026-09-21 | 2026-09-22 | 2026-09-23 | 11629 |
 | 2026-09-21 | 2026-09-18 | 2026-09-22 | 2026-09-23 | 2026-09-24 | 11629 |
-| 2026-09-22 | 2026-09-21 | 2026-09-23 | 2026-09-24 | — | 11637 |
-| 2026-09-23 | 2026-09-22 | 2026-09-24 | — | — | 11653 |
+| 2026-09-22 | 2026-09-21 | 2026-09-23 | 2026-09-24 | 2026-09-25 | 11637 |
+| 2026-09-23 | 2026-09-22 | 2026-09-24 | 2026-09-25 | — | 11653 |
+| 2026-09-24 | 2026-09-23 | 2026-09-25 | — | — | 11660 |
 
 ## Composite score effectiveness (total_score IC)
 
@@ -77,116 +78,117 @@ How to read: **IC** = Spearman rank correlation between the factor and the forwa
 | 2026-09-17 | +0.0987 | +0.2454 | +0.3070 |
 | 2026-09-18 | +0.0668 | +0.0651 | +0.1188 |
 | 2026-09-21 | +0.1709 | -0.0452 | -0.0110 |
-| 2026-09-22 | -0.1323 | -0.1167 | — |
-| 2026-09-23 | +0.0928 | — | — |
-- **1d**: mean IC **-0.0190**, ICIR -0.23, sign consistency 70% over 33 dates
-- **2d**: mean IC **-0.0319**, ICIR -0.33, sign consistency 59% over 32 dates
-- **3d**: mean IC **-0.0278**, ICIR -0.22, sign consistency 65% over 31 dates
+| 2026-09-22 | -0.1323 | -0.1167 | -0.0566 |
+| 2026-09-23 | +0.0928 | +0.0398 | — |
+| 2026-09-24 | -0.0345 | — | — |
+- **1d**: mean IC **-0.0194**, ICIR -0.24, sign consistency 71% over 34 dates
+- **2d**: mean IC **-0.0298**, ICIR -0.31, sign consistency 58% over 33 dates
+- **3d**: mean IC **-0.0287**, ICIR -0.23, sign consistency 66% over 32 dates
 
 ## Factor ranking — 1d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
-| short_fwd_1d | -1.0000 | -18293708165931056.00 | 100% | 33 | -5.91% | ✅ consistent |
-| short_fwd_2d | -0.6202 | -7.22 | 100% | 32 | -4.89% | ✅ consistent |
-| short_fwd_3d | -0.4901 | -4.32 | 100% | 31 | -4.38% | ✅ consistent |
-| Volatility (Month) | -0.0619 | -0.48 | 59% | 32 | +0.45% | ⚠️ flips / too few dates |
-| d_Performance (Week) | -0.0591 | -0.51 | 65% | 31 | -0.61% | ⚠️ flips / too few dates |
-| exit_price_1d | +0.0454 | +0.69 | 70% | 33 | n/a | ✅ consistent |
-| exit_price_2d | +0.0437 | +0.66 | 69% | 32 | n/a | ✅ consistent |
-| Profit Margin | +0.0411 | +0.41 | 67% | 33 | -2.36% | ✅ consistent |
-| d_200-Day Simple Moving Average | -0.0408 | -0.37 | 48% | 31 | -0.49% | ⚠️ flips / too few dates |
-| exit_price_3d | +0.0406 | +0.63 | 68% | 31 | n/a | ✅ consistent |
-| d_50-Day Simple Moving Average | -0.0401 | -0.37 | 52% | 31 | -0.51% | ⚠️ flips / too few dates |
-| Average Volume | -0.0398 | -0.64 | 70% | 33 | n/a | ✅ consistent |
-| valuation_score | -0.0386 | -0.43 | 70% | 33 | +0.95% | ✅ consistent |
-| n_pos | -0.0371 | -0.42 | 64% | 33 | n/a | ⚠️ flips / too few dates |
-| true_ret | -0.0371 | -0.35 | 48% | 31 | -0.60% | ⚠️ flips / too few dates |
-| d_Performance (YTD) | -0.0369 | -0.34 | 52% | 31 | -0.60% | ⚠️ flips / too few dates |
-| d_20-Day Simple Moving Average | -0.0354 | -0.34 | 48% | 31 | -0.35% | ⚠️ flips / too few dates |
-| d_Relative Strength Index (14) | -0.0351 | -0.38 | 61% | 31 | -0.76% | ⚠️ flips / too few dates |
-| Performance (Week) | -0.0346 | -0.24 | 58% | 33 | -1.18% | ⚠️ flips / too few dates |
-| Performance (YTD) | +0.0319 | +0.35 | 64% | 33 | -1.57% | ⚠️ flips / too few dates |
-| Beta | -0.0316 | -0.16 | 56% | 32 | -1.23% | ⚠️ flips / too few dates |
-| d_Forward P/E | -0.0314 | -0.31 | 65% | 31 | -0.17% | ⚠️ flips / too few dates |
-| d_Market Cap | -0.0314 | -0.47 | 68% | 31 | -0.65% | ✅ consistent |
-| Price | +0.0293 | +0.44 | 61% | 33 | n/a | ⚠️ flips / too few dates |
-| entry_price | +0.0293 | +0.44 | 61% | 33 | n/a | ⚠️ flips / too few dates |
-| d_Price | -0.0288 | -0.26 | 52% | 31 | -0.60% | ⚠️ flips / too few dates |
-| w_pos | -0.0282 | -0.30 | 64% | 33 | n/a | ⚠️ flips / too few dates |
-| Market Cap | +0.0277 | +0.46 | 67% | 33 | n/a | ✅ consistent |
-| 200-Day Simple Moving Average | +0.0276 | +0.34 | 58% | 33 | -1.52% | ⚠️ flips / too few dates |
-| upside_pct | -0.0258 | -0.20 | 58% | 33 | +0.89% | ⚠️ flips / too few dates |
+| short_fwd_1d | -1.0000 | -18568816959140892.00 | 100% | 34 | -5.84% | ✅ consistent |
+| short_fwd_2d | -0.6203 | -7.33 | 100% | 33 | -4.81% | ✅ consistent |
+| short_fwd_3d | -0.4935 | -4.35 | 100% | 32 | -4.34% | ✅ consistent |
+| Volatility (Month) | -0.0628 | -0.49 | 61% | 33 | +0.45% | ⚠️ flips / too few dates |
+| d_Performance (Week) | -0.0602 | -0.53 | 66% | 32 | -0.61% | ⚠️ flips / too few dates |
+| exit_price_1d | +0.0496 | +0.72 | 71% | 34 | n/a | ✅ consistent |
+| exit_price_2d | +0.0449 | +0.69 | 70% | 33 | n/a | ✅ consistent |
+| Profit Margin | +0.0436 | +0.44 | 68% | 34 | -2.29% | ✅ consistent |
+| exit_price_3d | +0.0434 | +0.66 | 69% | 32 | n/a | ✅ consistent |
+| d_200-Day Simple Moving Average | -0.0421 | -0.39 | 50% | 32 | -0.49% | ⚠️ flips / too few dates |
+| d_50-Day Simple Moving Average | -0.0405 | -0.38 | 53% | 32 | -0.50% | ⚠️ flips / too few dates |
+| Average Volume | -0.0402 | -0.66 | 71% | 34 | n/a | ✅ consistent |
+| valuation_score | -0.0387 | -0.44 | 71% | 34 | +0.93% | ✅ consistent |
+| d_Performance (YTD) | -0.0379 | -0.35 | 53% | 32 | -0.60% | ⚠️ flips / too few dates |
+| true_ret | -0.0377 | -0.36 | 50% | 32 | -0.60% | ⚠️ flips / too few dates |
+| n_pos | -0.0376 | -0.43 | 65% | 34 | n/a | ⚠️ flips / too few dates |
+| d_20-Day Simple Moving Average | -0.0361 | -0.35 | 50% | 32 | -0.35% | ⚠️ flips / too few dates |
+| d_Relative Strength Index (14) | -0.0356 | -0.39 | 62% | 32 | -0.75% | ⚠️ flips / too few dates |
+| Price | +0.0336 | +0.48 | 62% | 34 | n/a | ⚠️ flips / too few dates |
+| entry_price | +0.0336 | +0.48 | 62% | 34 | n/a | ⚠️ flips / too few dates |
+| Performance (YTD) | +0.0335 | +0.37 | 65% | 34 | -1.53% | ⚠️ flips / too few dates |
+| Performance (Week) | -0.0327 | -0.23 | 56% | 34 | -1.15% | ⚠️ flips / too few dates |
+| d_Market Cap | -0.0324 | -0.49 | 69% | 32 | -0.65% | ✅ consistent |
+| d_Forward P/E | -0.0323 | -0.33 | 66% | 32 | -0.17% | ⚠️ flips / too few dates |
+| d_Price | -0.0311 | -0.29 | 53% | 32 | -0.60% | ⚠️ flips / too few dates |
+| Market Cap | +0.0310 | +0.50 | 68% | 34 | n/a | ✅ consistent |
+| w_pos | -0.0292 | -0.32 | 65% | 34 | n/a | ⚠️ flips / too few dates |
+| 200-Day Simple Moving Average | +0.0290 | +0.36 | 59% | 34 | -1.48% | ⚠️ flips / too few dates |
+| upside_pct_lvl | -0.0284 | -0.22 | 59% | 34 | +0.87% | ⚠️ flips / too few dates |
+| upside_pct | -0.0284 | -0.22 | 59% | 34 | +0.87% | ⚠️ flips / too few dates |
 
 ## Factor ranking — 2d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
-| short_fwd_2d | -1.0000 | -16112567856389042.00 | 100% | 32 | -9.27% | ✅ consistent |
-| short_fwd_3d | -0.7334 | -9.80 | 100% | 31 | -8.27% | ✅ consistent |
-| short_fwd_1d | -0.6202 | -7.22 | 100% | 32 | -5.52% | ✅ consistent |
-| Volatility (Month) | -0.0816 | -0.64 | 71% | 31 | +0.97% | ✅ consistent |
-| exit_price_2d | +0.0591 | +0.98 | 81% | 32 | n/a | ✅ consistent |
-| exit_price_3d | +0.0557 | +0.96 | 77% | 31 | n/a | ✅ consistent |
-| Average Volume | -0.0529 | -0.91 | 81% | 32 | n/a | ✅ consistent |
-| Profit Margin | +0.0518 | +0.56 | 72% | 32 | -4.49% | ✅ consistent |
-| valuation_score | -0.0517 | -0.65 | 66% | 32 | +1.74% | ⚠️ flips / too few dates |
-| d_Performance (Week) | -0.0513 | -0.36 | 60% | 30 | -0.55% | ⚠️ flips / too few dates |
-| n_pos | -0.0481 | -0.47 | 72% | 32 | n/a | ✅ consistent |
-| exit_price_1d | +0.0477 | +0.78 | 75% | 32 | n/a | ✅ consistent |
-| d_50-Day Simple Moving Average | -0.0476 | -0.36 | 67% | 30 | -1.02% | ✅ consistent |
-| d_200-Day Simple Moving Average | -0.0441 | -0.32 | 60% | 30 | -1.13% | ⚠️ flips / too few dates |
-| w_pos | -0.0430 | -0.43 | 69% | 32 | n/a | ✅ consistent |
-| Beta | -0.0420 | -0.21 | 65% | 31 | -2.40% | ⚠️ flips / too few dates |
-| d_Relative Strength Index (14) | -0.0398 | -0.37 | 67% | 30 | -1.56% | ✅ consistent |
-| true_ret | -0.0397 | -0.30 | 57% | 30 | -1.31% | ⚠️ flips / too few dates |
-| d_20-Day Simple Moving Average | -0.0389 | -0.29 | 57% | 30 | -0.82% | ⚠️ flips / too few dates |
-| Performance (YTD) | +0.0387 | +0.45 | 69% | 32 | -2.99% | ✅ consistent |
-| d_Performance (YTD) | -0.0385 | -0.28 | 63% | 30 | -1.38% | ⚠️ flips / too few dates |
-| 200-Day Simple Moving Average | +0.0374 | +0.46 | 69% | 32 | -2.91% | ✅ consistent |
-| Performance (Week) | -0.0363 | -0.26 | 53% | 32 | -2.00% | ⚠️ flips / too few dates |
-| Price | +0.0360 | +0.58 | 72% | 32 | n/a | ✅ consistent |
-| entry_price | +0.0360 | +0.58 | 72% | 32 | n/a | ✅ consistent |
-| Short Float | -0.0348 | -0.32 | 59% | 32 | n/a | ⚠️ flips / too few dates |
-| d_Price | -0.0343 | -0.25 | 60% | 30 | -1.31% | ⚠️ flips / too few dates |
-| upside_pct | -0.0341 | -0.26 | 53% | 32 | +1.64% | ⚠️ flips / too few dates |
-| upside_pct_lvl | -0.0341 | -0.26 | 53% | 32 | +1.64% | ⚠️ flips / too few dates |
-| d_Market Cap | -0.0327 | -0.40 | 67% | 30 | -2.06% | ✅ consistent |
+| short_fwd_2d | -1.0000 | -15600926743107926.00 | 100% | 33 | -9.13% | ✅ consistent |
+| short_fwd_3d | -0.7356 | -9.85 | 100% | 32 | -8.17% | ✅ consistent |
+| short_fwd_1d | -0.6203 | -7.33 | 100% | 33 | -5.45% | ✅ consistent |
+| Volatility (Month) | -0.0829 | -0.65 | 72% | 32 | +0.97% | ✅ consistent |
+| exit_price_2d | +0.0630 | +1.00 | 82% | 33 | n/a | ✅ consistent |
+| exit_price_3d | +0.0584 | +0.99 | 78% | 32 | n/a | ✅ consistent |
+| Profit Margin | +0.0544 | +0.59 | 73% | 33 | -4.34% | ✅ consistent |
+| Average Volume | -0.0540 | -0.94 | 82% | 33 | n/a | ✅ consistent |
+| valuation_score | -0.0532 | -0.68 | 67% | 33 | +1.68% | ✅ consistent |
+| d_Performance (Week) | -0.0518 | -0.37 | 61% | 31 | -0.55% | ⚠️ flips / too few dates |
+| exit_price_1d | +0.0517 | +0.81 | 76% | 33 | n/a | ✅ consistent |
+| d_50-Day Simple Moving Average | -0.0482 | -0.37 | 68% | 31 | -1.01% | ✅ consistent |
+| n_pos | -0.0464 | -0.46 | 70% | 33 | n/a | ✅ consistent |
+| d_200-Day Simple Moving Average | -0.0458 | -0.33 | 61% | 31 | -1.11% | ⚠️ flips / too few dates |
+| Performance (YTD) | +0.0430 | +0.48 | 70% | 33 | -2.89% | ✅ consistent |
+| 200-Day Simple Moving Average | +0.0428 | +0.50 | 70% | 33 | -2.81% | ✅ consistent |
+| d_Relative Strength Index (14) | -0.0421 | -0.39 | 68% | 31 | -1.53% | ✅ consistent |
+| w_pos | -0.0414 | -0.42 | 67% | 33 | n/a | ✅ consistent |
+| d_20-Day Simple Moving Average | -0.0402 | -0.31 | 58% | 31 | -0.81% | ⚠️ flips / too few dates |
+| d_Performance (YTD) | -0.0401 | -0.30 | 65% | 31 | -1.35% | ⚠️ flips / too few dates |
+| Price | +0.0401 | +0.62 | 73% | 33 | n/a | ✅ consistent |
+| entry_price | +0.0401 | +0.62 | 73% | 33 | n/a | ✅ consistent |
+| true_ret | -0.0398 | -0.30 | 58% | 31 | -1.28% | ⚠️ flips / too few dates |
+| upside_pct | -0.0390 | -0.30 | 55% | 33 | +1.58% | ⚠️ flips / too few dates |
+| upside_pct_lvl | -0.0390 | -0.30 | 55% | 33 | +1.57% | ⚠️ flips / too few dates |
+| Beta | -0.0389 | -0.20 | 62% | 32 | -2.31% | ⚠️ flips / too few dates |
+| d_Price | -0.0385 | -0.29 | 61% | 31 | -1.28% | ⚠️ flips / too few dates |
+| Market Cap | +0.0345 | +0.57 | 70% | 33 | n/a | ✅ consistent |
+| d_Market Cap | -0.0343 | -0.43 | 68% | 31 | -2.00% | ✅ consistent |
+| Short Float | -0.0342 | -0.32 | 61% | 33 | n/a | ⚠️ flips / too few dates |
 
 ## Factor ranking — 3d forward returns
 
 | Factor | Mean IC | ICIR | Sign cons. | Dates | Spread | Verdict |
 |---|---|---|---|---|---|---|
-| short_fwd_3d | -1.0000 | -16716654339818676.00 | 100% | 31 | -11.76% | ✅ consistent |
-| short_fwd_2d | -0.7334 | -9.80 | 100% | 31 | -8.44% | ✅ consistent |
-| short_fwd_1d | -0.4901 | -4.32 | 100% | 31 | -4.84% | ✅ consistent |
-| Volatility (Month) | -0.0949 | -0.77 | 70% | 30 | +1.70% | ✅ consistent |
-| exit_price_3d | +0.0657 | +1.15 | 87% | 31 | n/a | ✅ consistent |
-| Average Volume | -0.0621 | -1.15 | 81% | 31 | n/a | ✅ consistent |
-| valuation_score | -0.0602 | -0.81 | 81% | 31 | +2.42% | ✅ consistent |
-| Profit Margin | +0.0580 | +0.66 | 77% | 31 | -6.03% | ✅ consistent |
-| exit_price_2d | +0.0563 | +0.96 | 87% | 31 | n/a | ✅ consistent |
-| d_Performance (Week) | -0.0506 | -0.32 | 76% | 29 | -0.37% | ✅ consistent |
-| exit_price_1d | +0.0470 | +0.79 | 77% | 31 | n/a | ✅ consistent |
-| Beta | -0.0466 | -0.25 | 57% | 30 | -3.54% | ⚠️ flips / too few dates |
-| n_pos | -0.0433 | -0.37 | 65% | 31 | n/a | ⚠️ flips / too few dates |
-| Performance (YTD) | +0.0432 | +0.46 | 74% | 31 | -4.07% | ✅ consistent |
-| w_pos | -0.0428 | -0.37 | 68% | 31 | n/a | ✅ consistent |
-| 200-Day Simple Moving Average | +0.0422 | +0.48 | 65% | 31 | -3.99% | ⚠️ flips / too few dates |
-| Short Float | -0.0409 | -0.42 | 65% | 31 | n/a | ⚠️ flips / too few dates |
-| Price | +0.0373 | +0.62 | 68% | 31 | n/a | ✅ consistent |
-| entry_price | +0.0373 | +0.62 | 68% | 31 | n/a | ✅ consistent |
-| upside_pct | -0.0367 | -0.30 | 65% | 31 | +2.27% | ⚠️ flips / too few dates |
-| upside_pct_lvl | -0.0367 | -0.30 | 65% | 31 | +2.27% | ⚠️ flips / too few dates |
-| d_50-Day Simple Moving Average | -0.0338 | -0.23 | 66% | 29 | -0.78% | ⚠️ flips / too few dates |
-| Gross Margin | +0.0335 | +0.53 | 71% | 31 | -2.83% | ✅ consistent |
-| Market Cap | +0.0332 | +0.58 | 71% | 31 | n/a | ✅ consistent |
-| d_Performance (Month) | -0.0322 | -0.23 | 76% | 29 | -0.97% | ✅ consistent |
-| Performance (Week) | -0.0310 | -0.23 | 48% | 31 | -2.37% | ⚠️ flips / too few dates |
-| Relative Strength Index (14) | +0.0307 | +0.35 | 55% | 31 | n/a | ⚠️ flips / too few dates |
-| Short Ratio | -0.0303 | -0.38 | 58% | 31 | n/a | ⚠️ flips / too few dates |
-| d_200-Day Simple Moving Average | -0.0299 | -0.20 | 62% | 29 | -0.90% | ⚠️ flips / too few dates |
-| total_score | -0.0278 | -0.22 | 65% | 31 | -0.82% | ⚠️ flips / too few dates |
+| short_fwd_3d | -1.0000 | -16984137793402062.00 | 100% | 32 | -11.62% | ✅ consistent |
+| short_fwd_2d | -0.7356 | -9.85 | 100% | 32 | -8.36% | ✅ consistent |
+| short_fwd_1d | -0.4935 | -4.35 | 100% | 32 | -4.83% | ✅ consistent |
+| Volatility (Month) | -0.1000 | -0.81 | 71% | 31 | +1.70% | ✅ consistent |
+| exit_price_3d | +0.0700 | +1.14 | 88% | 32 | n/a | ✅ consistent |
+| Average Volume | -0.0646 | -1.17 | 81% | 32 | n/a | ✅ consistent |
+| valuation_score | -0.0641 | -0.84 | 81% | 32 | +2.30% | ✅ consistent |
+| Profit Margin | +0.0619 | +0.69 | 78% | 32 | -5.80% | ✅ consistent |
+| exit_price_2d | +0.0608 | +0.97 | 88% | 32 | n/a | ✅ consistent |
+| d_Performance (Week) | -0.0565 | -0.36 | 77% | 30 | -0.39% | ✅ consistent |
+| exit_price_1d | +0.0515 | +0.81 | 78% | 32 | n/a | ✅ consistent |
+| Beta | -0.0496 | -0.26 | 58% | 31 | -3.44% | ⚠️ flips / too few dates |
+| Performance (YTD) | +0.0468 | +0.50 | 75% | 32 | -3.91% | ✅ consistent |
+| 200-Day Simple Moving Average | +0.0466 | +0.52 | 66% | 32 | -3.83% | ⚠️ flips / too few dates |
+| n_pos | -0.0459 | -0.40 | 66% | 32 | n/a | ⚠️ flips / too few dates |
+| w_pos | -0.0457 | -0.40 | 69% | 32 | n/a | ✅ consistent |
+| Short Float | -0.0447 | -0.46 | 66% | 32 | n/a | ⚠️ flips / too few dates |
+| upside_pct | -0.0441 | -0.34 | 66% | 32 | +2.16% | ⚠️ flips / too few dates |
+| upside_pct_lvl | -0.0441 | -0.34 | 66% | 32 | +2.16% | ⚠️ flips / too few dates |
+| Price | +0.0417 | +0.65 | 69% | 32 | n/a | ✅ consistent |
+| entry_price | +0.0417 | +0.65 | 69% | 32 | n/a | ✅ consistent |
+| d_50-Day Simple Moving Average | -0.0376 | -0.26 | 67% | 30 | -0.79% | ✅ consistent |
+| Market Cap | +0.0347 | +0.61 | 72% | 32 | n/a | ✅ consistent |
+| Relative Strength Index (14) | +0.0342 | +0.38 | 56% | 32 | n/a | ⚠️ flips / too few dates |
+| d_200-Day Simple Moving Average | -0.0336 | -0.22 | 63% | 30 | -0.89% | ⚠️ flips / too few dates |
+| Short Ratio | -0.0333 | -0.41 | 59% | 32 | n/a | ⚠️ flips / too few dates |
+| Gross Margin | +0.0329 | +0.52 | 72% | 32 | -2.81% | ✅ consistent |
+| Performance (Week) | -0.0321 | -0.24 | 50% | 32 | -2.31% | ⚠️ flips / too few dates |
+| d_Performance (Month) | -0.0312 | -0.23 | 77% | 30 | -0.94% | ✅ consistent |
+| d_20-Day Simple Moving Average | -0.0288 | -0.20 | 63% | 30 | -0.46% | ⚠️ flips / too few dates |
 
 ## What to do with this
 
