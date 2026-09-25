@@ -342,14 +342,66 @@ def save_rows_manifest(root: Path, rel: str, man: dict) -> None:
     p.write_text(json.dumps(man, indent=1) + "\n", encoding="utf-8")
 
 
+def table_for(root: Path, rel: str) -> tuple[str, str, str] | None:
+    """(manifest_rel, table_rel, kind) of the row manifest covering ``rel``.
+
+    Attribution pointer members (D_ic.csv, 01_daily/D_attribution.md) map to
+    their D_summary.json table."""
+    for man_rel, specs in ((ROWS_REL, ROWS_SPECS), (OPPSET_FP_REL, OPPSET_SPECS)):
+        kind = discover(root, specs).get(rel)
+        if kind:
+            return man_rel, rel, kind
+        if rel in load_rows_manifest(root, man_rel)["tables"]:
+            return man_rel, rel, load_rows_manifest(root, man_rel)["tables"][rel]["kind"]
+    m = DATE_RE.search(rel.rsplit("/", 1)[-1])
+    if m and rel in attr_pointer_files(m.group(1)):
+        summ = attr_pointer_files(m.group(1))[0]
+        if (root / summ).exists():
+            return ROWS_REL, summ, "attr_pointer"
+    return None
+
+
+def restate_table(root: Path, man: dict, frel: str, kind: str,
+                  today: str | None) -> None:
+    """Deliberate restatement (logged by check_history_hashes.py --restate):
+    re-fingerprint one table to its current contents. Unchanged parts keep
+    their record; changed/new parts get ``restated``. Attribution pointers keep
+    the history of other labels (upgrade-only check still applies)."""
+    tables = man["tables"]
+    old = (tables.get(frel) or {}).get("groups", {})
+    cur = fingerprint(root, frel, kind) if (root / frel).exists() else {}
+    new = json.loads(json.dumps(old)) if kind == "attr_pointer" else {}
+    for g, parts in cur.items():
+        for part, ent in parts.items():
+            prev = (old.get(g) or {}).get(part)
+            if prev and prev.get("sha") == ent["sha"]:
+                new.setdefault(g, {})[part] = prev
+                continue
+            st = _stamp({part: ent}, today)[part]
+            if prev:
+                st["first_recorded"] = prev.get("first_recorded", "")
+            st["restated"] = today or ""
+            new.setdefault(g, {})[part] = st
+    if cur or kind == "attr_pointer":
+        tables[frel] = {"kind": kind, "groups": {g: p for g, p in new.items() if p}}
+    else:
+        tables.pop(frel, None)
+
+
 def check_manifest(root: Path, rel: str, specs, today: str | None,
-                   update: bool) -> tuple[list[str], dict]:
+                   update: bool, restate=()) -> tuple[list[str], dict]:
     """Verify (update=False) or verify+merge new parts (update=True).
 
-    Returns (problems, new_manifest). Callers save only when problems == []."""
+    ``restate``: table paths deliberately re-fingerprinted first (logged by the
+    caller). Returns (problems, new_manifest). Callers save only when
+    problems == []."""
     man = load_rows_manifest(root, rel)
     tables = man["tables"]
     found = discover(root, specs)
+    for frel in restate:
+        kind = found.get(frel) or (tables.get(frel) or {}).get("kind")
+        if kind:
+            restate_table(root, man, frel, kind, today)
     probs: list[str] = []
     for frel, ent in list(tables.items()):
         kind = ent["kind"]

@@ -33,6 +33,11 @@
   2026-09-24 / 2026-09-25 were built from an earlier fetch of the 2026-09-23 /
   2026-09-24 raw files than the ones now in `data/snapshots/` (those were
   re-fetched by the ~23:00 UTC cron); the committed rows are the record.
+- Restored 2026-09-25 (War room, logged in `data/snapshots/RESTATEMENTS.log`):
+  join_morning 2026-09-22 rows back to 22d9eda (committed 2026-09-21 17:04 ET)
+  and 2026-09-23 rows back to dea3ff6 (2026-09-22 16:48 ET), i.e. the last
+  version committed before each morning's 09:30 ET open; the full-rebuild
+  rewrites in dea3ff6 / 69d7c6b are superseded.
 
 ## Features (from T−1)
 

@@ -116,6 +116,115 @@ class RowsManifestTest(unittest.TestCase):
         self.assertEqual(self.run_chh("add-new", "--today", "2026-09-23"), 1)
 
 
+class RestateRowsTest(unittest.TestCase):
+    """--restate covers row-fingerprinted tables (ROWS.json, FINGERPRINTS.json),
+    attribution pointer members, restored dated files and untracked records,
+    one RESTATEMENTS.log line each."""
+
+    def setUp(self):
+        self._t = tempfile.TemporaryDirectory()
+        self.root = Path(self._t.name)
+        for d in ("data/snapshots", "data/labels", "data/attribution", "01_daily",
+                  "02_lessons/candidate", "research/oppset_clock_b"):
+            (self.root / d).mkdir(parents=True)
+        self.lab = self.root / "data/labels/2026-09-22_fwd.csv"
+        self.lab.write_text(LABEL_HDR + label_row("A", 10.0, "2026-09-23", 11.0))
+        self.sp = self.root / "data/attribution/2026-09-22_summary.json"
+        self.ic = self.root / "data/attribution/2026-09-22_ic.csv"
+        self.md = self.root / "01_daily/2026-09-22_attribution.md"
+        self.sp.write_text(json.dumps({"label": "fwd_1d", "prediction_day": "2026-09-23"}))
+        self.ic.write_text("feature,ic\nx,0.1\n")
+        self.md.write_text("v1")
+        self.opp = self.root / "research/oppset_clock_b/oppset_all.csv"
+        hdr = ",".join(hg.OPPSET_BASE_COLS)
+        blank = "," * (len(hg.OPPSET_BASE_COLS) - 3)
+        self.opp_row = lambda jm, a, t: f"{jm},{a},{t}{blank}\n"
+        self.opp.write_text(hdr + "\n" + self.opp_row("2026-09-22", "2026-09-21", "AAA")
+                            + self.opp_row("2026-09-23", "2026-09-22", "BBB"))
+        self.assertEqual(quiet(hg.check_manifest, self.root, hg.OPPSET_FP_REL,
+                               hg.OPPSET_SPECS, "2026-09-23", True)[0], [])
+        _, man = hg.check_manifest(self.root, hg.OPPSET_FP_REL, hg.OPPSET_SPECS,
+                                   "2026-09-23", True)
+        hg.save_rows_manifest(self.root, hg.OPPSET_FP_REL, man)
+        self.assertEqual(self.run_chh("add-new", "--today", "2026-09-23"), 0)
+        self.assertEqual(self.run_chh("verify"), 0)
+
+    def tearDown(self):
+        self._t.cleanup()
+
+    def run_chh(self, *args):
+        return quiet(chh.main, [*args, "--root", str(self.root)])
+
+    def log(self):
+        p = self.root / chh.RESTATE_LOG_REL
+        return [ln for ln in p.read_text().splitlines()] if p.exists() else []
+
+    def test_restate_label_and_oppset_rows(self):
+        self.lab.write_text(LABEL_HDR + label_row("A", 10.0, "2026-09-23", 11.5))
+        self.opp.write_text(self.opp.read_text().replace("AAA", "AAB"))
+        self.assertEqual(self.run_chh("verify"), 1)
+        # without --restate: refused, manifests untouched
+        before = (self.root / hg.ROWS_REL).read_text()
+        self.assertEqual(self.run_chh("add-new", "--today", "2026-09-25"), 1)
+        self.assertEqual((self.root / hg.ROWS_REL).read_text(), before)
+        # restating only one of two changed tables is still refused
+        self.assertEqual(self.run_chh("add-new", "--today", "2026-09-25",
+                                      "--restate", "data/labels/2026-09-22_fwd.csv",
+                                      "--reason", "r1"), 1)
+        self.assertEqual(self.log(), [])
+        # mismatched reason count
+        self.assertEqual(self.run_chh("add-new", "--today", "2026-09-25",
+                                      "--restate", "data/labels/2026-09-22_fwd.csv",
+                                      "--restate", "research/oppset_clock_b/oppset_all.csv",
+                                      "--reason", "a", "--reason", "b", "--reason", "c"), 2)
+        self.assertEqual(self.run_chh("add-new", "--today", "2026-09-25",
+                                      "--restate", "data/labels/2026-09-22_fwd.csv",
+                                      "--reason", "restore label",
+                                      "--restate", "research/oppset_clock_b/oppset_all.csv",
+                                      "--reason", "restore oppset 2026-09-22"), 0)
+        self.assertEqual(self.run_chh("verify"), 0)
+        self.assertEqual(quiet(ob.verify, self.root / "research/oppset_clock_b",
+                               "2026-09-25"), [])
+        log = self.log()
+        self.assertEqual(len(log), 2)
+        self.assertTrue(log[0].split("\t")[1] == "data/labels/2026-09-22_fwd.csv"
+                        and log[0].endswith("restore label"))
+        self.assertIn("oppset_all.csv", log[1])
+        fp = json.loads((self.root / hg.OPPSET_FP_REL).read_text())
+        g = fp["tables"]["research/oppset_clock_b/oppset_all.csv"]["groups"]
+        self.assertEqual(g["2026-09-22"]["rows"]["restated"], "2026-09-25")
+        self.assertEqual(g["2026-09-22"]["rows"]["first_recorded"], "2026-09-23")
+        self.assertNotIn("restated", g["2026-09-23"]["rows"])   # untouched morning
+        # after the restatement the table is strict again
+        self.opp.write_text(self.opp.read_text().replace("BBB", "BBC"))
+        self.assertEqual(self.run_chh("verify"), 1)
+
+    def test_restate_attr_pointer_member_new_archive_and_untracked(self):
+        self.md.write_text("v0 original")
+        les = self.root / "02_lessons/candidate/2026-09-22_lesson.md"
+        les.write_text("lesson v0")
+        arch = self.root / "data/attribution/by_horizon"
+        arch.mkdir()
+        (arch / "2026-09-23_signal2026-09-22_fwd_1d_ic.csv").write_text("feature,ic\nx,0.1\n")
+        self.assertEqual(self.run_chh("verify"), 1)
+        self.assertEqual(self.run_chh(
+            "add-new", "--today", "2026-09-25",
+            "--restate", "01_daily/2026-09-22_attribution.md",
+            "--restate", "data/attribution/by_horizon/2026-09-23_signal2026-09-22_fwd_1d_ic.csv",
+            "--restate", "02_lessons/candidate/2026-09-22_lesson.md",
+            "--reason", "restore original"), 0)
+        self.assertEqual(self.run_chh("verify"), 0)
+        log = self.log()
+        self.assertEqual(len(log), 3)
+        self.assertEqual(log[1].split("\t")[2], "ABSENT")      # not previously recorded
+        files = json.loads((self.root / chh.MANIFEST_REL).read_text())["files"]
+        self.assertIn("data/attribution/by_horizon/"
+                      "2026-09-23_signal2026-09-22_fwd_1d_ic.csv", files)
+        # unknown, nonexistent file
+        self.assertEqual(self.run_chh("add-new", "--today", "2026-09-25",
+                                      "--restate", "data/nope.csv", "--reason", "x"), 2)
+
+
 class KeepExistingPastTest(unittest.TestCase):
     def test_keep_existing_past(self):
         with tempfile.TemporaryDirectory() as t:
