@@ -268,8 +268,12 @@ class OppsetAppendOnlyTest(unittest.TestCase):
     def tearDown(self):
         self._t.cleanup()
 
-    def write_raw(self, d, shift=0.0):
+    def write_raw(self, d, shift=0.0, scrape_ts="after_close"):
         df = raw_df(shift)
+        if scrape_ts == "after_close":
+            scrape_ts = f"{d}T20:47:00+00:00"                # 16:47 ET (EDT)
+        if scrape_ts is not None:
+            df["scrape_ts"] = scrape_ts
         df = pd.concat([df] * 30, ignore_index=True)  # > 1000 bytes
         df.to_csv(self.raw / f"{d}.raw.csv", index=False)
 
@@ -338,6 +342,27 @@ class OppsetAppendOnlyTest(unittest.TestCase):
         df["fwd_2d"] = "0.02"                               # never changes
         df.to_csv(self.out / "oppset_all.csv", index=False)
         self.assertNotEqual(quiet(ob.verify, self.out, "2026-09-26"), [])
+
+    def test_asof_snapshot_must_be_real_close(self):
+        self.assertEqual(self.build("--asof", "2026-09-22", "--today", "2026-09-22"), 0)
+        before = (self.out / "oppset_all.csv").read_bytes()
+        fp_before = (self.out / "FINGERPRINTS.json").read_bytes()
+        # 09-23 export taken pre-close (12:50 ET): refused, logged, nothing appended
+        self.write_raw("2026-09-23", scrape_ts="2026-09-23T16:50:00+00:00")
+        self.assertEqual(self.build("--today", "2026-09-23"), 1)
+        self.assertEqual((self.out / "oppset_all.csv").read_bytes(), before)
+        self.assertEqual((self.out / "FINGERPRINTS.json").read_bytes(), fp_before)
+        last = (self.out / "APPEND_LOG.tsv").read_text().splitlines()[-1].split("\t")
+        self.assertEqual(last[1:3], ["2026-09-24", "2026-09-23"])
+        self.assertTrue(last[3].startswith("refused: asof snapshot is not the real close"))
+        # no scrape_ts and not in git: unknown -> refused
+        self.write_raw("2026-09-23", scrape_ts=None)
+        self.assertEqual(self.build("--today", "2026-09-23"), 1)
+        # same-day re-fetch after the close: appended
+        self.write_raw("2026-09-23")
+        self.assertEqual(self.build("--today", "2026-09-23"), 0)
+        self.assertEqual(sorted(self.rows()["join_morning"].unique()),
+                         ["2026-09-23", "2026-09-24"])
 
     def test_knowable_by_0930(self):
         self.assertIsNotNone(ob.knowable_check("2026-09-23", "2026-09-23"))

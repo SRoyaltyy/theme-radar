@@ -290,9 +290,15 @@ def latest_raw(raw_dir: Path, today: str) -> str | None:
 def knowable_check(asof: str, jm: str) -> str | None:
     """Day N (= join_morning) may use only inputs knowable by 09:30 ET on N.
     Inputs are the single raw file dated finviz_asof (< N). If the companion
-    normalized snapshot carries scrape_ts, the export must predate N 09:30 ET."""
+    normalized snapshot carries scrape_ts, the export must predate N 09:30 ET.
+    The asof snapshot must also be the real close: taken after 16:00 ET on
+    finviz_asof and before the next trading day's open (history_guard.
+    close_is_in: scrape_ts, else git commit time of the on-disk file)."""
     if not asof < jm:
         return f"finviz_asof {asof} is not before join_morning {jm}"
+    ok, why = hg.close_is_in(RAW, asof)
+    if not ok:
+        return f"asof snapshot is not the real close: {why}"
     snap = RAW / f"{asof}.csv"
     if snap.exists():
         cols = pd.read_csv(snap, nrows=0).columns
@@ -307,7 +313,8 @@ def knowable_check(asof: str, jm: str) -> str | None:
 
 def _log(out_dir: Path, jm: str, asof: str, today: str, mode: str) -> None:
     """APPEND_LOG.tsv: when each morning was built. A morning built after its
-    own 09:30 ET (catch-up of a missed night) is visible as built_late=1."""
+    own 09:30 ET (catch-up of a missed night) is visible as built_late=1.
+    Refused builds are logged too (mode "refused: <reason>"; nothing appended)."""
     path = out_dir / "APPEND_LOG.tsv"
     now = pd.Timestamp.now(tz="UTC")
     late = int(now >= pd.Timestamp(f"{jm} 09:30", tz="America/New_York"))
@@ -357,6 +364,7 @@ def append_one(out_dir: Path, asof: str, jm: str, today: str) -> int:
     why = knowable_check(asof, jm)
     if why:
         print(f"[oppset] REFUSE: {why}", file=sys.stderr)
+        _log(out_dir, jm, asof, today, "refused: " + " ".join(why.split()))
         return 1
 
     day = build_day(jm, asof)

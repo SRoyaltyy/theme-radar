@@ -2,12 +2,19 @@ name: Finviz Daily Snapshot
 
 on:
   schedule:
-    # After US cash close: 16:30 ET ≈ 20:30 UTC (EDT)
+    # After US cash close, DST-safe (scripts/schedule_gate.py picks one slot):
+    #   20:30 UTC = 16:30 EDT (summer)  |  21:30 UTC = 16:30 EST (winter)
+    # The other slot is a no-op (pre-close, or today's snapshot already in).
     - cron: "30 20 * * 1-5"
+    - cron: "30 21 * * 1-5"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: finviz-daily
+  cancel-in-progress: false
 
 jobs:
   fetch:
@@ -23,19 +30,9 @@ jobs:
       - name: Install deps
         run: pip install requests pandas
 
-      - name: Gate on US trading day (ET)
+      - name: Gate (trading day, after 16:00 ET close, not already fetched)
         id: gate
-        run: |
-          python - <<'PY'
-          import os
-          from src.trading_calendar import is_trading_day, today_et
-          d = today_et()
-          open_ = is_trading_day(d)
-          print(f"ET date={d} trading_day={open_}")
-          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-              fh.write(f"trading={str(open_).lower()}\n")
-              fh.write(f"et_date={d.isoformat()}\n")
-          PY
+        run: python scripts/schedule_gate.py finviz --event "${{ github.event_name }}"
 
       - name: Verify past history unchanged (hash manifest)
         if: steps.gate.outputs.trading == 'true'

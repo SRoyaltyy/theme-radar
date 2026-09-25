@@ -140,9 +140,19 @@ def snapshot_scrape_time(snap_dir: Path, day: str) -> tuple[datetime | None, str
     rc_t, tracked = _git(Path(top), "ls-files", "--", rel)
     if rc_d != 0 or not tracked:
         return None, "no scrape_ts and file differs from its last commit"
-    rc, ts = _git(Path(top), "log", "-1", "--format=%cI", "--", rel)
-    if rc != 0 or not ts:
+    rc, out = _git(Path(top), "log", "-1", "--format=%H %cI", "--", rel)
+    if rc != 0 or not out:
         return None, "no scrape_ts and no commit"
+    sha, ts = out.split(" ", 1)
+    # Shallow clone (CI checkout, depth 1): the boundary commit appears to add
+    # every file, so its time says nothing about when the snapshot was taken.
+    rc_s, shallow = _git(Path(top), "rev-parse", "--is-shallow-repository")
+    if rc_s == 0 and shallow == "true":
+        rc_p, sp = _git(Path(top), "rev-parse", "--git-path", "shallow")
+        spath = Path(sp) if Path(sp).is_absolute() else Path(top) / sp
+        bounds = spath.read_text().split() if spath.exists() else []
+        if sha in bounds:
+            return None, "no scrape_ts and git history too shallow"
     return datetime.fromisoformat(ts), "git commit time (no scrape_ts)"
 
 

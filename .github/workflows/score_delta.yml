@@ -2,8 +2,12 @@ name: Finviz Score Delta
 
 on:
   schedule:
-    # After Finviz snapshot (20:30 UTC)
+    # After the Finviz snapshot, DST-safe (scripts/schedule_gate.py): runs in
+    # the first slot where today's post-close snapshot is in and today is not
+    # scored yet; the other slot is a no-op.
+    #   21:00 UTC (summer, finviz 20:30)  |  22:00 UTC (winter, finviz 21:30)
     - cron: "0 21 * * 1-5"
+    - cron: "0 22 * * 1-5"
   workflow_dispatch:
     inputs:
       run_date:
@@ -22,6 +26,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: score-delta
+  cancel-in-progress: false
+
 jobs:
   score:
     runs-on: ubuntu-latest
@@ -36,21 +44,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Gate on US trading day (ET) unless manual date set
+      - name: Gate (trading day, today's post-close snapshot in, not yet scored)
         id: gate
         run: |
-          python - <<'PY'
-          import os
-          from src.trading_calendar import is_trading_day, today_et
-          manual = "${{ github.event.inputs.run_date }}".strip()
-          d = today_et()
-          # Manual runs always proceed; scheduled runs need a trading day
-          event = "${{ github.event_name }}"
-          trading = True if (event == "workflow_dispatch" or manual) else is_trading_day(d)
-          print(f"event={event} ET={d} trading={trading} manual={manual!r}")
-          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-              fh.write(f"trading={str(trading).lower()}\n")
-          PY
+          if [ -n "${{ github.event.inputs.run_date }}" ]; then
+            echo "manual run_date set -> proceed"; echo "trading=true" >> "$GITHUB_OUTPUT"
+          else
+            python scripts/schedule_gate.py score --event "${{ github.event_name }}"
+          fi
 
       - name: Resolve target date
         if: steps.gate.outputs.trading == 'true'

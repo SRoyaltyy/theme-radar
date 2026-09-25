@@ -88,6 +88,14 @@ class CloseIsInTest(unittest.TestCase):
         ok, why = hg.close_is_in(self.d, "2026-08-10")
         self.assertTrue(ok, why)
         self.assertIn("git commit time", why)
+        # shallow CI checkout (depth 1): boundary commit time is not trusted
+        git("commit", "-q", "--allow-empty", "-m", "later", when="2026-09-25T12:00:00+00:00")
+        sh = self.d / "shallow"
+        subprocess.run(["git", "clone", "-q", "--depth", "1", self.d.as_uri(), str(sh)],
+                       env=env, check=True, capture_output=True)
+        ok, why = hg.close_is_in(sh, "2026-08-10")
+        self.assertFalse(ok)
+        self.assertIn("shallow", why)
 
 
 class LabelAndAttributionGuardTest(unittest.TestCase):

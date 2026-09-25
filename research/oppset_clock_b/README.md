@@ -17,9 +17,12 @@
   `/workspace/theme-radar-top-gainers/build_oppset_clock_b.py` is now a wrapper
   around it). Each refresh appends only the new `join_morning` (T = next US
   trading day after the latest `data/snapshots/<asof>.raw.csv`), one day at a time.
-- Day T is built only from the single raw file dated `finviz_asof` = T−1
-  (after-close, knowable before 09:30 ET on T; checked against `scrape_ts` when
-  present). No later file is read.
+- Day T is built only from the single raw file dated `finviz_asof` = T−1.
+  That snapshot must be the real close: taken after 16:00 ET on T−1 and before
+  09:30 ET on T (`scrape_ts`, else the git commit time of the on-disk file;
+  `history_guard.close_is_in`). Otherwise the build is refused, logged in
+  `APPEND_LOG.tsv` as `refused: ...`, and nothing is appended. No later file
+  is read.
 - Past rows are never recomputed. `FINGERPRINTS.json` holds a row-level sha256
   per `join_morning` for `oppset_all.csv`, `oppset_flagged.csv` and
   `oppset_0916_0918.csv`; the refresh and `scripts/check_history_hashes.py verify`
