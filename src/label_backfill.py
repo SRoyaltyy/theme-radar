@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 
 from . import config
+from . import history_guard as hg
 from .finviz_delta import normalize_frame
 from .snapshots import snapshot_dates
 
@@ -99,7 +100,25 @@ def backfill_one(scan_date: str, dates: dict) -> Path | None:
     out = pd.DataFrame(rows)
     LABELS_DIR.mkdir(parents=True, exist_ok=True)
     path = LABELS_DIR / f"{scan_date}_fwd.csv"
-    out.to_csv(path, index=False)
+    text_new = out.to_csv(index=False)
+    # Fill-once: an existing label file may only gain newly matured horizons.
+    # Parts already filled keep their values, except a part that matured on
+    # today's snapshot (same-day re-fetch of today's snapshot).
+    if path.exists():
+        text_old = path.read_text(encoding="utf-8")
+        if text_old == text_new:
+            print(f"[labels] {scan_date}: unchanged ({len(forward)} horizon(s)) — keep")
+            return path
+        fo = hg.fp_labels(*hg.read_csv_text(text_old), scan_date)["all"]
+        fn = hg.fp_labels(*hg.read_csv_text(text_new), scan_date)["all"]
+        today = hg.today_et()
+        clash = [p for p, e in fo.items()
+                 if (fn.get(p) or {}).get("sha") != e["sha"] and e["asof"] != today]
+        if clash:
+            print(f"[labels] {scan_date}: REFUSE rewrite — filled part(s) {clash} "
+                  f"would change; keeping the existing record (fill-once).")
+            return None
+    path.write_text(text_new, encoding="utf-8")
     meta = {
         "signal_asof": scan_date,
         "scan_date": scan_date,

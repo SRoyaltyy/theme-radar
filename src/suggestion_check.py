@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 
 from . import config
+from . import history_guard as hg
 
 SCORES_DIR = config.DATA / "scores"
 LABELS_DIR = config.DATA / "labels"
@@ -162,6 +163,37 @@ def check_one(signal: str, top_n: int = 15, bottom_n: int = 10,
     return {k: v for k, v in result.items() if k != "ranked"}
 
 
+def _append_new_horizons(csv_path: Path, pdf: pd.DataFrame, signal: str) -> bool:
+    """Append-only per horizon: rows for a horizon already in the file are kept
+    verbatim (unless that horizon's prediction day is today); only newly matured
+    horizons are appended. Returns False when nothing new (skip the md too)."""
+    if not csv_path.exists() or pdf.empty:
+        pdf.to_csv(csv_path, index=False)
+        return True
+    header, old_rows = hg.read_csv_path(csv_path)
+    if header != list(pdf.columns) or "horizon" not in header:
+        print(f"[suggest] {signal}: existing CSV has different columns — keep (append-only)")
+        return False
+    hi, pi = header.index("horizon"), header.index("prediction_day")
+    old_pred = {r[hi]: r[pi] for r in old_rows}
+    today = hg.today_et()
+    todo = [h for h in pdf["horizon"].unique()
+            if h not in old_pred or old_pred[h] == today]
+    if not todo:
+        print(f"[suggest] {signal}: horizons {sorted(old_pred)} already recorded — keep")
+        return False
+    import csv as _csv
+    import io as _io
+    buf = _io.StringIO()
+    w = _csv.writer(buf, lineterminator="\n")
+    w.writerow(header)
+    w.writerows(r for r in old_rows if r[hi] not in todo)
+    text = buf.getvalue() + pdf[pdf["horizon"].isin(todo)].to_csv(index=False, header=False)
+    csv_path.write_text(text, encoding="utf-8")
+    print(f"[suggest] {signal}: appended horizon(s) {todo}")
+    return True
+
+
 def _write(result: dict) -> None:
     signal = result["signal_asof"]
     ATTR_DIR.mkdir(parents=True, exist_ok=True)
@@ -169,7 +201,8 @@ def _write(result: dict) -> None:
 
     pdf = pd.DataFrame(result["rows"])
     csv_path = ATTR_DIR / f"{signal}_suggestion_check.csv"
-    pdf.to_csv(csv_path, index=False)
+    if not _append_new_horizons(csv_path, pdf, signal):
+        return
 
     L = [
         f"# Suggestion check — signal **{signal}** (full universe)",

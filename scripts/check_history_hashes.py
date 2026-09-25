@@ -5,8 +5,18 @@ Covers every dated file:
   data/snapshots/YYYY-MM-DD.csv and YYYY-MM-DD.raw.csv
       (NOT current.csv / previous.csv / manifest.json / archive/)
   data/features/YYYY-MM-DD*   data/scores/YYYY-MM-DD*
+  data/composite/YYYY-MM-DD*  data/universe/YYYY-MM-DD*
+  data/attribution/by_horizon/YYYY-MM-DD*   (write-once per-horizon records)
+  01_daily/YYYY-MM-DD_{scan,universe,composite_rank}.md
 
 Manifest: data/snapshots/HASHES.json  {path: {sha256, first_recorded}}
+
+Sibling row-level manifests (src/history_guard.py; fill-once semantics for
+outcomes that mature later, append-only for tables that grow by day):
+  data/snapshots/ROWS.json                   labels (+meta), suggestion checks,
+                                             attribution pointers (upgrade-only)
+  research/oppset_clock_b/FINGERPRINTS.json  Clock-B oppset; verified here but
+                                             only written by the oppset builder
 
 Modes
   verify   exit 1 if any file already in the manifest changed or was deleted.
@@ -40,7 +50,12 @@ RESTATE_LOG_REL = "data/snapshots/RESTATEMENTS.log"
 
 SNAP_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})(\.raw)?\.csv$")
 DATED_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})[._]")
-DATED_DIRS = ("data/features", "data/scores")
+DATED_DIRS = ("data/features", "data/scores", "data/composite", "data/universe",
+              "data/attribution/by_horizon")
+DAILY_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(scan|universe|composite_rank)\.md$")
+
+sys.path.insert(0, str(ROOT))
+from src import history_guard as hg  # noqa: E402
 
 
 def sha256_file(path: Path) -> str:
@@ -68,6 +83,10 @@ def discover(root: Path) -> list[str]:
         if dd.is_dir():
             out += [f"{d}/{p.name}" for p in dd.iterdir()
                     if p.is_file() and DATED_RE.match(p.name)]
+    daily = root / "01_daily"
+    if daily.is_dir():
+        out += [f"01_daily/{p.name}" for p in daily.iterdir()
+                if p.is_file() and DAILY_RE.match(p.name)]
     return sorted(out)
 
 
@@ -100,17 +119,37 @@ def et_today() -> str:
     return datetime.now(ZoneInfo("America/New_York")).date().isoformat()
 
 
+def rows_problems(root: Path, today: str | None, update: bool):
+    """Check the sibling row manifests. Returns (problems, rows_manifest)."""
+    probs, rows_man = hg.check_manifest(root, hg.ROWS_REL, hg.ROWS_SPECS,
+                                        today, update=update)
+    # Oppset fingerprints are only ever written by the oppset builder.
+    p2, _ = hg.check_manifest(root, hg.OPPSET_FP_REL, hg.OPPSET_SPECS,
+                              today, update=False)
+    return probs + p2, rows_man
+
+
 def cmd_verify(root: Path) -> int:
     man = load_manifest(root)
     bad = problems(root, man)
     for rel, why in bad.items():
         print(f"[history] FAIL {why}: {rel}", file=sys.stderr)
+    rprobs, rows_man = rows_problems(root, None, update=False)
+    for x in rprobs:
+        print(f"[history] FAIL rows: {x}", file=sys.stderr)
+    if rprobs and not bad:
+        print(f"[history] {len(rprobs)} row fingerprint(s) no longer match. Past "
+              "rows are append-only; matured grades are fill-once.", file=sys.stderr)
+        return 1
     if bad:
         print(f"[history] {len(bad)} manifest entr(y/ies) no longer match. "
               "Past days are immutable; use add-new --restate FILE --reason ... "
               "only for a deliberate, logged restatement.", file=sys.stderr)
         return 1
-    print(f"[history] OK: {len(man['files'])} files verified")
+    n_rows = len(rows_man["tables"]) + len(hg.load_rows_manifest(
+        root, hg.OPPSET_FP_REL)["tables"])
+    print(f"[history] OK: {len(man['files'])} files + {n_rows} row-fingerprinted "
+          "tables verified")
     return 0
 
 
@@ -155,9 +194,12 @@ def cmd_add_new(root: Path, today: str, restate: str | None,
             print(f"[history] same-day delete allowed ({today}): {rel}")
         bad.pop(rel)
 
-    if bad:
+    rprobs, rows_man = rows_problems(root, today, update=True)
+    if bad or rprobs:
         for rel, why in bad.items():
             print(f"[history] FAIL past file {why}: {rel}", file=sys.stderr)
+        for x in rprobs:
+            print(f"[history] FAIL rows: {x}", file=sys.stderr)
         print("[history] refusing to update manifest; past dates are strict.",
               file=sys.stderr)
         return 1
@@ -168,6 +210,7 @@ def cmd_add_new(root: Path, today: str, restate: str | None,
             files[rel] = {"sha256": sha256_file(root / rel), "first_recorded": today}
             added += 1
     save_manifest(root, man)
+    hg.save_rows_manifest(root, hg.ROWS_REL, rows_man)
     if log_lines:
         with open(root / RESTATE_LOG_REL, "a", encoding="utf-8") as fh:
             fh.write("\n".join(log_lines) + "\n")

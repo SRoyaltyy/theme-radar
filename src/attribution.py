@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 
 from . import config
+from . import history_guard as hg
 
 FEATURES_DIR = config.DATA / "features"
 LABELS_DIR = config.DATA / "labels"
@@ -308,6 +309,50 @@ def write_candidate_lesson(result: dict) -> Path | None:
     return path
 
 
+def _keep_existing_pointer(scan_date: str, label: str) -> bool:
+    """Append-only: D_summary.json / D_ic.csv / D_attribution.md / D_lesson.md
+    are an upgrade-only pointer. Same label -> keep (unless its prediction day
+    is today: same-day re-fetch); shorter horizon than recorded -> keep."""
+    sp = ATTR_DIR / f"{scan_date}_summary.json"
+    if not sp.exists():
+        return False
+    try:
+        old = json.loads(sp.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return False
+    old_label = str(old.get("label", ""))
+    if hg.horizon_of(label) < hg.horizon_of(old_label):
+        print(f"[attr] {scan_date}: recorded {old_label} > {label} — keep (no downgrade)")
+        return True
+    if label == old_label and str(old.get("prediction_day")) != hg.today_et():
+        print(f"[attr] {scan_date}: {label} already recorded — keep (append-only)")
+        return True
+    return False
+
+
+def _archive_pointer(scan_date: str) -> None:
+    """Write-once copy of the current pointer into data/attribution/by_horizon/
+    named <prediction_day>_signal<scan_date>_<label>_* (hash-locked by
+    scripts/check_history_hashes.py; only same-day files may be replaced)."""
+    sp = ATTR_DIR / f"{scan_date}_summary.json"
+    ic = ATTR_DIR / f"{scan_date}_ic.csv"
+    if not sp.exists():
+        return
+    d = json.loads(sp.read_text(encoding="utf-8"))
+    pred, label = str(d.get("prediction_day") or ""), str(d.get("label") or "")
+    if not pred or not label:
+        return
+    arch = ATTR_DIR / "by_horizon"
+    arch.mkdir(parents=True, exist_ok=True)
+    stem = f"{pred}_signal{scan_date}_{label}"
+    for src, dst in ((sp, arch / f"{stem}_summary.json"), (ic, arch / f"{stem}_ic.csv")):
+        if not src.exists():
+            continue
+        if dst.exists() and hg.is_past(pred):
+            continue
+        dst.write_bytes(src.read_bytes())
+
+
 def run(scan_date: str, horizon: str = "auto") -> None:
     df = _load_joined(scan_date)
     if df is None:
@@ -316,13 +361,18 @@ def run(scan_date: str, horizon: str = "auto") -> None:
     if df["fwd_1d"].notna().sum() < 30 and df.get("fwd_3d", pd.Series(dtype=float)).notna().sum() < 30:
         print(f"[attr] {scan_date}: insufficient labeled rows")
         return
+    label = pick_label(df, horizon)
+    if _keep_existing_pointer(scan_date, label):
+        return
     result = analyze(scan_date, df, horizon=horizon)
     if result["n"] < 30:
         print(f"[attr] {scan_date}: label {result['label']} has only {result['n']} rows")
         return
+    _archive_pointer(scan_date)  # preserve the previous horizon's record first
     write_ic_csv(scan_date, result)
     md = write_md(result)
     les = write_candidate_lesson(result)
+    _archive_pointer(scan_date)
     print(
         f"[attr] signal_asof={result['signal_asof']} prediction_day={result['prediction_day']} "
         f"label={result['label']} n={result['n']} -> {md}"

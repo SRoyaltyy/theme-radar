@@ -27,6 +27,9 @@ jobs:
       - name: Install
         run: pip install -r requirements.txt
 
+      - name: Verify past history unchanged (hash manifest)
+        run: python scripts/check_history_hashes.py verify
+
       - name: Run composite rank
         run: |
           set -e
@@ -45,7 +48,7 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add 01_daily/*_composite_rank.md data/composite/ || true
-          git commit -m "auto: composite residual rank" || echo "No changes"
-          git pull --rebase origin main || true
-          git push origin main
+          # Past dates are write-once (composite_rank keeps an existing past
+          # record); manifests are recorded after rebasing onto latest main.
+          bash scripts/commit_with_history.sh "auto: composite residual rank" \
+            "$(TZ=America/New_York date +%F)" 01_daily data/composite

@@ -341,6 +341,12 @@ def run(date_str: str, registry: dict) -> None:
     if not snap.exists():
         print(f"[segments] no snapshot {snap} — skip")
         return
+    from . import history_guard as hg
+    if hg.keep_existing_past([UNIVERSE_DIR / f"{date_str}_membership.csv",
+                              UNIVERSE_DIR / f"{date_str}_segment_stats.csv",
+                              config.DAILY / f"{date_str}_universe.md"],
+                             date_str, "segments"):
+        return
     df = _add_catalyst_flags(load_snapshot(snap))
     df["_dollar_adv"] = (
         df.get("Price", pd.Series(np.nan, index=df.index))

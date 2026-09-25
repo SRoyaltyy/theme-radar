@@ -11,6 +11,29 @@
 - All features come from the after-close raw Finviz snapshot dated `finviz_asof`.
 - Do **not** use same-day Gap / RelVol / Change from snapshot T (those are after-T outcomes).
 
+## Append-only (since 2026-09-25)
+
+- Built by `research/oppset_clock_b/build_oppset_clock_b.py` (the old
+  `/workspace/theme-radar-top-gainers/build_oppset_clock_b.py` is now a wrapper
+  around it). Each refresh appends only the new `join_morning` (T = next US
+  trading day after the latest `data/snapshots/<asof>.raw.csv`), one day at a time.
+- Day T is built only from the single raw file dated `finviz_asof` = T−1
+  (after-close, knowable before 09:30 ET on T; checked against `scrape_ts` when
+  present). No later file is read.
+- Past rows are never recomputed. `FINGERPRINTS.json` holds a row-level sha256
+  per `join_morning` for `oppset_all.csv`, `oppset_flagged.csv` and
+  `oppset_0916_0918.csv`; the refresh and `scripts/check_history_hashes.py verify`
+  fail if any committed row changes. Only the morning whose `finviz_asof` is
+  today (ET) may be rebuilt (same-day rerun).
+- Outcome-grade columns added later (e.g. forward returns) are fill-once: once a
+  morning's cells are set, they are fingerprinted and may never change.
+- `APPEND_LOG.tsv` records when each morning was built (`built_late=1` if built
+  after its own 09:30 ET, e.g. catch-up of a missed night).
+- Rows recorded before 2026-09-25 are kept as committed. Note: join_morning
+  2026-09-24 / 2026-09-25 were built from an earlier fetch of the 2026-09-23 /
+  2026-09-24 raw files than the ones now in `data/snapshots/` (those were
+  re-fetched by the ~23:00 UTC cron); the committed rows are the record.
+
 ## Features (from T−1)
 
 | Column | Finviz field |

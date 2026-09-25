@@ -241,6 +241,11 @@ def write_report(date_str: str, pair: str | None, df: pd.DataFrame, y: dict) -> 
     config.DAILY.mkdir(parents=True, exist_ok=True)
 
     csv_path = OUT_DIR / f"{date_str}_composite_rank.csv"
+    from . import history_guard as hg
+    if hg.keep_existing_past([csv_path, OUT_DIR / f"{date_str}_y_snapshot.json",
+                              config.DAILY / f"{date_str}_composite_rank.md"],
+                             date_str, "composite"):
+        return
     df.to_csv(csv_path, index=False)
     (OUT_DIR / f"{date_str}_y_snapshot.json").write_text(
         json.dumps({"date": date_str, "pair": pair, **y}, indent=2), encoding="utf-8"

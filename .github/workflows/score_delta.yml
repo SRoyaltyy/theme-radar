@@ -77,6 +77,12 @@ jobs:
           TRACE="${{ github.event.inputs.trace_tickers }}"
           HORIZON="${{ github.event.inputs.trace_horizon }}"
           HORIZON="${HORIZON:-1d}"
+          TODAY="$(TZ=America/New_York date +%F)"
+          if [[ "$DATE" < "$TODAY" ]] && { [ -f "data/features/${DATE}_1d.csv" ] || \
+               [ -f "data/scores/${DATE}_1d.csv" ] || [ -f "01_daily/${DATE}_scan.md" ]; }; then
+            echo "[history] $DATE < $TODAY already scored — not re-scoring a past day (append-only)."
+            exit 0
+          fi
           echo "=== score_engine --date $DATE ==="
           if [ -n "$TRACE" ]; then
             python -m src.score_engine --date "$DATE" --trace "$TRACE" --horizon "$HORIZON"
@@ -90,7 +96,7 @@ jobs:
           DATE="${{ steps.date.outputs.date }}"
           python -m src.segments ${DATE:+--date "$DATE"}
 
-      - name: Record hashes for new dated files (only today's may be replaced)
+      - name: Check dated files (only today's may be replaced)
         if: steps.gate.outputs.trading == 'true'
         run: python scripts/check_history_hashes.py add-new --today "$(TZ=America/New_York date +%F)"
 
@@ -108,6 +114,10 @@ jobs:
           python -m src.attribution_aggregate
           python -m src.weight_learner
 
+      - name: Check labels / attribution (fill-once, append-only)
+        if: steps.gate.outputs.trading == 'true'
+        run: python scripts/check_history_hashes.py add-new --today "$(TZ=America/New_York date +%F)"
+
       - name: Print brief + attribution to log
         if: steps.gate.outputs.trading == 'true'
         run: |
@@ -122,7 +132,10 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/snapshots/HASHES.json data/snapshots/RESTATEMENTS.log data/scores/ data/features/ data/labels/ data/attribution/ data/universe/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
-          git commit -m "auto: score+features+labels+attr ${{ steps.date.outputs.date }}" || echo "No changes"
-          git pull --rebase origin main || true
-          git push origin main
+          # Labels are fill-once, attribution pointers upgrade-only, past-dated
+          # files write-once; manifests are recorded after rebasing onto main.
+          bash scripts/commit_with_history.sh \
+            "auto: score+features+labels+attr ${{ steps.date.outputs.date }}" \
+            "$(TZ=America/New_York date +%F)" \
+            data/scores data/features data/labels data/attribution data/universe \
+            data/weight_overrides.json 01_daily 02_lessons 03_scoreboard

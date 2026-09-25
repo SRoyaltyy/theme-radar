@@ -32,6 +32,13 @@ def main() -> None:
     args = ap.parse_args()
     date_str = args.date or datetime.now(ZoneInfo(config.TZ)).date().isoformat()
 
+    from . import history_guard as hg
+    if hg.keep_existing_past([config.DAILY / f"{date_str}_predict.md"], date_str, "predict"):
+        return
+    if hg.is_past(date_str):
+        print(f"[predict] WARNING: {date_str} is a past date; any output is built "
+              "after the fact (live web search sees later news).")
+
     if not config.DEEPSEEK_API_KEY:
         raise SystemExit("DEEPSEEK_API_KEY not set")
 

@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Verify past history unchanged (hash manifest)
+        run: python scripts/check_history_hashes.py verify
+
       - name: Show available snapshots / features
         run: |
           echo "=== snapshots ==="
@@ -49,27 +52,40 @@ jobs:
         run: |
           set -e
           DATE="${{ github.event.inputs.scan_date }}"
-          python -m src.score_engine --date "$DATE"
+          TODAY="$(TZ=America/New_York date +%F)"
+          # Append-only + one-day-at-a-time: backtest never scores a past day.
+          # score_engine uses the CURRENT weight_overrides.json (learned from
+          # later labels), so building day N later would leak days > N.
+          # Only today's (ET) snapshot may be (re)scored here.
+          if [[ "$DATE" != "$TODAY" ]]; then
+            echo "[history] $DATE != today $TODAY — skip score_engine (past days are never re-scored or back-built)"
+          else
+            python -m src.score_engine --date "$DATE"
+          fi
 
       - name: Ensure features for all dated snapshots (no scan_date)
         if: ${{ github.event.inputs.ensure_features == 'true' && github.event.inputs.scan_date == '' }}
         run: |
           set -e
           python - <<'PY'
-          from src.snapshots import snapshot_dates
-          from src.feature_log import FEATURES_DIR
+          # One day at a time, today only: past snapshot dates are never scored
+          # after the fact (current weights would leak later labels into them).
           import subprocess, sys
-          dates = sorted(snapshot_dates().keys())
-          print("snapshot dates:", dates)
-          for d in dates:
-              feat = FEATURES_DIR / f"{d}_1d.csv"
-              if feat.exists():
-                  print(f"[skip score] features exist {feat.name}")
-                  continue
-              print(f"[run] score_engine --date {d}")
-              r = subprocess.run([sys.executable, "-m", "src.score_engine", "--date", d])
-              if r.returncode != 0:
-                  raise SystemExit(r.returncode)
+          from pathlib import Path
+          from src.snapshots import snapshot_dates
+          from src.trading_calendar import today_et
+          d = today_et().isoformat()
+          dates = snapshot_dates()
+          missing_past = [x for x in sorted(dates) if x < d
+                          and not Path(f"data/features/{x}_1d.csv").exists()]
+          if missing_past:
+              print(f"[history] past dates without features are NOT back-built: {missing_past}")
+          if d not in dates:
+              print(f"[skip score] no snapshot for today {d}")
+              raise SystemExit(0)
+          print(f"[run] score_engine --date {d}")
+          r = subprocess.run([sys.executable, "-m", "src.score_engine", "--date", d])
+          raise SystemExit(r.returncode)
           PY
 
       - name: Label backfill (forward returns after signal)
@@ -130,9 +146,10 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/features/ data/scores/ data/labels/ data/attribution/ data/weight_overrides.json 01_daily/ 02_lessons/ 03_scoreboard/ || true
           MSG="auto: backtest ${{ github.event.inputs.scan_date }}"
           [ -z "${{ github.event.inputs.scan_date }}" ] && MSG="auto: backtest all eligible dates"
-          git commit -m "$MSG" || echo "No changes"
-          git pull --rebase origin main || true
-          git push origin main
+          # add-new runs on the rebased tree: fails (no push) if any past-dated
+          # record changed; only today's files may be replaced.
+          bash scripts/commit_with_history.sh "$MSG" "$(TZ=America/New_York date +%F)" \
+            data/features data/scores data/labels data/attribution \
+            data/weight_overrides.json 01_daily 02_lessons 03_scoreboard
