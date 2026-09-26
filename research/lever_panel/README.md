@@ -111,3 +111,12 @@ Every Theme Radar return in this table looks **backward**: snapshot_date against
 ## Check result
 
 `python -m research.lever_panel.check_lever_panel` → **PASS** (406,649 rows, 35 trade dates; every `scrape_ts_utc` is after 16:00 ET of the prior trading day and before 09:30 ET of `trade_date`; all source commits are before 09:30 ET). Existing guards at build time: `scripts/check_history_hashes.py verify` OK (711 files + 111 row tables); pytest 37 passed.
+
+## Prior tries: daily return series (for the overlap-aware luck test)
+
+These files cover the earlier searches (`/workspace/finviz-lever-grid`, `finviz-fullscan-gates2` and `finviz-excel-clear-join`). The searches had saved only pooled numbers per combination (n, hit rate, mean after fees), not daily series. The series here were **regenerated** by re-running each search's own saved script on its saved inputs, in a scratch copy (`/workspace/prior_tries_regen/`; original folders untouched). The only change was a hook that records each combination's per-date result. Every regenerated combination reproduces the saved `n` and `after_fee_mean` exactly: 9,132 of 9,132 match, with a maximum absolute difference of 7e-11.
+
+- `prior_tries_daily_returns.csv.gz`: `combo_id, date, ret_after_fee, n_names`. `ret_after_fee` is the equal-weight mean, across the names the combination fired on that date, of the signed forward return minus a 10 bp round-trip fee. Weighting by `n_names` gives back the saved pooled mean.
+- `prior_tries_combos.csv.gz`: one row per combination. Columns: `source, section, pass, side, horizon, board, n, after_fee_mean_saved, n_dates_with_fires, regen_matches_saved, date_kind, in_8264_pass1_tally`.
+- **The 8,264 = Pass-1 cells**: 4,832 lever-grid + 2,808 gates2 + 624 Excel-join (`in_8264_pass1_tally`). Another 868 Pass-2 / Excel-alone tries are also listed and should count toward the tally too. 7,928 of the 8,264 have a series. The other 336 never fired (n=0), so they have no rows. Over all 9,132 tries, 656 never fired.
+- **Date meaning differs by source** (`date_kind`). For lever-grid (`LG|…`), `date` is the Finviz signal date T (2026-08-07 … 09-10, 22 dates). For gates2 (`G2|…`) and Excel-join (`XJ|…`), `date` is the t1 morning after T (2026-08-13 … 09-10, 13 dates). Horizons 2d/3d/1w are forward windows that overlap across consecutive dates, so their daily values are not independent.
