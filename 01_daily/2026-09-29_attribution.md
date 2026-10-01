@@ -1,73 +1,73 @@
-# Factor attribution — signal 2026-09-29 → prediction day 2026-09-30
+# Factor attribution — signal 2026-09-29 → prediction day 2026-10-01
 
 ## Trade window (read this first)
 
 | Role | Date | Meaning |
 |------|------|---------|
 | **Signal as-of** | **2026-09-29** | Features/scores formed from this snapshot (and deltas vs **2026-09-28**). Only data on/before this date. |
-| **Prediction day** | **2026-09-30** | The trading day the forward return is for (exit snapshot). |
+| **Prediction day** | **2026-10-01** | The trading day the forward return is for (exit snapshot). |
 | **Entry price** | Price @ 2026-09-29 | Long: buy here; short: sell here. |
-| **Exit price** | Price @ 2026-09-30 | Close proxy on prediction day. |
-| **Return column** | `fwd_1d` | Long: exit/entry − 1; short = opposite. |
+| **Exit price** | Price @ 2026-10-01 | Close proxy on prediction day. |
+| **Return column** | `fwd_2d` | Long: exit/entry − 1; short = opposite. |
 
-Graded **n=11673** names with valid entry and exit prices.
+Graded **n=11672** names with valid entry and exit prices.
 
 Provisional until multiple signal dates agree.
 
 _Column guide: **IC** = Spearman(feature, long forward return); **IC↑** / **IC↓** = IC among names that went up / down._
 
 ## Score calibration (long fwd)
-- Spearman IC(total_score, fwd_1d) = **-0.0367**
+- Spearman IC(total_score, fwd_2d) = **0.0392**
 
 | Quintile | Mean long fwd | Hit up>1.5% | n |
 |---|---|---|---|
-| 1 | 0.20% | 12.0% | 2364 |
-| 2 | -0.25% | 5.3% | 2529 |
-| 3 | -0.41% | 5.6% | 2177 |
-| 4 | -0.41% | 9.3% | 2298 |
-| 5 | -0.05% | 16.4% | 2305 |
+| 1 | 1.39% | 14.9% | 2364 |
+| 2 | -0.45% | 7.5% | 2529 |
+| 3 | -0.05% | 9.6% | 2177 |
+| 4 | -0.40% | 14.6% | 2297 |
+| 5 | 0.23% | 27.4% | 2305 |
 
 ## Top |IC| features
 
 | Feature | IC | IC↑ | IC↓ | Mean fwd when + | Mean fwd when − | n+/n− |
 |---|---|---|---|---|---|---|
-| d_Performance (Quarter) | -0.1076 | -0.0841 | -0.0837 | -0.27% | -0.10% | 4227/6823 |
-| Performance (Month) | +0.0782 | -0.2483 | +0.2127 | -0.38% | -0.11% | 3092/8390 |
-| d_Short Ratio | -0.0680 | +0.1001 | -0.1539 | -0.39% | 0.11% | 5154/2449 |
-| upside_pct_lvl | +0.0557 | +0.3569 | -0.2760 | -0.42% | -0.51% | 4389/247 |
-| d_Average Volume | +0.0553 | -0.1057 | +0.1599 | 0.14% | -0.38% | 4140/6938 |
-| Performance (Week) | +0.0529 | -0.3109 | +0.2270 | -0.50% | -0.12% | 1894/9629 |
-| d_Performance (Month) | -0.0447 | +0.0231 | -0.0840 | -0.22% | -0.32% | 6639/4752 |
-| d_Volatility (Month) | -0.0446 | +0.0474 | -0.0874 | -0.09% | -0.30% | 5837/3580 |
-| Relative Strength Index (14) | +0.0429 | -0.1292 | -0.0663 | -0.18% | n/a | 11568/0 |
-| d_Institutional Ownership | -0.0403 | -0.0203 | -0.0079 | -3.79% | 1.45% | 5/26 |
-| d_20-Day Simple Moving Average | -0.0389 | -0.0295 | -0.0322 | -0.05% | -0.29% | 5415/6112 |
-| d_Performance (Week) | +0.0369 | -0.1060 | +0.1157 | -0.18% | -0.19% | 4042/7371 |
-| Relative Volume | -0.0346 | +0.0634 | -0.0137 | -0.18% | n/a | 11430/0 |
-| d_Sales Year Over Year TTM | -0.0306 | +0.0056 | -0.0279 | -2.27% | -0.61% | 14/9 |
-| d_Beta | -0.0303 | +0.1508 | -0.0685 | 0.01% | -0.53% | 3551/1245 |
-| Short Float | -0.0296 | +0.1515 | -0.0591 | -0.07% | n/a | 5694/0 |
-| d_Forward P/E | -0.0238 | +0.0876 | -0.0640 | -0.57% | -0.58% | 1188/1742 |
-| Institutional Transactions | +0.0228 | +0.0727 | -0.0474 | -0.47% | 0.18% | 3234/1813 |
-| d_50-Day Simple Moving Average | -0.0223 | -0.0574 | -0.0059 | 0.02% | -0.31% | 4559/6979 |
-| d_Gross Margin | -0.0199 | -0.0001 | -0.0247 | -1.65% | 0.17% | 14/15 |
-| d_Relative Strength Index (14) | -0.0194 | -0.0319 | -0.0790 | -0.18% | -0.32% | 4307/6921 |
-| d_200-Day Simple Moving Average | -0.0165 | -0.0658 | -0.0136 | -0.01% | -0.29% | 4470/7065 |
-| d_Insider Transactions | +0.0126 | +0.0136 | -0.0277 | 2.54% | -0.18% | 63/111 |
-| true_ret | -0.0124 | -0.1075 | +0.0267 | -0.19% | -0.30% | 4230/6815 |
-| d_EPS Surprise | -0.0121 | +0.0150 | -0.0361 | -1.50% | -0.18% | 7/5 |
+| Performance (Month) | +0.1488 | -0.1135 | +0.2401 | -0.08% | 0.23% | 3091/8390 |
+| upside_pct_lvl | -0.1359 | +0.2531 | -0.3410 | -0.26% | -0.66% | 4388/247 |
+| Performance (Week) | +0.0988 | -0.2274 | +0.2595 | -0.43% | 0.26% | 1894/9628 |
+| d_Performance (Week) | +0.0944 | -0.0313 | +0.1832 | 0.77% | -0.19% | 4041/7371 |
+| Relative Strength Index (14) | +0.0838 | +0.0159 | -0.0608 | 0.14% | n/a | 11567/0 |
+| d_Performance (Quarter) | -0.0780 | -0.0555 | -0.0132 | 0.59% | -0.12% | 4227/6822 |
+| d_Volatility (Month) | -0.0721 | +0.0340 | -0.1122 | 0.40% | -0.05% | 5836/3580 |
+| d_Beta | -0.0662 | +0.0984 | -0.0844 | -0.12% | -0.69% | 3551/1244 |
+| true_ret | +0.0562 | +0.0177 | +0.1074 | 0.72% | -0.43% | 4229/6815 |
+| Institutional Transactions | -0.0556 | +0.0298 | -0.1138 | -0.02% | 1.12% | 3234/1812 |
+| d_Price | +0.0518 | +0.0814 | -0.0015 | 0.72% | -0.43% | 4229/6815 |
+| d_Performance (YTD) | +0.0509 | +0.0363 | +0.0794 | 0.72% | -0.31% | 4316/6938 |
+| d_200-Day Simple Moving Average | +0.0403 | +0.0485 | +0.0605 | 0.82% | -0.27% | 4470/7064 |
+| d_Relative Strength Index (14) | +0.0340 | +0.1164 | +0.0164 | 0.71% | -0.32% | 4307/6920 |
+| d_50-Day Simple Moving Average | +0.0331 | +0.0265 | +0.0726 | 0.99% | -0.40% | 4559/6978 |
+| Short Float | -0.0294 | +0.2092 | -0.1476 | 0.50% | n/a | 5693/0 |
+| d_Forward P/E | +0.0230 | +0.1076 | -0.0060 | -0.10% | -0.22% | 1188/1742 |
+| d_Performance (Month) | +0.0203 | +0.1170 | -0.0703 | -0.06% | 0.26% | 6639/4751 |
+| d_Gross Margin | -0.0202 | +0.0021 | -0.0404 | -2.42% | 0.49% | 14/15 |
+| d_Market Cap | +0.0183 | +0.0835 | -0.0347 | 1.08% | -0.28% | 2438/3260 |
+| d_Institutional Ownership | -0.0166 | -0.0220 | -0.0054 | -3.64% | 3.61% | 5/26 |
+| d_20-Day Simple Moving Average | +0.0146 | +0.0677 | +0.0369 | 0.78% | -0.41% | 5415/6111 |
+| d_Average Volume | -0.0140 | -0.1806 | +0.1335 | 0.62% | -0.12% | 4140/6937 |
+| d_Relative Volume | -0.0135 | -0.0359 | -0.0095 | 0.36% | -0.02% | 5496/5725 |
+| d_Short Float | -0.0117 | -0.0186 | -0.0005 | -1.44% | 0.75% | 43/40 |
 
 ## Combinations
 
 | Pattern | n | Mean long fwd | Hit up |
 |---|---|---|---|
-| true_ret>3% & DOWNTREND | 269 | 3.11% | 26.4% |
-| true_ret>3% & UPTREND | 195 | -0.72% | 19.0% |
-| true_ret>3% & MIXED | 127 | -0.81% | 28.3% |
+| true_ret>3% & DOWNTREND | 269 | 14.10% | 32.3% |
+| true_ret>3% & UPTREND | 194 | 0.95% | 45.9% |
+| true_ret>3% & MIXED | 127 | -1.06% | 31.5% |
 
 ## Risk dominance probes
 
 | State | n | Mean long fwd | Mean fwd if score top quintile |
 |---|---|---|---|
-| EXTENDED | 160 | -1.12% | -1.57% |
-| WASHED | 2419 | 0.34% | 1.53% |
+| EXTENDED | 160 | -1.58% | -4.27% |
+| WASHED | 2419 | 0.19% | 1.00% |
