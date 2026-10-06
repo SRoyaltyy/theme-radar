@@ -19,7 +19,10 @@ The exact frozen rules are in `rules_frozen.json` (sha256 `e66cac9b7208117611466
 | `log.csv` | one row per shadow short: signal fields (`cell,date,ticker,entry,hold_days,feature_date,source`) and outcome fields (`exit_date,short_ret,short_ret_fee_only,short_ret_fee_borrow,tape`), plus `meta` |
 | `rules_frozen.json` | frozen rule definitions. Must never change. Its hash is pinned |
 | `lock_manifest.json` | the lock: pinned fingerprints, the list of pre_lock rows, the history of pin runs |
-| `shadow_log_lock.py` | `check`, `pin`, `scorecard` (Python stdlib only) |
+| `shadow_log_lock.py` | `check`, `pin`, `scorecard`, `plan-pin`, `plan-status` (Python stdlib only) |
+| `plans/plan_<entry>.csv` | the pre-open plan for one entry day: `cell,signal_date,ticker,entry_date,hold_days,rules_sha256,source`, then `#` status/provenance lines. Append-only, never overwritten |
+| `plans/letters_<entry>.csv` | the Excel CLEAR letters the plan's DCP fires came from (only when there were DCP candidates) |
+| `plan_build.py`, `plan_run.sh` | build / pin / commit / push a plan (research box only; needs pandas and the box data). CI never runs them |
 | `scorecard.md` | generated results per cell (LOCKED / CLEAN / MIXED). Don't edit it by hand |
 | `iwm_daily.csv` | cached Yahoo IWM daily open/close (split-adjusted), used for the "vs shorting IWM" comparison |
 | `summary.json`, `milestones_posted.json`, `letters/` | the daily routine's own state and the DCP letter inputs, copied as they were on 2026-10-06 |
@@ -53,12 +56,28 @@ The fingerprint normalises numbers (`hold_days` to an int, returns to `repr(floa
 
 - **pre_lock**: the 196 rows that were already in `log.csv` on 2026-10-06, when the lock started. They were built before the lock, so they are **not fingerprinted**. Fingerprinting them now would only prove they haven't changed since today, not that they were never edited earlier. Git history from the lock commit is their only record. Only their keys are listed in the manifest, so `check` can tell them apart from new rows and catch a deleted row.
   - 27 of them were still open (unscored) at lock time (`pre_lock.open_at_lock`). When one of them is scored, its **outcome** is pinned on that run. That is a new fact recorded going forward, not a backfill. Its signal stays unpinned.
-- **locked**: a row appended on or after 2026-10-06 whose signal fingerprint was pinned on the run that appended it. Only these rows count as LOCKED in the scorecard.
+- **locked**: a row appended on or after 2026-10-06 whose signal fingerprint was pinned on the run that appended it. From entry date 2026-10-06 on it must **also** match a pre-09:30 plan (next section) to count as LOCKED in the scorecard.
 - **late_append**: a new row that `pin` sees for the first time but that can't be trusted as forward. Either its signal date is before the lock start, it was first pinned more than 5 days after its signal date, or it was already scored when first seen. It is still pinned (so it can't change), but it is **never** counted as LOCKED. The reason is recorded in `late_reason`.
+
+## Pre-open plans (the shorts are fixed before the open)
+
+The log is written in the evening, after the entry day's open has already happened. So the log alone can't prove a short was chosen before the market opened. The plan files fix that.
+
+- **Every trading day, before 09:30 New York time, the day's shorts are committed to git** as `plans/plan_<entry date>.csv`. It is built with the same code and the same frozen rules as the log rows, from data dated up to the previous session plus fullscan's universe file for the entry day, which lands around 04:30 ET.
+  - Normal run: as soon as the inputs have landed (the previous evening's theme-radar snapshot and Yahoo closes, plus fullscan's pre-market universe file). In practice that means from about 04:45 ET on the entry day.
+  - Backstop: by 09:00 ET a second run checks the plan is there and builds and commits it if not (`plan_run.sh`).
+- A plan with no shorts is still committed. It has just the header and `# status=no_fires`, so **"no fires"** looks different from **"no plan"**.
+- **A day with no plan file reads "no plan".** Its rows can never be LOCKED.
+- **Only log rows that match a pre-09:30 plan count as LOCKED.** A match means the same cell, ticker, entry date and hold. The time that counts is when the plan file was *first* committed (`git log --diff-filter=A --format=%cI`). It has to be before 09:30 America/New_York on the entry date.
+- Rows with entry on or after 2026-10-06 that have no such plan, or that differ from their plan, get the status **`no_preopen_plan`** and are never LOCKED. **Rows with entry 2026-10-06 have no pre-09:30 plan**, so they read `no_preopen_plan`. The first plan is `plan_2026-10-07.csv`.
+- Every plan row needs a log row. If one is missing, the scorecard lists it under **MISSING log rows**. Append it. Don't skip it.
+- Plans are append-only. `plan-pin` records each plan file's sha256 in `lock_manifest.json`. `check` fails if a pinned plan changed or was deleted, or if a plan differs from the version first committed. With `--against-git`, `check` also fails if a plan file that existed at that commit was modified or deleted (adding new plans is fine).
+- The commit-time test needs full git history. CI checks out with `fetch-depth: 0`. In a shallow checkout, or with no git at all, plan times can't be checked, so the scorecard counts nothing from plan days as LOCKED and says so.
+- One limit: git commit times are written by the machine that makes the commit. The plan's own `# built_at_utc`, the manifest's `pinned_at_utc` and GitHub's push/CI times are the cross-checks.
 
 ## Scorecard buckets and the bar
 
-- **LOCKED**: rows whose signal was pinned when they were appended (none yet on 2026-10-06).
+- **LOCKED**: rows whose signal was pinned when they were appended **and**, from entry 2026-10-06 on, that match a plan committed before 09:30 ET on the entry day (none yet on 2026-10-06).
 - **CLEAN pre-lock**: pre_lock rows with signal date >= 2026-09-28, the live shadow days.
 - **CLEAN+LOCKED**: both together, i.e. every forward row since 2026-09-28.
 - **MIXED**: every scored row, including reconstructed history. Context only.
@@ -69,11 +88,21 @@ The scorecard also shows: the mean without the single best trade; the mean retur
 
 ## Daily routine (must follow this order)
 
+Pre-open (research box; normal run from ~04:45 ET once fullscan's universe file for the day has landed, backstop by 09:00 ET):
+
+```
+research/shadow_log/plan_run.sh            # builds, plan-pins, commits and pushes plans/plan_<today>.csv; exit 0 = committed before 09:30 ET
+#   exit 3 = inputs not landed yet (retry later), 4 = builder refused (Yahoo/letter problem, report), 5 = plan landed after 09:30 ET
+```
+
+Evening (after the entry day's close):
+
 ```
 git pull --ff-only                                   # repo copy is the source of truth
 python research/shadow_log/shadow_log_lock.py check  # FAIL -> stop, report, do NOT append
-#  ... compute the day's new rows and fill outcomes for rows whose hold closed, exactly as before,
-#      writing research/shadow_log/log.csv (append rows; only fill blank outcome fields)
+python research/shadow_log/plan_build.py --append-log <asof>   # the day's new rows = the rows of plans/plan_<asof>.csv
+#  ... (only if there is NO plan for <asof>: compute the day's rows exactly as before; they will read no_preopen_plan)
+#  ... fill outcomes for rows whose hold closed, exactly as before (only fill blank outcome fields)
 python research/shadow_log/shadow_log_lock.py pin        # pins new signals + new outcomes
 python research/shadow_log/shadow_log_lock.py scorecard  # regenerates scorecard.md
 git add research/shadow_log && git commit -m "shadow_log: <asof>" && git push   # same run, never later

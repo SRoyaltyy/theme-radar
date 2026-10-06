@@ -8,14 +8,26 @@ All returns are per trade **after the 15bp fee and 0.3% borrow** (`short_ret_fee
 **The bar** (counted on LOCKED or CLEAN rows only): closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. MIXED can never clear it. Under 30 closed trades = too few for any verdict.
 
 Buckets:
-- **LOCKED** - signal fingerprint pinned the run the row was appended (signal date >= lock start). The only fully tamper-evident record.
+- **LOCKED** - signal fingerprint pinned the run the row was appended (signal date >= lock start) AND, for entry dates >= 2026-10-06, the row matches (cell, ticker, entry, hold_days) a row of `plans/plan_<entry>.csv` first committed to git before 09:30 America/New_York on the entry date. The only fully tamper-evident record.
 - **CLEAN pre-lock** - built before the lock, signal date >= 2026-09-28 (live shadow days only). Not fingerprinted; git history is the record.
 - **CLEAN+LOCKED** - both together: every forward shadow row since 2026-09-28.
 - **MIXED** - every row, including reconstructed/backfilled history from before the shadow started. Context only.
 
+## Pre-open plans
+
+Git history for plan timing: **ok**
+
+| entry date | plan | plan rows | first commit (UTC) | before 09:30 ET? | log rows |
+|---|---|---|---|---|---|
+| 2026-10-06 | no plan | - | - | no pre-09:30 plan | 0 |
+
+Plan rows missing from log.csv: none.
+
 IWM column: shorting IWM over the exact same entry/exit days, gross (no fee/borrow), Yahoo split-adjusted close. Excess = trade (after fee+borrow) minus that IWM short, per trade.
 
 ## fpe_delta_t3_earn_today_3d
+
+LOCKED (pre-09:30 plan): 0 row(s), 0 closed, 0 open. no_preopen_plan rows (entry >= 2026-10-06, never LOCKED): 0. Plan rows missing from log: 0.
 
 | bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -26,6 +38,8 @@ IWM column: shorting IWM over the exact same entry/exit days, gross (no fee/borr
 
 ## fresh_dcp_t1_ep_ge03_2d
 
+LOCKED (pre-09:30 plan): 0 row(s), 0 closed, 0 open. no_preopen_plan rows (entry >= 2026-10-06, never LOCKED): 0. Plan rows missing from log: 0.
+
 | bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 0 | n/a (0) | n/a | n/a | nothing locked yet |
@@ -34,6 +48,8 @@ IWM column: shorting IWM over the exact same entry/exit days, gross (no fee/borr
 | MIXED | 28 | 12 | 71.4% | +3.63% | +3.65% | +1.71% | 1 | -0.09% (28) | +3.72% | 75.0% | CONTEXT ONLY - mixed history can never clear the bar |
 
 ## fresh_dcp_t1_avoid_ah_3d
+
+LOCKED (pre-09:30 plan): 0 row(s), 0 closed, 0 open. no_preopen_plan rows (entry >= 2026-10-06, never LOCKED): 0. Plan rows missing from log: 0.
 
 | bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|

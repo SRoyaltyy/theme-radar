@@ -48,3 +48,6 @@ jobs:
           else
             python research/shadow_log/shadow_log_lock.py check
           fi
+
+      - name: Pre-open plan timing (informational; needs the full history above)
+        run: python research/shadow_log/shadow_log_lock.py plan-status
