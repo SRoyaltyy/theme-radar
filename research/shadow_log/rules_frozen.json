@@ -1,0 +1,60 @@
+{
+  "schema": "frozen_short_rules_v1",
+  "hash_algorithm": "sha256",
+  "hash_basis": "SHA-256 of each rule object excluding its sha256 field, serialized as UTF-8 JSON with sort_keys=true, separators=(',', ':'), ensure_ascii=false.",
+  "rules": [
+    {
+      "rule_id": "FPE_ER",
+      "cell": "fpe_delta_t3_earn_today_3d",
+      "display_name": "Forward P/E delta_gt0 T-3 short × univ_earn_today @3d",
+      "factor": "Forward P/E",
+      "factor_rule": "delta_gt0",
+      "lag": "T-3",
+      "signal_condition": "d|T-3|Forward P/E is non-null and > 0",
+      "universe_gate": "univ_earn_today: earnings label is one of {today, tomorrow, this_week}",
+      "side": "short",
+      "hold_days": 3,
+      "source_definitions": [
+        "/workspace/stale-news-rejoin/scripts/gates2_mine.py",
+        "/workspace/stale-news-rejoin/scripts/oos_common.py"
+      ],
+      "sha256": "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69"
+    },
+    {
+      "rule_id": "DCP_EP",
+      "cell": "fresh_dcp_t1_ep_ge03_2d",
+      "display_name": "fresh_cat_data_center_power appear T-1 short × avoid_EP_ge03 @2d",
+      "factor": "fresh_cat_data_center_power",
+      "factor_rule": "appear",
+      "lag": "T-1",
+      "signal_condition": "fresh_cat_data_center_power is 0 on the immediately prior snapshot and 1 on signal date T; candidate is in the dated Excel CLEAR-letter rows for T",
+      "universe_gate": "avoid_EP_ge03: Excel CLEAR open_features EP >= 0.03 (fraction)",
+      "side": "short",
+      "hold_days": 2,
+      "source_definitions": [
+        "/workspace/stale-news-rejoin/fresh_cat/common.py",
+        "/workspace/stale-news-rejoin/fresh_cat/reproduce_insample.py",
+        "/workspace/stale-news-rejoin/scripts/excel_clear_join.py"
+      ],
+      "sha256": "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845"
+    },
+    {
+      "rule_id": "DCP_AH",
+      "cell": "fresh_dcp_t1_avoid_ah_3d",
+      "display_name": "fresh_cat_data_center_power appear T-1 short × avoid_AH @3d",
+      "factor": "fresh_cat_data_center_power",
+      "factor_rule": "appear",
+      "lag": "T-1",
+      "signal_condition": "fresh_cat_data_center_power is 0 on the immediately prior snapshot and 1 on signal date T; candidate is in the dated Excel CLEAR-letter rows for T",
+      "universe_gate": "avoid_AH: Excel CLEAR open_features AH >= 1",
+      "side": "short",
+      "hold_days": 3,
+      "source_definitions": [
+        "/workspace/stale-news-rejoin/fresh_cat/common.py",
+        "/workspace/stale-news-rejoin/fresh_cat/reproduce_insample.py",
+        "/workspace/stale-news-rejoin/scripts/excel_clear_join.py"
+      ],
+      "sha256": "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934"
+    }
+  ]
+}

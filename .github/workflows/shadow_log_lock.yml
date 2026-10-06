@@ -1,0 +1,50 @@
+name: Shadow log lock check
+
+# Research-only shadow shorts (research/shadow_log). Verifies the IRONCLAD
+# append-only lock: pinned fingerprints, pre_lock rows present, rules hash,
+# and that lock_manifest.json only ever grows. No secrets, no LLM, read-only.
+
+on:
+  push:
+    paths:
+      - "research/shadow_log/**"
+      - ".github/workflows/shadow_log_lock.yml"
+  pull_request:
+    paths:
+      - "research/shadow_log/**"
+      - ".github/workflows/shadow_log_lock.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lock check (append-only)
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          REF=""
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            REF="$PR_BASE"
+          elif [ "$EVENT_NAME" = "push" ] && [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            REF="$PUSH_BEFORE"
+          fi
+          if [ -n "$REF" ] && git cat-file -e "${REF}^{commit}" 2>/dev/null; then
+            python research/shadow_log/shadow_log_lock.py check --against-git "$REF"
+          else
+            python research/shadow_log/shadow_log_lock.py check
+          fi
