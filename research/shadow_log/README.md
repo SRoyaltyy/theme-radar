@@ -69,7 +69,7 @@ The log is written in the evening, after the entry day's open has already happen
 - A plan with no shorts is still committed. It has just the header and `# status=no_fires`, so **"no fires"** looks different from **"no plan"**.
 - **A day with no plan file reads "no plan".** Its rows can never be LOCKED.
 - **Only log rows that match a pre-09:30 plan count as LOCKED.** A match means the same cell, ticker, entry date and hold. The time that counts is when the plan file was *first* committed (`git log --diff-filter=A --format=%cI`). It has to be before 09:30 America/New_York on the entry date.
-- Rows with entry on or after 2026-10-06 that have no such plan, or that differ from their plan, get the status **`no_preopen_plan`** and are never LOCKED. **Rows with entry 2026-10-06 have no pre-09:30 plan**, so they read `no_preopen_plan`. The first plan is `plan_2026-10-07.csv`.
+- Rows with entry on or after 2026-10-06 that have no such plan, or that differ from their plan, get the status **`no_preopen_plan`** and are never LOCKED. The first plan is `plan_2026-10-06.csv`, committed at 06:20 ET on 2026-10-06 (commit `ecdb627`), before that day's open.
 - Every plan row needs a log row. If one is missing, the scorecard lists it under **MISSING log rows**. Append it. Don't skip it.
 - Plans are append-only. `plan-pin` records each plan file's sha256 in `lock_manifest.json`. `check` fails if a pinned plan changed or was deleted, or if a plan differs from the version first committed. With `--against-git`, `check` also fails if a plan file that existed at that commit was modified or deleted (adding new plans is fine).
 - The commit-time test needs full git history. CI checks out with `fetch-depth: 0`. In a shallow checkout, or with no git at all, plan times can't be checked, so the scorecard counts nothing from plan days as LOCKED and says so.
@@ -77,7 +77,7 @@ The log is written in the evening, after the entry day's open has already happen
 
 ## Scorecard buckets and the bar
 
-- **LOCKED**: rows whose signal was pinned when they were appended **and**, from entry 2026-10-06 on, that match a plan committed before 09:30 ET on the entry day (none yet on 2026-10-06).
+- **LOCKED**: rows whose signal was pinned when they were appended **and**, from entry 2026-10-06 on, that match a plan committed before 09:30 ET on the entry day (first plan: 2026-10-06).
 - **CLEAN pre-lock**: pre_lock rows with signal date >= 2026-09-28, the live shadow days.
 - **CLEAN+LOCKED**: both together, i.e. every forward row since 2026-09-28.
 - **MIXED**: every scored row, including reconstructed history. Context only.
