@@ -700,6 +700,13 @@
       "asof": "2026-10-05",
       "first_recorded": "2026-10-05"
      }
+    },
+    "fwd_3d": {
+     "files": {
+      "sha": "1eeeb535ffe34f8f05253e637028817f83836f1154ed0d90071005b87539482f",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
+     }
     }
    }
   },
@@ -711,6 +718,25 @@
       "sha": "b130f9d99ead9c2b73e570f11cd2d38bebe289975a9fb0a5be39d5f0962b22f4",
       "asof": "2026-10-05",
       "first_recorded": "2026-10-05"
+     }
+    },
+    "fwd_2d": {
+     "files": {
+      "sha": "1252229a66b410b98cd18ba080bd434f41c8af4691ee51c697775fdb9d65a87b",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
+     }
+    }
+   }
+  },
+  "data/attribution/2026-10-05_summary.json": {
+   "kind": "attr_pointer",
+   "groups": {
+    "fwd_1d": {
+     "files": {
+      "sha": "bdb3a4c736e1095ddbeafaa3fe5bc1cba5d0e8dae80968ce16a003ab26076f56",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
      }
     }
    }
@@ -2405,6 +2431,11 @@
       "sha": "7ccc85b0a59500be1fd52092221d96caf4c4bd8065e76418cb20959bb11a0fc0",
       "asof": "2026-10-05",
       "first_recorded": "2026-10-05"
+     },
+     "3d": {
+      "sha": "c3b04aa2eb5036d96a3aed88f1a2e47c69650074ad3718037924832c8b953313",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
      }
     }
    }
@@ -2417,6 +2448,11 @@
       "sha": "f093c26125507a69bfb429e5aeb551bfdec634f2e5adc3808bb7210e5d866d78",
       "asof": "2026-10-02",
       "first_recorded": "2026-10-02"
+     },
+     "final": {
+      "sha": "098775a1b82c5c9c59dad03938a573d8e6e86b1db0a7b1f39e7626dcd348efd2",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
      }
     }
    }
@@ -2434,6 +2470,11 @@
       "sha": "8dcdebb562a389a2b44d81e77fcc74f9ffd09994da4abfe9aeeddf1f796aa60e",
       "asof": "2026-10-05",
       "first_recorded": "2026-10-05"
+     },
+     "2d": {
+      "sha": "9d5c3dbc07a55e691b1b6b8d5d6d2aa542af3cd51176d124bd436d01adbc5ac4",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
      }
     }
    }
@@ -2446,6 +2487,35 @@
       "sha": "fdf2a2eea9e69936d4f0bdcf786d27722403d282f79ce050db263010d01409e6",
       "asof": "2026-10-05",
       "first_recorded": "2026-10-05"
+     }
+    }
+   }
+  },
+  "data/labels/2026-10-05_fwd.csv": {
+   "kind": "labels",
+   "groups": {
+    "all": {
+     "base": {
+      "sha": "bbf1313f8cf0873f496904e0f6d719a7a4efdaed83125e0d525be86f018bcc37",
+      "asof": "2026-10-05",
+      "first_recorded": "2026-10-06"
+     },
+     "1d": {
+      "sha": "58f748d1f0e08f780851e66068d842c850449df236eddd758b2ea042a0b83d94",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
+     }
+    }
+   }
+  },
+  "data/labels/2026-10-05_fwd.meta.json": {
+   "kind": "label_meta",
+   "groups": {
+    "all": {
+     "first": {
+      "sha": "276a5bff5ec464e0765d93ee1d946401f3edae2642eede82af5026584b901b52",
+      "asof": "2026-10-06",
+      "first_recorded": "2026-10-06"
      }
     }
    }
