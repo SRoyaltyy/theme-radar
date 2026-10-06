@@ -353,5 +353,177 @@
       "2026-10-05": 21
     }
   },
-  "new_fires_source": "plans/plan_2026-10-06.csv (committed ecdb627 before 09:30 ET)"
+  "new_fires_source": "plans/plan_2026-10-06.csv (committed ecdb627 before 09:30 ET)",
+  "scorecard_bar_primary": "Cyrus's bar (primary): win rate > 55% over >= 30 closed trades, after-fee+borrow mean shown (and called out if <= 0). LOCKED or CLEAN rows only; MIXED never counts.",
+  "scorecard_bar_extra": "Stricter extra check: closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. LOCKED or CLEAN rows only; MIXED never counts.",
+  "scorecard_verdicts": {
+    "note": "From shadow_log_lock.py scorecard (LOCKED / CLEAN only count; MIXED is context). cyrus_bar is the primary verdict; extra_check is the stricter 60/12 bar. Returns are short_ret_fee_borrow. Supersedes seen_designed_after.*.verdict, which is computed on mixed history.",
+    "log_sha256": "db0310587ab0d46d4680d8daf462c3a0bdcd80695c5bdcd8f357fd2a1bd9cef5",
+    "log_rows": 212,
+    "lock_check": "PASS",
+    "cells": {
+      "fpe_delta_t3_earn_today_3d": {
+        "LOCKED": {
+          "closed_n": 0,
+          "distinct_dates": 0,
+          "open": 12,
+          "win_fee_borrow": null,
+          "mean_fee_borrow": null,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=0 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=0 < 30)"
+        },
+        "CLEAN pre-lock": {
+          "closed_n": 40,
+          "distinct_dates": 4,
+          "open": 10,
+          "win_fee_borrow": 0.525,
+          "mean_fee_borrow": -0.01436509822442463,
+          "counts_toward_bar": true,
+          "cyrus_bar": "NOT_MET",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 52.5% <= 55%, n 40); mean after fee+borrow -1.44% (negative)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "NOT_CLEARED",
+          "extra_check_text": "NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0)"
+        },
+        "CLEAN+LOCKED": {
+          "closed_n": 40,
+          "distinct_dates": 4,
+          "open": 22,
+          "win_fee_borrow": 0.525,
+          "mean_fee_borrow": -0.01436509822442463,
+          "counts_toward_bar": true,
+          "cyrus_bar": "NOT_MET",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 52.5% <= 55%, n 40); mean after fee+borrow -1.44% (negative)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "NOT_CLEARED",
+          "extra_check_text": "NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0)"
+        },
+        "MIXED": {
+          "closed_n": 122,
+          "distinct_dates": 14,
+          "open": 22,
+          "win_fee_borrow": 0.5573770491803278,
+          "mean_fee_borrow": 0.003334896280102131,
+          "counts_toward_bar": false,
+          "cyrus_bar": "CONTEXT_ONLY",
+          "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "CONTEXT_ONLY",
+          "extra_check_text": "CONTEXT ONLY - mixed history can never clear the bar"
+        }
+      },
+      "fresh_dcp_t1_ep_ge03_2d": {
+        "LOCKED": {
+          "closed_n": 0,
+          "distinct_dates": 0,
+          "open": 2,
+          "win_fee_borrow": null,
+          "mean_fee_borrow": null,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=0 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=0 < 30)"
+        },
+        "CLEAN pre-lock": {
+          "closed_n": 12,
+          "distinct_dates": 5,
+          "open": 0,
+          "win_fee_borrow": 0.5833333333333334,
+          "mean_fee_borrow": 0.00886588772476198,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=12 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
+        },
+        "CLEAN+LOCKED": {
+          "closed_n": 12,
+          "distinct_dates": 5,
+          "open": 2,
+          "win_fee_borrow": 0.5833333333333334,
+          "mean_fee_borrow": 0.00886588772476198,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=12 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
+        },
+        "MIXED": {
+          "closed_n": 29,
+          "distinct_dates": 13,
+          "open": 2,
+          "win_fee_borrow": 0.6896551724137931,
+          "mean_fee_borrow": 0.03430860240263244,
+          "counts_toward_bar": false,
+          "cyrus_bar": "CONTEXT_ONLY",
+          "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "CONTEXT_ONLY",
+          "extra_check_text": "CONTEXT ONLY - mixed history can never clear the bar"
+        }
+      },
+      "fresh_dcp_t1_avoid_ah_3d": {
+        "LOCKED": {
+          "closed_n": 0,
+          "distinct_dates": 0,
+          "open": 2,
+          "win_fee_borrow": null,
+          "mean_fee_borrow": null,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=0 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=0 < 30)"
+        },
+        "CLEAN pre-lock": {
+          "closed_n": 12,
+          "distinct_dates": 3,
+          "open": 1,
+          "win_fee_borrow": 0.4166666666666667,
+          "mean_fee_borrow": -0.005188833350476939,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=12 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
+        },
+        "CLEAN+LOCKED": {
+          "closed_n": 12,
+          "distinct_dates": 3,
+          "open": 3,
+          "win_fee_borrow": 0.4166666666666667,
+          "mean_fee_borrow": -0.005188833350476939,
+          "counts_toward_bar": true,
+          "cyrus_bar": "TOO_FEW",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=12 < 30)",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "TOO_FEW",
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
+        },
+        "MIXED": {
+          "closed_n": 34,
+          "distinct_dates": 12,
+          "open": 3,
+          "win_fee_borrow": 0.6764705882352942,
+          "mean_fee_borrow": 0.029656180618378793,
+          "counts_toward_bar": false,
+          "cyrus_bar": "CONTEXT_ONLY",
+          "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
+          "cyrus_bar_met_but_mean_negative": false,
+          "extra_check": "CONTEXT_ONLY",
+          "extra_check_text": "CONTEXT ONLY - mixed history can never clear the bar"
+        }
+      }
+    }
+  }
 }

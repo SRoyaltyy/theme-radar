@@ -82,7 +82,12 @@ The log is written in the evening, after the entry day's open has already happen
 - **CLEAN+LOCKED**: both together, i.e. every forward row since 2026-09-28.
 - **MIXED**: every scored row, including reconstructed history. Context only.
 
-**The bar:** closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, and mean > 0 after fee and borrow. It is counted on LOCKED or CLEAN rows only. **MIXED can never clear it.** Fewer than 30 closed trades means too few for any verdict.
+**The bar.** Each cell is judged against two bars, in this order. Both are counted on LOCKED or CLEAN rows only (`short_ret_fee_borrow`). **MIXED never counts toward either.** Fewer than 30 closed trades means too few for any verdict. This is reporting only. It changes no rule and no row selection.
+
+1. **Cyrus's bar (primary):** win rate > 55% over >= 30 closed trades. The mean after fee and borrow is always shown next to it. If a cell meets the win rate but its mean after fee and borrow is negative, the same line says **LOSES MONEY**. A high hit rate that loses money is never hidden.
+2. **Stricter extra check (the older 60/12 bar):** closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, and mean > 0 after fee and borrow.
+
+The scorecard shows both bars as two columns of each cell's table and as a "Verdicts" list under it. `scorecard` also writes `scorecard_bar_primary`, `scorecard_bar_extra` and `scorecard_verdicts` (per cell and bucket: `cyrus_bar`, `cyrus_bar_met_but_mean_negative`, `extra_check`, plus n, dates, win, mean) into `summary.json`. It leaves every other key as it is. The older `bar` and `seen_designed_after.*.verdict` fields stay, but those come from mixed history and are not verdicts.
 
 The scorecard also shows: the mean without the single best trade; the mean return of shorting IWM over the same entry/exit days (gross, Yahoo split-adjusted close); and the per-trade excess over that IWM short.
 
@@ -104,7 +109,7 @@ python research/shadow_log/plan_build.py --append-log <asof>   # the day's new r
 #  ... (only if there is NO plan for <asof>: compute the day's rows exactly as before; they will read no_preopen_plan)
 #  ... fill outcomes for rows whose hold closed, exactly as before (only fill blank outcome fields)
 python research/shadow_log/shadow_log_lock.py pin        # pins new signals + new outcomes
-python research/shadow_log/shadow_log_lock.py scorecard  # regenerates scorecard.md
+python research/shadow_log/shadow_log_lock.py scorecard  # regenerates scorecard.md + summary.json scorecard_* keys (write summary.json first)
 git add research/shadow_log && git commit -m "shadow_log: <asof>" && git push   # same run, never later
 ```
 

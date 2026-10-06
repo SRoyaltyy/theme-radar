@@ -5,7 +5,10 @@ Lock check at generation: **PASS**.
 
 All returns are per trade **after the 15bp fee and 0.3% borrow** (`short_ret_fee_borrow`). Win = return > 0. Entry/exit are the after-close prices on `entry` and `exit_date`.
 
-**The bar** (counted on LOCKED or CLEAN rows only): closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. MIXED can never clear it. Under 30 closed trades = too few for any verdict.
+**The bar** - each cell is judged against Cyrus's bar first; the older 60/12 bar is shown as a stricter extra check. Both count LOCKED or CLEAN rows only; MIXED can never meet either. Under 30 closed trades = too few for any verdict.
+
+1. **Cyrus's bar (primary)**: win rate > 55% over >= 30 closed trades, after-fee+borrow mean shown (and called out if <= 0). LOCKED or CLEAN rows only; MIXED never counts. A cell that meets it on win rate but loses money after fee+borrow is flagged **LOSES MONEY** on the same line.
+2. **Stricter extra check**: closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. LOCKED or CLEAN rows only; MIXED never counts.
 
 Buckets:
 - **LOCKED** - signal fingerprint pinned the run the row was appended (signal date >= lock start) AND, for entry dates >= 2026-10-06, the row matches (cell, ticker, entry, hold_days) a row of `plans/plan_<entry>.csv` first committed to git before 09:30 America/New_York on the entry date. The only fully tamper-evident record.
@@ -29,32 +32,53 @@ IWM column: shorting IWM over the exact same entry/exit days, gross (no fee/borr
 
 LOCKED (pre-09:30 plan): 12 row(s), 0 closed, 12 open. no_preopen_plan rows (entry >= 2026-10-06, never LOCKED): 0. Plan rows missing from log: 0.
 
-| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 12 | n/a (0) | n/a | n/a | TOO FEW FOR A VERDICT (n=0 < 30) |
-| CLEAN pre-lock | 40 | 4 | 52.5% | -1.44% | +0.37% | -1.86% | 10 | -1.02% (40) | -0.42% | 55.0% | NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0) |
-| CLEAN+LOCKED | 40 | 4 | 52.5% | -1.44% | +0.37% | -1.86% | 22 | -1.02% (40) | -0.42% | 55.0% | NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0) |
-| MIXED | 122 | 14 | 55.7% | +0.33% | +0.63% | +0.21% | 22 | +0.20% (122) | +0.14% | 50.8% | CONTEXT ONLY - mixed history can never clear the bar |
+| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | Cyrus bar (>55% win over >=30) | stricter extra check (60/12) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 12 | n/a (0) | n/a | n/a | TOO FEW FOR A VERDICT (n=0 < 30) | TOO FEW FOR A VERDICT (n=0 < 30) |
+| CLEAN pre-lock | 40 | 4 | 52.5% | -1.44% | +0.37% | -1.86% | 10 | -1.02% (40) | -0.42% | 55.0% | DOES NOT MEET CYRUS BAR (win 52.5% <= 55%, n 40); mean after fee+borrow -1.44% (negative) | NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0) |
+| CLEAN+LOCKED | 40 | 4 | 52.5% | -1.44% | +0.37% | -1.86% | 22 | -1.02% (40) | -0.42% | 55.0% | DOES NOT MEET CYRUS BAR (win 52.5% <= 55%, n 40); mean after fee+borrow -1.44% (negative) | NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0) |
+| MIXED | 122 | 14 | 55.7% | +0.33% | +0.63% | +0.21% | 22 | +0.20% (122) | +0.14% | 50.8% | CONTEXT ONLY - mixed history never counts | CONTEXT ONLY - mixed history can never clear the bar |
+
+Verdicts (Cyrus's bar first, then the stricter extra check):
+
+- **LOCKED** - Cyrus bar: TOO FEW FOR A VERDICT (n=0 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=0 < 30).
+- **CLEAN pre-lock** - Cyrus bar: DOES NOT MEET CYRUS BAR (win 52.5% <= 55%, n 40); mean after fee+borrow -1.44% (negative). Stricter extra check (60/12): NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0).
+- **CLEAN+LOCKED** - Cyrus bar: DOES NOT MEET CYRUS BAR (win 52.5% <= 55%, n 40); mean after fee+borrow -1.44% (negative). Stricter extra check (60/12): NOT CLEARED (n 40<60, dates 4<12, win 52.5%<=55%, mean -1.44%<=0).
+- **MIXED** - Cyrus bar: CONTEXT ONLY - mixed history never counts. Stricter extra check (60/12): CONTEXT ONLY - mixed history can never clear the bar.
 
 ## fresh_dcp_t1_ep_ge03_2d
 
 LOCKED (pre-09:30 plan): 2 row(s), 0 closed, 2 open. no_preopen_plan rows (entry >= 2026-10-06, never LOCKED): 0. Plan rows missing from log: 0.
 
-| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 2 | n/a (0) | n/a | n/a | TOO FEW FOR A VERDICT (n=0 < 30) |
-| CLEAN pre-lock | 12 | 5 | 58.3% | +0.89% | +0.61% | +0.23% | 0 | -0.93% (12) | +1.82% | 66.7% | TOO FEW FOR A VERDICT (n=12 < 30) |
-| CLEAN+LOCKED | 12 | 5 | 58.3% | +0.89% | +0.61% | +0.23% | 2 | -0.93% (12) | +1.82% | 66.7% | TOO FEW FOR A VERDICT (n=12 < 30) |
-| MIXED | 29 | 13 | 69.0% | +3.43% | +2.99% | +1.58% | 2 | -0.09% (29) | +3.52% | 72.4% | CONTEXT ONLY - mixed history can never clear the bar |
+| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | Cyrus bar (>55% win over >=30) | stricter extra check (60/12) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 2 | n/a (0) | n/a | n/a | TOO FEW FOR A VERDICT (n=0 < 30) | TOO FEW FOR A VERDICT (n=0 < 30) |
+| CLEAN pre-lock | 12 | 5 | 58.3% | +0.89% | +0.61% | +0.23% | 0 | -0.93% (12) | +1.82% | 66.7% | TOO FEW FOR A VERDICT (n=12 < 30) | TOO FEW FOR A VERDICT (n=12 < 30) |
+| CLEAN+LOCKED | 12 | 5 | 58.3% | +0.89% | +0.61% | +0.23% | 2 | -0.93% (12) | +1.82% | 66.7% | TOO FEW FOR A VERDICT (n=12 < 30) | TOO FEW FOR A VERDICT (n=12 < 30) |
+| MIXED | 29 | 13 | 69.0% | +3.43% | +2.99% | +1.58% | 2 | -0.09% (29) | +3.52% | 72.4% | CONTEXT ONLY - mixed history never counts | CONTEXT ONLY - mixed history can never clear the bar |
+
+Verdicts (Cyrus's bar first, then the stricter extra check):
+
+- **LOCKED** - Cyrus bar: TOO FEW FOR A VERDICT (n=0 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=0 < 30).
+- **CLEAN pre-lock** - Cyrus bar: TOO FEW FOR A VERDICT (n=12 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=12 < 30).
+- **CLEAN+LOCKED** - Cyrus bar: TOO FEW FOR A VERDICT (n=12 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=12 < 30).
+- **MIXED** - Cyrus bar: CONTEXT ONLY - mixed history never counts. Stricter extra check (60/12): CONTEXT ONLY - mixed history can never clear the bar.
 
 ## fresh_dcp_t1_avoid_ah_3d
 
 LOCKED (pre-09:30 plan): 2 row(s), 0 closed, 2 open. no_preopen_plan rows (entry >= 2026-10-06, never LOCKED): 0. Plan rows missing from log: 0.
 
-| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 2 | n/a (0) | n/a | n/a | TOO FEW FOR A VERDICT (n=0 < 30) |
-| CLEAN pre-lock | 12 | 3 | 41.7% | -0.52% | -0.22% | -1.72% | 1 | -1.03% (12) | +0.51% | 58.3% | TOO FEW FOR A VERDICT (n=12 < 30) |
-| CLEAN+LOCKED | 12 | 3 | 41.7% | -0.52% | -0.22% | -1.72% | 3 | -1.03% (12) | +0.51% | 58.3% | TOO FEW FOR A VERDICT (n=12 < 30) |
-| MIXED | 34 | 12 | 67.6% | +2.97% | +4.21% | +1.57% | 3 | +0.14% (34) | +2.83% | 70.6% | CONTEXT ONLY - mixed history can never clear the bar |
+| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | Cyrus bar (>55% win over >=30) | stricter extra check (60/12) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| LOCKED | 0 | 0 | n/a | n/a | n/a | n/a | 2 | n/a (0) | n/a | n/a | TOO FEW FOR A VERDICT (n=0 < 30) | TOO FEW FOR A VERDICT (n=0 < 30) |
+| CLEAN pre-lock | 12 | 3 | 41.7% | -0.52% | -0.22% | -1.72% | 1 | -1.03% (12) | +0.51% | 58.3% | TOO FEW FOR A VERDICT (n=12 < 30) | TOO FEW FOR A VERDICT (n=12 < 30) |
+| CLEAN+LOCKED | 12 | 3 | 41.7% | -0.52% | -0.22% | -1.72% | 3 | -1.03% (12) | +0.51% | 58.3% | TOO FEW FOR A VERDICT (n=12 < 30) | TOO FEW FOR A VERDICT (n=12 < 30) |
+| MIXED | 34 | 12 | 67.6% | +2.97% | +4.21% | +1.57% | 3 | +0.14% (34) | +2.83% | 70.6% | CONTEXT ONLY - mixed history never counts | CONTEXT ONLY - mixed history can never clear the bar |
+
+Verdicts (Cyrus's bar first, then the stricter extra check):
+
+- **LOCKED** - Cyrus bar: TOO FEW FOR A VERDICT (n=0 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=0 < 30).
+- **CLEAN pre-lock** - Cyrus bar: TOO FEW FOR A VERDICT (n=12 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=12 < 30).
+- **CLEAN+LOCKED** - Cyrus bar: TOO FEW FOR A VERDICT (n=12 < 30). Stricter extra check (60/12): TOO FEW FOR A VERDICT (n=12 < 30).
+- **MIXED** - Cyrus bar: CONTEXT ONLY - mixed history never counts. Stricter extra check (60/12): CONTEXT ONLY - mixed history can never clear the bar.
 

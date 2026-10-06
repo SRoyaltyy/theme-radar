@@ -13,7 +13,11 @@ Subcommands (run from anywhere; paths are relative to this file's folder):
              for every newly appended row and an outcome fingerprint for every
              newly scored row. Never alters or removes an existing pin.
   scorecard  Rewrite scorecard.md (LOCKED / CLEAN pre-lock / MIXED per cell,
-             after 15bp fee + 0.3% borrow, vs shorting IWM).
+             after 15bp fee + 0.3% borrow, vs shorting IWM). Each cell is judged
+             against Cyrus's bar first (win > 55% over >= 30 closed trades, after-fee
+             mean shown), then the stricter extra check (n >= 60, >= 12 dates,
+             win > 55%, mean > 0). Also adds/refreshes the scorecard_* keys in
+             summary.json (other keys are left untouched).
   plan-pin   Run check first. Then record the sha256 of every plans/plan_<entry>.csv
              not yet in the manifest. Never alters or removes an existing plan pin.
   plan-status [ENTRY_DATE]
@@ -37,6 +41,7 @@ LOG = os.path.join(HERE, "log.csv")
 RULES = os.path.join(HERE, "rules_frozen.json")
 MANIFEST = os.path.join(HERE, "lock_manifest.json")
 SCORECARD = os.path.join(HERE, "scorecard.md")
+SUMMARY = os.path.join(HERE, "summary.json")
 IWM_CACHE = os.path.join(HERE, "iwm_daily.csv")
 REL_MANIFEST = "research/shadow_log/lock_manifest.json"
 PLANS_DIR = os.path.join(HERE, "plans")
@@ -720,7 +725,48 @@ def bucket_stats(all_rows, scored, iwm):
     return s
 
 
+# Reporting only. Cyrus's standing bar is the primary verdict; the older 60/12 bar
+# is kept as a stricter extra check. Both are counted on LOCKED or CLEAN rows only.
+CYRUS_MIN_N = 30
+WIN_BAR = 0.55
+EXTRA_MIN_N = 60
+EXTRA_MIN_DATES = 12
+CYRUS_BAR_TEXT = (f"Cyrus's bar (primary): win rate > {100*WIN_BAR:.0f}% over >= {CYRUS_MIN_N} closed trades, "
+                  "after-fee+borrow mean shown (and called out if <= 0). LOCKED or CLEAN rows only; MIXED never counts.")
+EXTRA_BAR_TEXT = (f"Stricter extra check: closed n >= {EXTRA_MIN_N} over >= {EXTRA_MIN_DATES} distinct signal dates, "
+                  f"win rate > {100*WIN_BAR:.0f}%, mean > 0 after fee+borrow. LOCKED or CLEAN rows only; MIXED never counts.")
+
+
+def cyrus_verdict(s, can_clear=True):
+    """Return (code, text). code in CONTEXT_ONLY / TOO_FEW / MET / MET_BUT_MEAN_NEGATIVE /
+    MET_BUT_MEAN_ZERO / NOT_MET. The after-fee+borrow mean is always in the text."""
+    if not can_clear:
+        return "CONTEXT_ONLY", "CONTEXT ONLY - mixed history never counts"
+    if s["n"] < CYRUS_MIN_N:
+        return "TOO_FEW", f"TOO FEW FOR A VERDICT (n={s['n']} < {CYRUS_MIN_N})"
+    m = f"mean after fee+borrow {pct(s['mean'])}"
+    if s["win"] > WIN_BAR:
+        head = f"MEETS CYRUS BAR (win {100*s['win']:.1f}% > {100*WIN_BAR:.0f}%, n {s['n']} >= {CYRUS_MIN_N})"
+        if s["mean"] < 0:
+            return "MET_BUT_MEAN_NEGATIVE", head + f" BUT LOSES MONEY: {m} is NEGATIVE"
+        if s["mean"] == 0:
+            return "MET_BUT_MEAN_ZERO", head + f" BUT MAKES NO MONEY: {m}"
+        return "MET", head + f"; {m}"
+    return "NOT_MET", (f"DOES NOT MEET CYRUS BAR (win {100*s['win']:.1f}% <= {100*WIN_BAR:.0f}%, n {s['n']}); {m}"
+                       + (" (negative)" if s["mean"] < 0 else ""))
+
+
+def extra_code(s, can_clear=True):
+    if not can_clear:
+        return "CONTEXT_ONLY"
+    if s["n"] < CYRUS_MIN_N:
+        return "TOO_FEW"
+    ok = s["n"] >= EXTRA_MIN_N and s["dates"] >= EXTRA_MIN_DATES and s["win"] > WIN_BAR and s["mean"] > 0
+    return "CLEARS" if ok else "NOT_CLEARED"
+
+
 def verdict(s, can_clear=True):
+    """Stricter extra check (the original 60/12 bar). Text unchanged from before."""
     if not can_clear:
         return "CONTEXT ONLY - mixed history can never clear the bar"
     if s["n"] < 30:
@@ -776,9 +822,12 @@ def run_scorecard():
     L.append("All returns are per trade **after the 15bp fee and 0.3% borrow** (`short_ret_fee_borrow`). "
              "Win = return > 0. Entry/exit are the after-close prices on `entry` and `exit_date`.")
     L.append("")
-    L.append("**The bar** (counted on LOCKED or CLEAN rows only): closed n >= 60 over >= 12 distinct signal dates, "
-             "win rate > 55%, mean > 0 after fee+borrow. MIXED can never clear it. Under 30 closed trades = "
-             "too few for any verdict.")
+    L.append("**The bar** - each cell is judged against Cyrus's bar first; the older 60/12 bar is shown as a stricter extra check. "
+             "Both count LOCKED or CLEAN rows only; MIXED can never meet either. Under 30 closed trades = too few for any verdict.")
+    L.append("")
+    L.append(f"1. **{CYRUS_BAR_TEXT.split(':', 1)[0]}**:{CYRUS_BAR_TEXT.split(':', 1)[1]} "
+             "A cell that meets it on win rate but loses money after fee+borrow is flagged **LOSES MONEY** on the same line.")
+    L.append(f"2. **{EXTRA_BAR_TEXT.split(':', 1)[0]}**:{EXTRA_BAR_TEXT.split(':', 1)[1]}")
     L.append("")
     L.append("Buckets:")
     L.append(f"- **LOCKED** - signal fingerprint pinned the run the row was appended (signal date >= lock start) AND, for entry dates >= {PLAN_REQUIRED_FROM}, "
@@ -825,6 +874,7 @@ def run_scorecard():
     L.append("IWM column: shorting IWM over the exact same entry/exit days, gross (no fee/borrow), Yahoo split-adjusted close. "
              "Excess = trade (after fee+borrow) minus that IWM short, per trade.")
     L.append("")
+    sv = {}
     for c in CELLS:
         allc = [r for r in rows if r["cell"] == c]
         bk = {
@@ -845,23 +895,72 @@ def run_scorecard():
                  f"{len(npp)}" + (" (" + "; ".join(f"{v} {k}" for k, v in sorted(why.items())) + ")" if why else "")
                  + f". Plan rows missing from log: {sum(1 for x in missing if x[1] == c)}.")
         L.append("")
-        L.append("| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | verdict |")
-        L.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+        L.append("| bucket | closed n | distinct dates | win | mean | median | mean w/o best | still open | IWM short mean (n) | excess vs IWM mean | excess win | Cyrus bar (>55% win over >=30) | stricter extra check (60/12) |")
+        L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+        vlines = []
+        sv[c] = {}
         for name, rs in bk.items():
             sc = [r for r in rs if is_scored(r)]
             s = bucket_stats(rs, sc, iwm)
-            v = verdict(s, can_clear=(name != "MIXED"))
-            if name == "LOCKED" and s["n"] == 0:
-                v = "nothing locked yet" if not rs else v
+            can = name != "MIXED"
+            ccode, cv = cyrus_verdict(s, can_clear=can)
+            v = verdict(s, can_clear=can)
+            if name == "LOCKED" and s["n"] == 0 and not rs:
+                cv = v = "nothing locked yet"
             iwm_cell = f"{pct(s['iwm_mean'])} ({s['iwm_n']}{', ' + str(s['iwm_missing']) + ' missing' if s['iwm_missing'] else ''})"
             L.append(f"| {name} | {s['n']} | {s['dates']} | {fmt_rate(s['win'])} | "
                      f"{pct(s['mean'])} | {pct(s['median'])} | {pct(s['mean_ex_best'])} | {s['open']} | {iwm_cell} | "
-                     f"{pct(s['excess_mean'])} | {fmt_rate(s['excess_win'])} | {v} |")
+                     f"{pct(s['excess_mean'])} | {fmt_rate(s['excess_win'])} | {cv} | {v} |")
+            vlines.append(f"- **{name}** - Cyrus bar: {cv}. Stricter extra check (60/12): {v}.")
+            sv[c][name] = {
+                "closed_n": s["n"], "distinct_dates": s["dates"], "open": s["open"],
+                "win_fee_borrow": s["win"], "mean_fee_borrow": s["mean"],
+                "counts_toward_bar": can,
+                "cyrus_bar": ccode, "cyrus_bar_text": cv,
+                "cyrus_bar_met_but_mean_negative": bool(ccode == "MET_BUT_MEAN_NEGATIVE"),
+                "extra_check": extra_code(s, can_clear=can), "extra_check_text": v,
+            }
+        L.append("")
+        L.append("Verdicts (Cyrus's bar first, then the stricter extra check):")
+        L.append("")
+        L.extend(vlines)
         L.append("")
     with open(SCORECARD, "w", encoding="utf-8") as f:
         f.write("\n".join(L) + "\n")
     print(f"scorecard written: {SCORECARD}" + (f" (IWM note: {iwm_err})" if iwm_err else ""))
+    write_summary_verdicts(sv, problems, rows)
     return 0
+
+
+def write_summary_verdicts(sv, problems, rows):
+    """Add/refresh scorecard_* keys in summary.json. Every other key is kept as is
+    (including the older 'bar' and seen_designed_after verdict fields)."""
+    if not os.path.exists(SUMMARY):
+        print(f"summary.json not found - scorecard verdict fields not written ({SUMMARY})")
+        return
+    try:
+        with open(SUMMARY, encoding="utf-8") as f:
+            d = json.load(f)
+    except Exception as ex:  # noqa
+        print(f"summary.json unreadable - scorecard verdict fields not written ({type(ex).__name__}: {ex})")
+        return
+    if not isinstance(d, dict):
+        print("summary.json is not a JSON object - scorecard verdict fields not written")
+        return
+    d["scorecard_bar_primary"] = CYRUS_BAR_TEXT
+    d["scorecard_bar_extra"] = EXTRA_BAR_TEXT
+    d["scorecard_verdicts"] = {
+        "note": "From shadow_log_lock.py scorecard (LOCKED / CLEAN only count; MIXED is context). "
+                "cyrus_bar is the primary verdict; extra_check is the stricter 60/12 bar. "
+                "Returns are short_ret_fee_borrow. Supersedes seen_designed_after.*.verdict, which is computed on mixed history.",
+        "log_sha256": sha256_file(LOG),
+        "log_rows": len(rows),
+        "lock_check": "PASS" if not problems else "FAIL",
+        "cells": sv,
+    }
+    with open(SUMMARY, "w", encoding="utf-8") as f:
+        json.dump(d, f, indent=2, ensure_ascii=False)
+    print(f"summary.json updated: scorecard_bar_primary, scorecard_bar_extra, scorecard_verdicts")
 
 
 def main():
