@@ -1,91 +1,98 @@
 {
-  "asof": "2026-10-07",
+  "asof": "2026-10-08",
   "snapshot_landed": true,
   "scores_landed": true,
-  "feature_date_T": "2026-10-06",
-  "entry_morning_T1": "2026-10-07",
+  "feature_date_T": "2026-10-07",
+  "entry_morning_T1": "2026-10-08",
   "new_fires": {
     "fpe_delta_t3_earn_today_3d": [
-      "ASML",
-      "BAC",
       "BLK",
-      "C",
+      "CMC",
       "DAL",
       "DPZ",
-      "FAST",
-      "FBK",
-      "GS",
-      "LEVI",
-      "LW",
-      "MS",
-      "PENG",
-      "PEP",
+      "ERIC",
+      "JNJ",
+      "MRSH",
+      "PGR",
       "RELL",
       "UNH",
-      "WFC",
-      "WS"
+      "WSE"
     ],
-    "fresh_dcp_t1_ep_ge03_2d": [
-      "GCDT",
-      "GLXY",
-      "NOK",
-      "PWCM",
-      "SPWR"
-    ],
+    "fresh_dcp_t1_ep_ge03_2d": [],
     "fresh_dcp_t1_avoid_ah_3d": [
-      "GCDT",
-      "ONDS",
-      "PWCM",
-      "RDW",
-      "SPWR"
+      "AIB"
     ]
   },
-  "newly_scored_count": 5,
+  "newly_scored_count": 8,
   "newly_scored": [
     {
       "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-02",
-      "ticker": "ACN",
-      "short_ret": 0.0113624937154349,
-      "short_ret_fee_borrow": 0.0068624937154349005,
-      "exit_date": "2026-10-07"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-02",
+      "date": "2026-10-05",
       "ticker": "DAL",
-      "short_ret": 0.0133190629087882,
-      "short_ret_fee_borrow": 0.0088190629087882,
-      "exit_date": "2026-10-07"
+      "short_ret": 0.0113143957631198,
+      "short_ret_fee_borrow": 0.0068143957631198,
+      "exit_date": "2026-10-08"
     },
     {
       "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-02",
+      "date": "2026-10-05",
       "ticker": "LEVI",
-      "short_ret": 0.0181177654755912,
-      "short_ret_fee_borrow": 0.013617765475591199,
-      "exit_date": "2026-10-07"
+      "short_ret": 0.0601874691662555,
+      "short_ret_fee_borrow": 0.055687469166255506,
+      "exit_date": "2026-10-08"
     },
     {
       "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-02",
-      "ticker": "RELL",
-      "short_ret": -0.0531858873091102,
-      "short_ret_fee_borrow": -0.057685887309110194,
-      "exit_date": "2026-10-07"
+      "date": "2026-10-05",
+      "ticker": "LW",
+      "short_ret": -0.1097150549697105,
+      "short_ret_fee_borrow": -0.1142150549697105,
+      "exit_date": "2026-10-08"
     },
     {
-      "cell": "fresh_dcp_t1_avoid_ah_3d",
-      "date": "2026-10-02",
-      "ticker": "JBL",
-      "short_ret": 0.0162281133996912,
-      "short_ret_fee_borrow": 0.011728113399691199,
-      "exit_date": "2026-10-07"
+      "cell": "fpe_delta_t3_earn_today_3d",
+      "date": "2026-10-05",
+      "ticker": "PENG",
+      "short_ret": -0.1788832152857846,
+      "short_ret_fee_borrow": -0.1833832152857846,
+      "exit_date": "2026-10-08"
+    },
+    {
+      "cell": "fpe_delta_t3_earn_today_3d",
+      "date": "2026-10-05",
+      "ticker": "RELL",
+      "short_ret": -0.0633652822151222,
+      "short_ret_fee_borrow": -0.06786528221512221,
+      "exit_date": "2026-10-08"
+    },
+    {
+      "cell": "fpe_delta_t3_earn_today_3d",
+      "date": "2026-10-05",
+      "ticker": "WS",
+      "short_ret": 0.1150306748466257,
+      "short_ret_fee_borrow": 0.1105306748466257,
+      "exit_date": "2026-10-08"
+    },
+    {
+      "cell": "fresh_dcp_t1_ep_ge03_2d",
+      "date": "2026-10-06",
+      "ticker": "AIB",
+      "short_ret": 0.089171974522293,
+      "short_ret_fee_borrow": 0.084671974522293,
+      "exit_date": "2026-10-08"
+    },
+    {
+      "cell": "fresh_dcp_t1_ep_ge03_2d",
+      "date": "2026-10-06",
+      "ticker": "RIVN",
+      "short_ret": 0.0124052377670571,
+      "short_ret_fee_borrow": 0.0079052377670571,
+      "exit_date": "2026-10-08"
     }
   ],
   "letters_path": "/workspace/stale-news-rejoin/shadow_log/letters/letters_2026-10-05.csv",
   "letter_fails": [],
-  "generated_at_hkt": "2026-10-08 06:03:42 HKT",
+  "generated_at_hkt": "2026-10-09 16:27:54 HKT",
   "milestone_triggered": [],
   "quiet_day": false,
   "notes": [
@@ -98,7 +105,8 @@
     "2026-10-02: fires FPE=['ACN', 'DAL', 'LEVI', 'RELL'] EP=['JBL'] AH=['JBL']; newly_scored=17 closed_entries=['2026-09-29', '2026-09-30'].",
     "2026-10-05: fires FPE=['DAL', 'LEVI', 'LW', 'PENG', 'RELL', 'WS'] EP=[] AH=[]; newly_scored=21 closed_entries=['2026-09-30', '2026-10-01']. Inputs: theme-radar snapshot/features 2026-10-02 (+10-05 after-close snapshot landed 20:49Z), fullscan membership 2026-10-05 @1334373 (committed 11:22Z, pre-open), letters 2026-10-05 DCP appear candidates BABA,EMR,ETN,FLR,PLTR (all 5 rows built, 0 Yahoo fails).",
     "2026-10-06: rows appended from plan_2026-10-06.csv via plan_build.py --append-log (16); newly_scored=16; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
-    "2026-10-07: rows appended from plan_2026-10-07.csv via plan_build.py --append-log (28); newly_scored=5; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only."
+    "2026-10-07: rows appended from plan_2026-10-07.csv via plan_build.py --append-log (28); newly_scored=5; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
+    "2026-10-08: rows appended from plan_2026-10-08.csv via plan_build.py --append-log (12); newly_scored=8; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only."
   ],
   "paths_written": [
     "/workspace/stale-news-rejoin/shadow_log/log.csv",
@@ -278,20 +286,20 @@
       "2026-10-05": 21
     }
   },
-  "new_fires_source": "plans/plan_2026-10-07.csv (committed 129527d at 05:23 ET, before 09:30 ET)",
+  "new_fires_source": "plans/plan_2026-10-08.csv (committed ad4952e at 05:23 ET, before 09:30 ET)",
   "scorecard_bar_primary": "Cyrus's bar (primary): win rate > 55% over >= 30 closed trades, after-fee+borrow mean shown (and called out if <= 0). LOCKED or CLEAN rows only; MIXED never counts.",
   "scorecard_bar_extra": "Stricter extra check: closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. LOCKED or CLEAN rows only; MIXED never counts.",
   "scorecard_verdicts": {
     "note": "From shadow_log_lock.py scorecard (LOCKED / CLEAN only count; MIXED is context). cyrus_bar is the primary verdict; extra_check is the stricter 60/12 bar. Returns are short_ret_fee_borrow. Supersedes seen_designed_after.*.verdict, which is computed on mixed history.",
-    "log_sha256": "bca1a592b559e4fa504c2b4ad5ecdeea65ad8141245d457f3b610d826dff10db",
-    "log_rows": 240,
+    "log_sha256": "7feed22d3c0eddab885504cd367bce2753c4fc79cc91d24b0b2028c2a1318d4e",
+    "log_rows": 252,
     "lock_check": "PASS",
     "cells": {
       "fpe_delta_t3_earn_today_3d": {
         "LOCKED": {
           "closed_n": 0,
           "distinct_dates": 0,
-          "open": 30,
+          "open": 41,
           "win_fee_borrow": null,
           "mean_fee_borrow": null,
           "counts_toward_bar": true,
@@ -302,37 +310,37 @@
           "extra_check_text": "TOO FEW FOR A VERDICT (n=0 < 30)"
         },
         "CLEAN pre-lock": {
-          "closed_n": 44,
-          "distinct_dates": 5,
-          "open": 6,
-          "win_fee_borrow": 0.5454545454545454,
-          "mean_fee_borrow": -0.013704329413324568,
+          "closed_n": 50,
+          "distinct_dates": 6,
+          "open": 0,
+          "win_fee_borrow": 0.54,
+          "mean_fee_borrow": -0.01590843013761795,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 54.5% <= 55%, n 44); mean after fee+borrow -1.37% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 54.0% <= 55%, n 50); mean after fee+borrow -1.59% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (n 44<60, dates 5<12, win 54.5%<=55%, mean -1.37%<=0)"
+          "extra_check_text": "NOT CLEARED (n 50<60, dates 6<12, win 54.0%<=55%, mean -1.59%<=0)"
         },
         "CLEAN+LOCKED": {
-          "closed_n": 44,
-          "distinct_dates": 5,
-          "open": 36,
-          "win_fee_borrow": 0.5454545454545454,
-          "mean_fee_borrow": -0.013704329413324568,
+          "closed_n": 50,
+          "distinct_dates": 6,
+          "open": 41,
+          "win_fee_borrow": 0.54,
+          "mean_fee_borrow": -0.01590843013761795,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 54.5% <= 55%, n 44); mean after fee+borrow -1.37% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 54.0% <= 55%, n 50); mean after fee+borrow -1.59% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (n 44<60, dates 5<12, win 54.5%<=55%, mean -1.37%<=0)"
+          "extra_check_text": "NOT CLEARED (n 50<60, dates 6<12, win 54.0%<=55%, mean -1.59%<=0)"
         },
         "MIXED": {
-          "closed_n": 126,
-          "distinct_dates": 15,
-          "open": 36,
-          "win_fee_borrow": 0.5634920634920635,
-          "mean_fee_borrow": 0.0030037363568505087,
+          "closed_n": 132,
+          "distinct_dates": 16,
+          "open": 41,
+          "win_fee_borrow": 0.5606060606060606,
+          "mean_fee_borrow": 0.0014093921838526345,
           "counts_toward_bar": false,
           "cyrus_bar": "CONTEXT_ONLY",
           "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
@@ -343,17 +351,17 @@
       },
       "fresh_dcp_t1_ep_ge03_2d": {
         "LOCKED": {
-          "closed_n": 0,
-          "distinct_dates": 0,
-          "open": 7,
-          "win_fee_borrow": null,
-          "mean_fee_borrow": null,
+          "closed_n": 2,
+          "distinct_dates": 1,
+          "open": 5,
+          "win_fee_borrow": 1.0,
+          "mean_fee_borrow": 0.046288606144675046,
           "counts_toward_bar": true,
           "cyrus_bar": "TOO_FEW",
-          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=0 < 30)",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=2 < 30)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "TOO_FEW",
-          "extra_check_text": "TOO FEW FOR A VERDICT (n=0 < 30)"
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=2 < 30)"
         },
         "CLEAN pre-lock": {
           "closed_n": 12,
@@ -369,24 +377,24 @@
           "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
         },
         "CLEAN+LOCKED": {
-          "closed_n": 12,
-          "distinct_dates": 5,
-          "open": 7,
-          "win_fee_borrow": 0.5833333333333334,
-          "mean_fee_borrow": 0.00886588772476198,
+          "closed_n": 14,
+          "distinct_dates": 6,
+          "open": 5,
+          "win_fee_borrow": 0.6428571428571429,
+          "mean_fee_borrow": 0.014211990356178135,
           "counts_toward_bar": true,
           "cyrus_bar": "TOO_FEW",
-          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=12 < 30)",
+          "cyrus_bar_text": "TOO FEW FOR A VERDICT (n=14 < 30)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "TOO_FEW",
-          "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
+          "extra_check_text": "TOO FEW FOR A VERDICT (n=14 < 30)"
         },
         "MIXED": {
-          "closed_n": 29,
-          "distinct_dates": 13,
-          "open": 7,
-          "win_fee_borrow": 0.6896551724137931,
-          "mean_fee_borrow": 0.03430860240263244,
+          "closed_n": 31,
+          "distinct_dates": 14,
+          "open": 5,
+          "win_fee_borrow": 0.7096774193548387,
+          "mean_fee_borrow": 0.035081505869860995,
           "counts_toward_bar": false,
           "cyrus_bar": "CONTEXT_ONLY",
           "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
@@ -399,7 +407,7 @@
         "LOCKED": {
           "closed_n": 0,
           "distinct_dates": 0,
-          "open": 7,
+          "open": 8,
           "win_fee_borrow": null,
           "mean_fee_borrow": null,
           "counts_toward_bar": true,
@@ -425,7 +433,7 @@
         "CLEAN+LOCKED": {
           "closed_n": 13,
           "distinct_dates": 4,
-          "open": 7,
+          "open": 8,
           "win_fee_borrow": 0.46153846153846156,
           "mean_fee_borrow": -0.003887529754310159,
           "counts_toward_bar": true,
@@ -438,7 +446,7 @@
         "MIXED": {
           "closed_n": 35,
           "distinct_dates": 13,
-          "open": 7,
+          "open": 8,
           "win_fee_borrow": 0.6857142857142857,
           "mean_fee_borrow": 0.029143950126416296,
           "counts_toward_bar": false,
