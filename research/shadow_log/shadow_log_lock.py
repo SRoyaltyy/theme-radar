@@ -24,6 +24,15 @@ Subcommands (run from anywhere; paths are relative to this file's folder):
              Show each plan file's first git commit time vs 09:30 America/New_York on
              its entry date. With a date: exit 0 if that plan was committed pre-open,
              1 if it exists but is not (yet) a pre-open commit, 2 if there is no plan.
+  audit      Fail-closed first-seal fingerprint audit (strategy
+             theme_radar_research_shorts). Compares every sealed pre-open plan and
+             every closed LOCKED/CLEAN log row to its first-seal fingerprint in
+             lock_manifest.json. Exit 0 = pass, non-zero = fail. Prints a console
+             report and a JSON summary (``--json PATH`` or ``--json -``).
+             ``--seal`` appends first-seal fingerprints that are missing for
+             currently sealed days. It never rewrites a seal, a plan, or a log row.
+             A seal that already exists and no longer matches is a hard fail; the
+             manifest is left untouched. Days with no plan stay missing (no backfill).
 
 Pre-open plans: from entry date PLAN_REQUIRED_FROM on, a log row counts as LOCKED only if
 its signal was pinned on the append run AND it matches (cell, ticker, entry, hold_days) a
@@ -68,6 +77,17 @@ FLOAT_FIELDS = {"short_ret", "short_ret_fee_only", "short_ret_fee_borrow"}
 # calendar days (UTC) after its signal date and before it is scored.
 MAX_PIN_LAG_DAYS = 5
 CELLS = ["fpe_delta_t3_earn_today_3d", "fresh_dcp_t1_ep_ge03_2d", "fresh_dcp_t1_avoid_ah_3d"]
+STRATEGY = "theme_radar_research_shorts"
+# Closed-row seal covers the buy/sell (signal) and the close (outcome). meta is
+# not hashed: an added note is allowed; a rewrite of meta is still a hard fail.
+SEAL_LOG_FIELDS = SIGNAL_FIELDS + OUTCOME_FIELDS
+SEAL_PLAN_FIELDS = list(PLAN_COLUMNS)
+REL_LOG = "research/shadow_log/log.csv"
+FIRST_SEAL_NOTE = (
+    "Append-only first-seal fingerprints for sealed pre-open plans and closed LOCKED/CLEAN "
+    "shadow-log rows (strategy theme_radar_research_shorts). Written once; never rewritten. "
+    "A missing plan day stays missing (no backfill). meta may only grow by an added note. "
+    "Rewriting a sealed field is a hard fail. The audit never rewrites row content.")
 FINGERPRINT_METHOD = (
     "sha256 of UTF-8 JSON array [field values in the listed order], json.dumps(separators=(',',':'), "
     "ensure_ascii=False). Each value is the CSV string with surrounding whitespace stripped; "
@@ -141,18 +161,56 @@ def is_trading_day(iso):
     return d.weekday() < 5 and iso not in NYSE_HOLIDAYS
 
 
+def _nth_sunday(year, month, n):
+    x = dt.date(year, month, 1)
+    x += dt.timedelta(days=(6 - x.weekday()) % 7)
+    return x + dt.timedelta(weeks=n - 1)
+
+
+def _eastern_offset_hours(day):
+    """Hours behind UTC for America/New_York on this date (US DST rules since 2007)."""
+    dst = _nth_sunday(day.year, 3, 2) <= day < _nth_sunday(day.year, 11, 1)
+    return 4 if dst else 5
+
+
 def ny_open_utc(iso):
     """09:30 America/New_York on date iso, as an aware UTC datetime (US DST rules since 2007;
     stdlib only, no tzdata needed)."""
     d = dt.date.fromisoformat(iso)
-
-    def nth_sunday(year, month, n):
-        x = dt.date(year, month, 1)
-        x += dt.timedelta(days=(6 - x.weekday()) % 7)
-        return x + dt.timedelta(weeks=n - 1)
-    dst = nth_sunday(d.year, 3, 2) <= d < nth_sunday(d.year, 11, 1)
-    off = 4 if dst else 5
+    off = _eastern_offset_hours(d)
     return dt.datetime(d.year, d.month, d.day, PREOPEN_HHMM[0] + off, PREOPEN_HHMM[1], tzinfo=dt.timezone.utc)
+
+
+def to_et(utc_dt):
+    """Aware UTC datetime -> America/New_York wall time (naive clock, DST-adjusted)."""
+    if utc_dt.tzinfo is None:
+        utc_dt = utc_dt.replace(tzinfo=dt.timezone.utc)
+    utc_dt = utc_dt.astimezone(dt.timezone.utc)
+    day = utc_dt.date()
+    et = utc_dt - dt.timedelta(hours=_eastern_offset_hours(day))
+    if et.date() != day:
+        et = utc_dt - dt.timedelta(hours=_eastern_offset_hours(et.date()))
+    # Wall clock in America/New_York. tzinfo is dropped so callers compare .time()
+    # against naive ET times (the instant is already shifted).
+    return et.replace(tzinfo=None)
+
+
+def today_et():
+    return to_et(now_utc()).date().isoformat()
+
+
+def audit_slot_due(now_et, event):
+    """Weekday crons fire at 22:30 and 23:30 UTC so one of them is 18:30 ET.
+
+    Manual events (pull_request, workflow_dispatch, push) always run. The other
+    scheduled slot is a no-op so the audit runs once per weekday, after the
+    evening append. Returns (run, reason)."""
+    if event != "schedule":
+        return True, f"{event}: always run"
+    t = now_et.time()
+    if dt.time(18, 30) <= t < dt.time(19, 30):
+        return True, "weekday 18:30 America/New_York slot"
+    return False, "other DST cron slot (no-op; the 18:30 ET slot runs the audit)"
 
 
 def plan_files():
@@ -414,6 +472,9 @@ def run_check(against_git=None, quiet=False):
     # pre-lock rows that were open at lock time: once outcome is pinned it is covered above
     # pre-open plan files: pinned sha256, format, unchanged since first commit
     problems += plan_check_problems(m, by_key)
+    # first-seal fingerprints: existing seals must still match. Missing seals are
+    # not a check failure (pin / audit --seal append them); a mismatch is.
+    problems += [format_drift(d) for d in existing_seal_drifts(m, by_key)]
     if against_git:
         problems += check_against_git(m, against_git)
         problems += plans_against_git(against_git)
@@ -425,9 +486,11 @@ def run_check(against_git=None, quiet=False):
         else:
             n_sig = sum(1 for e in m["rows"].values() if e.get("signal"))
             n_out = sum(1 for e in m["rows"].values() if e.get("outcome"))
+            fs = m.get("first_seals") or {}
             print(f"CHECK OK: rules sha256 {actual_rules}; log rows {len(rows)}; "
                   f"pre_lock {len(m['pre_lock']['keys'])}; signal pins {n_sig}; outcome pins {n_out}; "
-                  f"plan files {len(plan_files())} (pinned {len(m.get('plans') or {})}; git {git_state()[0]})"
+                  f"plan files {len(plan_files())} (pinned {len(m.get('plans') or {})}; git {git_state()[0]}); "
+                  f"first seals plans {len(fs.get('plans') or {})} log rows {len(fs.get('log_rows') or {})}"
                   + (f"; manifest + plans append-only vs {against_git}" if against_git else ""))
             pidx = plan_index()
             for entry, pl in sorted(pidx.items()):
@@ -462,6 +525,7 @@ def manifest_superset_problems(old, new, label):
         for part, val in e.items():
             if not _same(val, ne.get(part)):
                 p.append(f"manifest entry {k}.{part} modified vs {label}")
+    p += first_seal_superset_problems(old, new, label)
     return p
 
 
@@ -525,17 +589,32 @@ def run_pin():
         if is_scored(r) and not e.get("outcome"):
             e["outcome"] = {"sha256": fingerprint(r, OUTCOME_FIELDS), "pinned_at_utc": ts_s}
             added_out += 1
+    # First-seal any pre-open plan and closed LOCKED/CLEAN row that does not have
+    # one yet. Never rewrites a seal or a CSV row. Skipped (with a warning) when
+    # git history cannot prove which plans were committed before the open.
+    n_seal_plans = n_seal_logs = 0
+    scope, scope_err = sealed_scope(m, rows, today_et())
+    if scope_err:
+        print(f"pin: first-seal skipped ({scope_err})")
+    else:
+        n_seal_plans, n_seal_logs = apply_scope_seals(m, scope, ts_s)
     # append-only guard: every old pin must survive untouched
     bad = manifest_superset_problems(old, m, "pre-pin manifest")
     if bad:
         print("pin refused: would modify/remove existing pins:\n  - " + "\n  - ".join(bad))
         return 1
-    if added_sig or added_out:
-        m["pin_runs"].append({"at_utc": ts_s, "log_sha256": sha256_file(LOG), "log_rows": len(rows),
-                              "new_signal_pins": added_sig, "new_outcome_pins": added_out})
+    if added_sig or added_out or n_seal_plans or n_seal_logs:
+        entry = {"at_utc": ts_s}
+        if added_sig or added_out:
+            entry.update(log_sha256=sha256_file(LOG), log_rows=len(rows),
+                         new_signal_pins=added_sig, new_outcome_pins=added_out)
+        if n_seal_plans or n_seal_logs:
+            entry["first_seals"] = {"plans": n_seal_plans, "log_rows": n_seal_logs}
+        m["pin_runs"].append(entry)
         write_manifest(m)
-    print(f"pin: +{added_sig} signal pin(s), +{added_out} outcome pin(s)"
-          + ("" if (added_sig or added_out) else " (nothing new; manifest unchanged)"))
+    print(f"pin: +{added_sig} signal pin(s), +{added_out} outcome pin(s), "
+          f"+{n_seal_plans} plan seal(s), +{n_seal_logs} log-row seal(s)"
+          + ("" if (added_sig or added_out or n_seal_plans or n_seal_logs) else " (nothing new; manifest unchanged)"))
     p2, _, _ = run_check(quiet=True)
     if p2:
         print("post-pin check FAILED:\n  - " + "\n  - ".join(p2))
@@ -566,12 +645,26 @@ def run_plan_pin():
                        "rows": len(rows), "status": st[len("# status="):].split()[0] if st else "",
                        "pinned_before_open": ts < ny_open_utc(plan_entry(name))}
         added.append(name)
+    sealed_now = []
+    for name in added:
+        if not plans[name]["pinned_before_open"]:
+            continue
+        # The plan file is not in git yet (plan-pin runs before the commit). The
+        # clock says this pin is before 09:30 ET, so record the first seal of
+        # these bytes in the same manifest write. A later edit fails closed.
+        fs = ensure_first_seals_block(m)
+        snap = plan_snapshot(name, fs.get("plan_fields"))
+        if record_plan_seal(fs, snap, ts_s, True):
+            sealed_now.append(plan_entry(name))
     bad = manifest_superset_problems(old, m, "pre-plan-pin manifest")
     if bad:
         print("plan-pin refused: would modify/remove existing pins:\n  - " + "\n  - ".join(bad))
         return 1
     if added:
-        m["pin_runs"].append({"at_utc": ts_s, "plan_pins": added})
+        run = {"at_utc": ts_s, "plan_pins": added}
+        if sealed_now:
+            run["first_seals"] = {"plans": len(sealed_now), "log_rows": 0, "plan_dates": sealed_now}
+        m["pin_runs"].append(run)
         write_manifest(m)
     print(f"plan-pin: +{len(added)} plan pin(s)" + (f" {added}" if added else " (nothing new; manifest unchanged)"))
     for n in added:
@@ -963,6 +1056,562 @@ def write_summary_verdicts(sv, problems, rows):
     print(f"summary.json updated: scorecard_bar_primary, scorecard_bar_extra, scorecard_verdicts")
 
 
+# ---------------------------------------------------------------- first-seal audit
+def hash_values(vals):
+    return hashlib.sha256(json.dumps(list(vals), separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
+
+
+def seal_values(row, fields):
+    return [norm(f, row.get(f, "")) for f in fields]
+
+
+def meta_note_ok(sealed, current):
+    """True if current meta is the sealed text or the sealed text plus an added note."""
+    sealed = (sealed or "").strip()
+    current = (current or "").strip()
+    if current == sealed:
+        return True
+    if not current.startswith(sealed):
+        return False
+    if sealed == "":
+        return True
+    return current[len(sealed):len(sealed) + 1] in " \t|;,\n"
+
+
+def _clip(v, n=160):
+    if not isinstance(v, str):
+        v = json.dumps(v, ensure_ascii=False)
+    return v if len(v) <= n else v[:n] + "..."
+
+
+def format_drift(d):
+    bits = []
+    for c in d.get("what_changed") or []:
+        bits.append(f"{c.get('field')}: sealed {_clip(c.get('sealed'))!r} current {_clip(c.get('current'))!r}")
+    detail = "; ".join(bits) if bits else "content moved"
+    return f"first-seal drift {d.get('kind')} {d.get('date')} {d.get('key')}: {detail}"
+
+
+def _row_from_by_key(by_key, key):
+    item = (by_key or {}).get(key)
+    if item is None:
+        return None
+    if isinstance(item, tuple):
+        return item[1]
+    return item
+
+
+def plan_repo_path(date):
+    return f"research/shadow_log/plans/plan_{date}.csv"
+
+
+def ensure_first_seals_block(m):
+    fs = m.get("first_seals")
+    if fs:
+        fs.setdefault("plans", {})
+        fs.setdefault("log_rows", {})
+        return fs
+    fs = {
+        "strategy": STRATEGY,
+        "note": FIRST_SEAL_NOTE,
+        "fingerprint_method": FINGERPRINT_METHOD,
+        "log_fields": list(SEAL_LOG_FIELDS),
+        "plan_fields": list(SEAL_PLAN_FIELDS),
+        "plans": {},
+        "log_rows": {},
+    }
+    m["first_seals"] = fs
+    return fs
+
+
+def first_seal_superset_problems(old, new, label):
+    """Existing first seals may only gain new keys. A rewrite or deletion is a hard fail."""
+    old_fs = old.get("first_seals")
+    if not old_fs:
+        return []
+    new_fs = new.get("first_seals")
+    if not new_fs:
+        return [f"manifest first_seals removed vs {label}"]
+    p = []
+    for fld in ("strategy", "note", "fingerprint_method", "log_fields", "plan_fields"):
+        if not _same(old_fs.get(fld), new_fs.get(fld)):
+            p.append(f"manifest first_seals.{fld} changed vs {label}")
+    for section in ("plans", "log_rows"):
+        for k, e in (old_fs.get(section) or {}).items():
+            if not _same(e, (new_fs.get(section) or {}).get(k)):
+                p.append(f"manifest first_seal {section}.{k} removed or modified vs {label}")
+    return p
+
+
+def plan_snapshot(name, fields):
+    cols, rows, status = read_plan(name)
+    entry = plan_entry(name)
+    rowmap = {}
+    for r in rows:
+        k = f"{(r.get('cell') or '').strip()}|{(r.get('ticker') or '').strip()}"
+        vals = seal_values(r, fields)
+        rowmap[k] = {"sha256": hash_values(vals), "values": vals}
+    return {
+        "entry": entry,
+        "file": f"plans/{name}",
+        "path": plan_repo_path(entry),
+        "file_sha256": sha256_file(os.path.join(PLANS_DIR, name)),
+        "status_lines": list(status),
+        "rows": rowmap,
+    }
+
+
+def log_snapshot(row, bucket, fields):
+    vals = seal_values(row, fields)
+    return {
+        "bucket": bucket,
+        "signal_date": (row.get("date") or "").strip(),
+        "entry": (row.get("entry") or "").strip(),
+        "sha256": hash_values(vals),
+        "values": vals,
+        "meta": (row.get("meta") or "").strip(),
+    }
+
+
+def record_plan_seal(fs, snap, ts_s, preopen):
+    """Append one plan seal. Returns False if that day is already sealed (left untouched)."""
+    entry = snap["entry"]
+    plans = fs.setdefault("plans", {})
+    if entry in plans:
+        return False
+    plans[entry] = {
+        "entry": entry,
+        "file": snap["file"],
+        "file_sha256": snap["file_sha256"],
+        "sealed_at_utc": ts_s,
+        "preopen": bool(preopen),
+        "status_lines": list(snap["status_lines"]),
+        "rows": {k: {"sha256": v["sha256"], "values": list(v["values"])} for k, v in snap["rows"].items()},
+    }
+    return True
+
+
+def record_log_seal(fs, key, snap, ts_s):
+    rows = fs.setdefault("log_rows", {})
+    if key in rows:
+        return False
+    rows[key] = {
+        "bucket": snap["bucket"],
+        "signal_date": snap["signal_date"],
+        "entry": snap["entry"],
+        "sha256": snap["sha256"],
+        "values": list(snap["values"]),
+        "meta": snap["meta"],
+        "sealed_at_utc": ts_s,
+    }
+    return True
+
+
+def row_bucket(r, m, pidx):
+    """'LOCKED' or 'CLEAN' for a closed row that counts, else None.
+
+    Same buckets as the scorecard: LOCKED needs a signal pin (and, from
+    PLAN_REQUIRED_FROM, a pre-open plan match). CLEAN is a pre_lock row whose
+    signal date is on or after CLEAN_FROM. Open rows are not sealed.
+    """
+    if not is_scored(r):
+        return None
+    k = key_of(r)
+    pre = set((m.get("pre_lock") or {}).get("keys") or [])
+    e = (m.get("rows") or {}).get(k) or {}
+    pinned_locked = e.get("status") == "locked" and bool(e.get("signal"))
+    entry = (r.get("entry") or "").strip()
+    if entry >= PLAN_REQUIRED_FROM:
+        ok, _why = plan_class(r, pidx)
+        if ok and pinned_locked:
+            return "LOCKED"
+    elif pinned_locked:
+        return "LOCKED"
+    if k in pre and (r.get("date") or "").strip() >= CLEAN_FROM:
+        return "CLEAN"
+    return None
+
+
+def plan_gap_dates(today, have_files):
+    """Past trading days from PLAN_REQUIRED_FROM with no plan file. Not a failure."""
+    out = []
+    d = dt.date.fromisoformat(PLAN_REQUIRED_FROM)
+    end = dt.date.fromisoformat(today) - dt.timedelta(days=1)
+    while d <= end:
+        iso = d.isoformat()
+        if is_trading_day(iso) and iso not in have_files:
+            out.append({"date": iso, "reason": "no plan file; left missing (no backfill)"})
+        d += dt.timedelta(days=1)
+    return out
+
+
+def sealed_scope(m, rows, today):
+    """Plans committed before 09:30 ET on or before today, and closed LOCKED/CLEAN rows.
+
+    Returns (scope, error). error is set when git history cannot prove plan timing;
+    the caller must fail closed and must not invent seals.
+    """
+    state = git_state()[0]
+    if state != "ok":
+        return None, f"git history {state}: full clone required to enumerate sealed pre-open plans"
+    pidx = plan_index()
+    plan_fields = (m.get("first_seals") or {}).get("plan_fields") or list(SEAL_PLAN_FIELDS)
+    log_fields = (m.get("first_seals") or {}).get("log_fields") or list(SEAL_LOG_FIELDS)
+    plans = {}
+    late = []
+    have = set()
+    for name in plan_files():
+        entry = plan_entry(name)
+        have.add(entry)
+        if entry > today:
+            continue
+        t = (pidx.get(entry) or {}).get("timing") or {}
+        if t.get("preopen") is True:
+            plans[entry] = plan_snapshot(name, plan_fields)
+        else:
+            late.append({"date": entry, "file": f"plans/{name}",
+                         "reason": t.get("reason") or "not a pre-open commit"})
+    logs = {}
+    for r in rows:
+        b = row_bucket(r, m, pidx)
+        if not b:
+            continue
+        logs[key_of(r)] = log_snapshot(r, b, log_fields)
+    scope = {
+        "plans": plans,
+        "log_rows": logs,
+        "gaps": plan_gap_dates(today, have),
+        "not_preopen_plans": late,
+        "counts": {
+            "plans": len(plans),
+            "plan_rows": sum(len(s["rows"]) for s in plans.values()),
+            "log_rows": len(logs),
+            "log_rows_locked": sum(1 for s in logs.values() if s["bucket"] == "LOCKED"),
+            "log_rows_clean": sum(1 for s in logs.values() if s["bucket"] == "CLEAN"),
+        },
+    }
+    return scope, None
+
+
+def apply_scope_seals(m, scope, ts_s):
+    """Append first seals for in-scope plans and log rows that do not have one. Returns counts."""
+    fs = ensure_first_seals_block(m)
+    n_plans = n_logs = 0
+    for date in sorted(scope["plans"]):
+        if record_plan_seal(fs, scope["plans"][date], ts_s, True):
+            n_plans += 1
+    for key in sorted(scope["log_rows"]):
+        if record_log_seal(fs, key, scope["log_rows"][key], ts_s):
+            n_logs += 1
+    return n_plans, n_logs
+
+
+def plan_content_drifts(date, seal, snap, fields):
+    """Compare one stored plan seal to a snapshot (None if the file is gone)."""
+    path = plan_repo_path(date)
+    name = f"plan_{date}.csv"
+    if snap is None:
+        return [{"kind": "plan_file", "date": date, "key": name, "path": path,
+                 "what_changed": [{"field": "file", "sealed": "present", "current": "missing"}]}]
+    if snap.get("file_sha256") == seal.get("file_sha256"):
+        return []
+    drifts = []
+    changes = [{"field": "file_sha256", "sealed": seal.get("file_sha256"), "current": snap.get("file_sha256")}]
+    if list(seal.get("status_lines") or []) != list(snap.get("status_lines") or []):
+        changes.append({"field": "status_lines", "sealed": seal.get("status_lines") or [],
+                        "current": snap.get("status_lines") or []})
+    drifts.append({"kind": "plan_file", "date": date, "key": name, "path": path, "what_changed": changes})
+    srows = seal.get("rows") or {}
+    crows = snap.get("rows") or {}
+    for k in sorted(set(srows) | set(crows)):
+        if k not in crows:
+            drifts.append({"kind": "plan_row", "date": date, "key": k, "path": path,
+                           "what_changed": [{"field": "row", "sealed": "present", "current": "missing"}]})
+            continue
+        if k not in srows:
+            drifts.append({"kind": "plan_row", "date": date, "key": k, "path": path,
+                           "what_changed": [{"field": "row", "sealed": "missing", "current": "present"}]})
+            continue
+        sv = list((srows[k] or {}).get("values") or [])
+        cv = list((crows[k] or {}).get("values") or [])
+        if sv == cv:
+            continue
+        if len(sv) != len(cv) or len(fields) != len(sv):
+            ch = [{"field": "values", "sealed": sv, "current": cv}]
+        else:
+            ch = [{"field": f, "sealed": a, "current": b} for f, a, b in zip(fields, sv, cv) if a != b]
+        if ch:
+            drifts.append({"kind": "plan_row", "date": date, "key": k, "path": path, "what_changed": ch})
+    return drifts
+
+
+def diff_log_seal(key, seal, row, fields):
+    signal = (seal or {}).get("signal_date") or ""
+    entry = (seal or {}).get("entry") or signal
+    if not entry and isinstance(key, str) and key.count("|") >= 2:
+        entry = key.split("|")[1]
+    base = {"kind": "log_row", "date": entry, "signal_date": signal, "key": key,
+            "bucket": (seal or {}).get("bucket") or "", "path": REL_LOG}
+    if not isinstance(seal, dict) or "values" not in seal:
+        base["what_changed"] = [{"field": "seal", "sealed": "unreadable", "current": "present" if row else "missing"}]
+        return [base]
+    if row is None:
+        base["what_changed"] = [{"field": "row", "sealed": "present", "current": "missing"}]
+        return [base]
+    cur = seal_values(row, fields)
+    sealed_vals = list(seal.get("values") or [])
+    changes = []
+    if sealed_vals != cur:
+        if len(sealed_vals) != len(cur) or len(fields) != len(sealed_vals):
+            changes.append({"field": "values", "sealed": sealed_vals, "current": cur})
+        else:
+            changes.extend({"field": f, "sealed": a, "current": b} for f, a, b in zip(fields, sealed_vals, cur) if a != b)
+    if not meta_note_ok(seal.get("meta", ""), row.get("meta", "")):
+        changes.append({"field": "meta", "sealed": seal.get("meta") or "",
+                        "current": (row.get("meta") or "").strip(),
+                        "note": "meta is add-only; rewriting it is a hard fail"})
+    if hash_values(sealed_vals) != seal.get("sha256"):
+        changes.append({"field": "sha256", "sealed": seal.get("sha256"), "current": hash_values(sealed_vals),
+                        "note": "stored sha256 does not match stored values"})
+    if not changes:
+        return []
+    base["what_changed"] = changes
+    return [base]
+
+
+def existing_seal_drifts(m, by_key):
+    """Drifts of seals already in the manifest. Does not complain about missing seals."""
+    fs = m.get("first_seals") or {}
+    if not fs:
+        return []
+    drifts = []
+    if fs.get("strategy") not in (None, STRATEGY):
+        drifts.append({
+            "kind": "manifest", "date": "", "key": "strategy", "path": REL_MANIFEST,
+            "what_changed": [{"field": "strategy", "sealed": fs.get("strategy"), "current": STRATEGY}],
+        })
+    plan_fields = fs.get("plan_fields") or list(SEAL_PLAN_FIELDS)
+    log_fields = fs.get("log_fields") or list(SEAL_LOG_FIELDS)
+    for date, seal in (fs.get("plans") or {}).items():
+        name = f"plan_{date}.csv"
+        path = os.path.join(PLANS_DIR, name)
+        if not os.path.exists(path):
+            drifts.extend(plan_content_drifts(date, seal, None, plan_fields))
+            continue
+        try:
+            snap = plan_snapshot(name, plan_fields)
+        except Exception as ex:  # noqa
+            drifts.append({"kind": "plan_file", "date": date, "key": name, "path": plan_repo_path(date),
+                           "what_changed": [{"field": "file", "sealed": seal.get("file_sha256"),
+                                             "current": f"unreadable: {ex}"}]})
+            continue
+        drifts.extend(plan_content_drifts(date, seal, snap, plan_fields))
+    for key, seal in (fs.get("log_rows") or {}).items():
+        drifts.extend(diff_log_seal(key, seal, _row_from_by_key(by_key, key), log_fields))
+    return drifts
+
+
+def build_report(m, rows, by_key, mode, today):
+    drifts = existing_seal_drifts(m, by_key)
+    scope, err = sealed_scope(m, rows, today)
+    fs = m.get("first_seals") or {}
+    missing, gaps, late = [], [], []
+    in_scope = {"plans": 0, "plan_rows": 0, "log_rows": 0, "log_rows_locked": 0, "log_rows_clean": 0}
+    if scope:
+        gaps = scope["gaps"]
+        late = scope["not_preopen_plans"]
+        in_scope = scope["counts"]
+        for date, snap in sorted(scope["plans"].items()):
+            if date not in (fs.get("plans") or {}):
+                missing.append({"kind": "plan", "date": date, "key": f"plan_{date}.csv", "path": snap["path"]})
+        for key, snap in sorted(scope["log_rows"].items()):
+            if key not in (fs.get("log_rows") or {}):
+                missing.append({"kind": "log_row", "date": snap["entry"] or snap["signal_date"], "key": key,
+                                "bucket": snap["bucket"], "path": REL_LOG})
+    sealed_logs = fs.get("log_rows") or {}
+    return {
+        "schema": "theme_radar_research_shorts_ironclad_audit_v1",
+        "strategy": STRATEGY,
+        "ok": False,
+        "mode": mode,
+        "checked_at_utc": now_utc().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "asof_et": today,
+        "in_scope": in_scope,
+        "sealed": {
+            "plans": len(fs.get("plans") or {}),
+            "plan_dates": sorted((fs.get("plans") or {}).keys()),
+            "log_rows": len(sealed_logs),
+            "log_rows_locked": sum(1 for e in sealed_logs.values() if e.get("bucket") == "LOCKED"),
+            "log_rows_clean": sum(1 for e in sealed_logs.values() if e.get("bucket") == "CLEAN"),
+        },
+        "summary": {},
+        "drift_dates": [],
+        "drift": drifts,
+        "missing_seals": missing,
+        "gaps": gaps,
+        "not_preopen_plans": late,
+        "blocked": err,
+        "lock_problems": [],
+        "notes": (
+            "Pass (exit 0): every sealed pre-open plan and every closed LOCKED/CLEAN log row matches its "
+            "first-seal fingerprint. Fail (non-zero): a previously sealed fingerprint does not match current "
+            "content, a sealed plan or closed LOCKED/CLEAN row has no first-seal fingerprint, the lock check "
+            "failed, or git history cannot enumerate pre-open plans. Gaps (trading days with no plan file) "
+            "stay missing and are not a failure. meta may gain an added note; rewriting a sealed field is a hard fail."
+        ),
+    }
+
+
+def finalize_report(report, problems):
+    others = [p for p in (problems or []) if not str(p).startswith("first-seal drift")]
+    report["lock_problems"] = others
+    report["summary"] = {
+        "drifts": len(report.get("drift") or []),
+        "missing_seals": len(report.get("missing_seals") or []),
+        "gaps": len(report.get("gaps") or []),
+        "lock_problems": len(others),
+    }
+    report["drift_dates"] = sorted({d.get("date") for d in (report.get("drift") or []) if d.get("date")})
+    report["ok"] = not (report["drift"] or report["missing_seals"] or report.get("blocked") or others)
+    return report
+
+
+def _human_report(report):
+    L = []
+    L.append(f"IRONCLAD fingerprint audit: {'PASS' if report.get('ok') else 'FAIL'}")
+    L.append(f"strategy: {report.get('strategy')}")
+    L.append(f"asof_et: {report.get('asof_et')}  checked_at_utc: {report.get('checked_at_utc')}  mode: {report.get('mode')}")
+    scope = report.get("in_scope") or {}
+    sealed = report.get("sealed") or {}
+    L.append(
+        f"in scope: plans {scope.get('plans', 0)} ({scope.get('plan_rows', 0)} rows); "
+        f"closed log rows {scope.get('log_rows', 0)} "
+        f"(LOCKED {scope.get('log_rows_locked', 0)}, CLEAN {scope.get('log_rows_clean', 0)})"
+    )
+    L.append(
+        f"first seals: plans {sealed.get('plans', 0)} "
+        f"log rows {sealed.get('log_rows', 0)} "
+        f"(LOCKED {sealed.get('log_rows_locked', 0)}, CLEAN {sealed.get('log_rows_clean', 0)})"
+    )
+    if report.get("newly_sealed"):
+        ns = report["newly_sealed"]
+        L.append(f"newly sealed this run: plans {ns.get('plans', 0)}, log rows {ns.get('log_rows', 0)}")
+    if report.get("blocked"):
+        L.append(f"BLOCKED: {report['blocked']}")
+    if report.get("lock_problems"):
+        L.append(f"lock check ({len(report['lock_problems'])} problem(s)):")
+        for p in report["lock_problems"]:
+            L.append("  - " + p)
+    if report.get("drift"):
+        L.append(f"drift dates: {', '.join(report.get('drift_dates') or []) or '(none named)'}")
+        for d in report["drift"]:
+            L.append("  - " + format_drift(d))
+    else:
+        L.append("drift: none")
+    missing = report.get("missing_seals") or []
+    if missing:
+        L.append(f"missing first seals: {len(missing)} (fail closed; run audit --seal only if the rows are still the original seal)")
+        for item in missing[:40]:
+            L.append(f"  - {item.get('kind')} {item.get('date')} {item.get('key')} {item.get('bucket', '')}".rstrip())
+        if len(missing) > 40:
+            L.append(f"  - ... {len(missing) - 40} more")
+    else:
+        L.append("missing first seals: none")
+    gaps = report.get("gaps") or []
+    if gaps:
+        L.append("gaps left missing (no backfill): " + ", ".join(g["date"] for g in gaps))
+    else:
+        L.append("gaps: none")
+    if report.get("seal_refused"):
+        L.append(f"seal: {report['seal_refused']}")
+    L.append("result: PASS (exit 0)" if report.get("ok") else "result: FAIL (exit 1)")
+    return "\n".join(L) + "\n"
+
+
+def emit_report(report, json_path):
+    human = _human_report(report)
+    text = json.dumps(report, indent=2, ensure_ascii=False) + "\n"
+    if json_path == "-":
+        sys.stderr.write(human)
+        sys.stdout.write(text)
+        return
+    sys.stdout.write(human)
+    if json_path:
+        parent = os.path.dirname(os.path.abspath(json_path))
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with open(json_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        sys.stdout.write(f"json: {json_path}\n")
+    else:
+        sys.stdout.write("--- json ---\n")
+        sys.stdout.write(text)
+
+
+def run_audit(seal=False, json_path=None):
+    """Exit 0 when every sealed plan and closed LOCKED/CLEAN row matches its first seal.
+
+    ``--seal`` appends missing first seals and does not rewrite row content. A drift,
+    a lock-check failure, or unverifiable git history refuses the write.
+    """
+    mode = "seal" if seal else "check"
+    today = today_et()
+    problems, m, parsed = run_check(quiet=True)
+    if m is None or parsed is None:
+        report = finalize_report({
+            "schema": "theme_radar_research_shorts_ironclad_audit_v1",
+            "strategy": STRATEGY,
+            "ok": False,
+            "mode": mode,
+            "checked_at_utc": now_utc().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "asof_et": today,
+            "in_scope": {},
+            "sealed": {},
+            "summary": {},
+            "drift_dates": [],
+            "drift": [],
+            "missing_seals": [],
+            "gaps": [],
+            "not_preopen_plans": [],
+            "blocked": "lock_manifest.json missing" if m is None else None,
+            "lock_problems": [],
+            "notes": FIRST_SEAL_NOTE,
+        }, problems or ["lock_manifest.json missing"])
+        emit_report(report, json_path)
+        return 1
+    _cols, rows, by_key = parsed
+    report = finalize_report(build_report(m, rows, by_key, mode, today), problems)
+    can_seal = seal and not report["drift"] and not report.get("blocked") and not report["lock_problems"]
+    if can_seal and report["missing_seals"]:
+        ts_s = now_utc().strftime("%Y-%m-%dT%H:%M:%SZ")
+        scope, err = sealed_scope(m, rows, today)
+        if err or scope is None:
+            report["blocked"] = err or "could not enumerate seals"
+            report["seal_refused"] = "manifest not written"
+            report = finalize_report(report, problems)
+        else:
+            n_plans, n_logs = apply_scope_seals(m, scope, ts_s)
+            if n_plans or n_logs:
+                m.setdefault("pin_runs", []).append({
+                    "at_utc": ts_s,
+                    "first_seals": {"plans": n_plans, "log_rows": n_logs},
+                    "note": "first-seal fingerprints recorded; row content not rewritten",
+                })
+                write_manifest(m)
+            problems2, m2, parsed2 = run_check(quiet=True)
+            m2 = m2 or m
+            rows2 = parsed2[1] if parsed2 else rows
+            by2 = parsed2[2] if parsed2 else by_key
+            report = finalize_report(build_report(m2, rows2, by2, mode, today), problems2)
+            report["newly_sealed"] = {"plans": n_plans, "log_rows": n_logs}
+    elif seal and not report["ok"]:
+        report["seal_refused"] = "manifest not written"
+    elif seal:
+        report["newly_sealed"] = {"plans": 0, "log_rows": 0}
+    emit_report(report, json_path)
+    return 0 if report.get("ok") else 1
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -974,6 +1623,11 @@ def main():
     sp.add_parser("plan-pin", help="pin sha256 of new plans/plan_<entry>.csv files (append-only)")
     ps = sp.add_parser("plan-status", help="first-commit time of plan files vs 09:30 ET")
     ps.add_argument("entry", nargs="?", default=None)
+    au = sp.add_parser("audit", help="fail-closed first-seal audit of sealed plans and closed LOCKED/CLEAN rows")
+    au.add_argument("--seal", action="store_true",
+                    help="append missing first-seal fingerprints; never rewrite a seal or a row")
+    au.add_argument("--json", default=None, metavar="PATH",
+                    help="write the summary JSON here, or - for JSON only on stdout")
     a = ap.parse_args()
     if a.cmd == "check":
         p, _, _ = run_check(against_git=a.against_git)
@@ -988,6 +1642,8 @@ def main():
         return run_plan_pin()
     if a.cmd == "plan-status":
         return run_plan_status(a.entry)
+    if a.cmd == "audit":
+        return run_audit(seal=a.seal, json_path=a.json)
 
 
 if __name__ == "__main__":
