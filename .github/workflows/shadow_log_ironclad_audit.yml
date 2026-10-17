@@ -1,0 +1,65 @@
+name: Shadow log IRONCLAD fingerprint audit
+
+# Research-only shadow shorts. Fail closed if a sealed pre-open plan or a closed
+# LOCKED/CLEAN log row has moved since its first seal in lock_manifest.json.
+# Stdlib only. Exit 0 = pass. This job does not seal and does not push.
+#
+# Weekday schedule is DST-safe, after the evening append (~18:30 America/New_York):
+#   22:30 UTC = 18:30 EDT (summer)  |  23:30 UTC = 18:30 EST (winter)
+# The other slot is a no-op. pull_request / workflow_dispatch / push always run.
+
+on:
+  schedule:
+    - cron: "30 22 * * 1-5"
+    - cron: "30 23 * * 1-5"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/shadow_log/**"
+      - ".github/workflows/shadow_log_ironclad_audit.yml"
+  push:
+    paths:
+      - "research/shadow_log/**"
+      - ".github/workflows/shadow_log_ironclad_audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Slot (18:30 America/New_York; manual runs always proceed)
+        id: slot
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - << 'PY'
+          import os
+          import sys
+          sys.path.insert(0, "research/shadow_log")
+          import shadow_log_lock as lock
+          now = lock.to_et(lock.now_utc())
+          run, why = lock.audit_slot_due(now, os.environ.get("EVENT_NAME", "schedule"))
+          print(f"[slot] ET={now:%Y-%m-%d %H:%M} run={run}: {why}")
+          path = os.environ.get("GITHUB_OUTPUT")
+          if path:
+              with open(path, "a", encoding="utf-8") as fh:
+                  fh.write(f"run={str(run).lower()}\n")
+          PY
+
+      - name: First-seal fingerprint audit
+        if: steps.slot.outputs.run == 'true'
+        run: |
+          python research/shadow_log/shadow_log_lock.py audit --json "$RUNNER_TEMP/ironclad_audit.json"
+          echo "----- audit json -----"
+          cat "$RUNNER_TEMP/ironclad_audit.json"

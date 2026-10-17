@@ -18,8 +18,8 @@ The exact frozen rules are in `rules_frozen.json` (sha256 `e66cac9b7208117611466
 |---|---|
 | `log.csv` | one row per shadow short: signal fields (`cell,date,ticker,entry,hold_days,feature_date,source`) and outcome fields (`exit_date,short_ret,short_ret_fee_only,short_ret_fee_borrow,tape`), plus `meta` |
 | `rules_frozen.json` | frozen rule definitions. Must never change. Its hash is pinned |
-| `lock_manifest.json` | the lock: pinned fingerprints, the list of pre_lock rows, the history of pin runs |
-| `shadow_log_lock.py` | `check`, `pin`, `scorecard`, `plan-pin`, `plan-status` (Python stdlib only) |
+| `lock_manifest.json` | the lock: pinned fingerprints, first-seal fingerprints, the list of pre_lock rows, the history of pin runs |
+| `shadow_log_lock.py` | `check`, `pin`, `scorecard`, `plan-pin`, `plan-status`, `audit` (Python stdlib only) |
 | `plans/plan_<entry>.csv` | the pre-open plan for one entry day: `cell,signal_date,ticker,entry_date,hold_days,rules_sha256,source`, then `#` status/provenance lines. Append-only, never overwritten |
 | `plans/letters_<entry>.csv` | the Excel CLEAR letters the plan's DCP fires came from (only when there were DCP candidates) |
 | `plan_build.py`, `plan_run.sh` | build / pin / commit / push a plan (research box only; needs pandas and the box data). CI never runs them |
@@ -50,7 +50,34 @@ The fingerprint normalises numbers (`hold_days` to an int, returns to `repr(floa
 - a pinned row, or a pre_lock row, is missing from `log.csv`;
 - a key is duplicated, or the columns changed;
 - the `rules_frozen.json` hash changed;
-- (with `--against-git REF`) any manifest entry from REF was removed or modified.
+- (with `--against-git REF`) any manifest entry from REF was removed or modified, including a first-seal fingerprint.
+
+## Daily IRONCLAD fingerprint audit
+
+`audit` answers one question: has any sealed pre-open plan, or any closed LOCKED or CLEAN log row, moved since its first seal?
+
+```
+python research/shadow_log/shadow_log_lock.py audit
+python research/shadow_log/shadow_log_lock.py audit --json /tmp/ironclad_audit.json
+python research/shadow_log/shadow_log_lock.py audit --json -          # JSON only on stdout; human report on stderr
+```
+
+Exit **0** means pass. Every sealed plan (`plans/plan_<entry>.csv` whose first git commit is before 09:30 America/New_York on that entry date, on or before today ET) and every closed LOCKED or CLEAN row in `log.csv` matches the first-seal fingerprint in `lock_manifest.json` under `first_seals`. The JSON summary is machine-readable for an external wrapper. It always includes `strategy` = `theme_radar_research_shorts`, `ok`, `drift_dates`, and `drift` (each drift names the date, the row or plan, and `what_changed` with the sealed value and the current value).
+
+Exit **1** means fail, and the manifest is left as it was. A fail is any of:
+
+- a first seal that no longer matches the file (the date and the field that moved are in the report);
+- a sealed plan or closed LOCKED/CLEAN row that has no first seal yet;
+- the ordinary lock `check` failing (rules hash, a pinned signal/outcome, a deleted row, a duplicate key);
+- git history too shallow to tell which plans were committed before the open.
+
+A trading day with no plan file is a **gap**. It is listed and left missing. The audit does not backfill it and does not fail for it.
+
+`audit --seal` appends first-seal fingerprints that are missing for days that are sealed right now. It does not rewrite a plan, a log row, or an existing seal. If anything already sealed has drifted, `--seal` writes nothing and exits 1. `pin` records the same missing seals when it pins the evening log, and `plan-pin` records the seal for a plan it pins before 09:30 ET. Commit that manifest in the same run as the append. The daily job does not seal; it only checks, so a drift fails the job.
+
+`meta` may gain an added note (`plan_2026-10-06.csv | note: ...`). Replacing `meta` is a fail. The sealed fields themselves are the signal and outcome columns (and, for a plan, the plan columns plus the file bytes).
+
+Weekday CI (`.github/workflows/shadow_log_ironclad_audit.yml`) runs the check after the evening append, at 18:30 America/New_York (22:30 UTC in summer, 23:30 UTC in winter; the other slot is a no-op), and on `workflow_dispatch`. Full git history is required (`fetch-depth: 0`).
 
 ## pre_lock vs locked
 
@@ -108,7 +135,8 @@ python research/shadow_log/shadow_log_lock.py check  # FAIL -> stop, report, do 
 python research/shadow_log/plan_build.py --append-log <asof>   # the day's new rows = the rows of plans/plan_<asof>.csv
 #  ... (only if there is NO plan for <asof>: compute the day's rows exactly as before; they will read no_preopen_plan)
 #  ... fill outcomes for rows whose hold closed, exactly as before (only fill blank outcome fields)
-python research/shadow_log/shadow_log_lock.py pin        # pins new signals + new outcomes
+python research/shadow_log/shadow_log_lock.py pin        # pins new signals + new outcomes; first-seals newly closed LOCKED/CLEAN rows and pre-open plans
+python research/shadow_log/shadow_log_lock.py audit      # exit 0 = sealed plans and closed rows match their first seal; exit 1 = stop, report, do NOT commit
 python research/shadow_log/shadow_log_lock.py scorecard  # regenerates scorecard.md + summary.json scorecard_* keys (write summary.json first)
 git add research/shadow_log && git commit -m "shadow_log: <asof>" && git push   # same run, never later
 ```
