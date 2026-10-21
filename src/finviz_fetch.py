@@ -5,7 +5,7 @@ includes your auth key (the single link Finviz gives you).
 
 Writes (append-only history):
   data/snapshots/YYYY-MM-DD.csv          ← canonical snapshot for that ET date
-  data/snapshots/archive/YYYY-MM-DD_HHMMSS.csv  ← prior version if same day re-run
+  data/snapshots/archive/YYYY-MM-DD_HHMMSS.csv  ← every run (dated file is add-only; pre-close runs archive only)
   data/snapshots/current.csv / previous.csv     ← convenience pointers only
   data/snapshots/manifest.json                  ← runs[].scrape_ts_utc = export time
 
@@ -121,26 +121,37 @@ def save_dated_snapshot(
     raw_path = SNAPSHOT_DIR / f"{date_str}.raw.csv"
     path = SNAPSHOT_DIR / f"{date_str}.csv"
 
-    # Preserve any existing same-day files before overwrite
-    archived_norm = _archive_if_exists(path, stamp)
-    archived_raw = _archive_if_exists(raw_path, stamp)
-    if archived_norm:
-        print(f"[finviz_fetch] archived prior {path.name} → {archived_norm.name}")
-    if archived_raw:
-        print(f"[finviz_fetch] archived prior {raw_path.name} → {archived_raw.name}")
+    # Add-only dated files. data/<date>.csv / .raw.csv are written at most once
+    # and never overwritten (point-in-time rule: first-committed version counts).
+    # A run before the 16:00 ET close of <date> holds the PRIOR session's close,
+    # so it never creates the dated file; it goes to archive only. That way the
+    # dated file is D's close in normal operation (first post-close run wins).
+    close_dt = datetime.fromisoformat(date_str).replace(
+        hour=16, tzinfo=ZoneInfo(tz))
+    pre_close = now < close_dt
+    exists = path.exists() or raw_path.exists()
+    write_dated = not exists and not pre_close
 
-    raw_path.write_bytes(content)
-    df = pd.read_csv(raw_path, low_memory=False)
+    scrape_ts = datetime.now(ZoneInfo("UTC")).isoformat(timespec="seconds")
+    run_archive = ARCHIVE_DIR / f"{date_str}_{stamp}.csv"
+    run_archive_raw = ARCHIVE_DIR / f"{date_str}_{stamp}.raw.csv"
+    run_archive_raw.write_bytes(content)
+    df = pd.read_csv(run_archive_raw, low_memory=False)
     # Explicit export time (UTC ISO) on every row; normalize_frame puts
     # News URL, scrape_ts, Open (TAIL) at the END of the column list.
-    scrape_ts = datetime.now(ZoneInfo("UTC")).isoformat(timespec="seconds")
     df["scrape_ts"] = scrape_ts
     norm = normalize_frame(df)
-    norm.to_csv(path, index=False)
+    norm.to_csv(run_archive, index=False)
 
-    # Also keep a uniquely named copy in archive for this run (immutable history)
-    run_archive = ARCHIVE_DIR / f"{date_str}_{stamp}.csv"
-    shutil.copy2(path, run_archive)
+    if write_dated:
+        shutil.copy2(run_archive_raw, raw_path)
+        shutil.copy2(run_archive, path)
+    elif exists:
+        print(f"[finviz_fetch] {date_str} already saved; not overwriting. "
+              f"This run kept as archive/{run_archive.name}")
+    else:
+        print(f"[finviz_fetch] run is before {date_str} 16:00 ET close; dated "
+              f"file not written. This run kept as archive/{run_archive.name}")
 
     current = SNAPSHOT_DIR / "current.csv"
     previous = SNAPSHOT_DIR / "previous.csv"
@@ -150,25 +161,28 @@ def save_dated_snapshot(
         if previous.exists():
             previous.unlink()
         shutil.copy2(current, previous)
-    shutil.copy2(path, current)
+    shutil.copy2(run_archive, current)
 
     man = SNAPSHOT_DIR / "manifest.json"
     data = {"dates": [], "files": {}, "runs": []}
     if man.exists():
         data = json.loads(man.read_text())
     dates = data.get("dates", [])
-    if date_str not in dates:
+    if path.exists() and date_str not in dates:
         dates.append(date_str)
         dates.sort()
     data["dates"] = dates
     data["latest"] = dates[-1] if dates else None
-    data.setdefault("files", {})[date_str] = path.name
+    if path.exists():
+        data.setdefault("files", {})[date_str] = path.name
     runs = data.setdefault("runs", [])
     runs.append(
         {
             "date": date_str,
             "stamp": stamp,
-            "canonical": path.name,
+            "canonical": path.name if write_dated else None,
+            "dated_written": write_dated,
+            "pre_close": pre_close,
             "archive": run_archive.name,
             "bytes": len(content),
             "scrape_ts_utc": scrape_ts,
