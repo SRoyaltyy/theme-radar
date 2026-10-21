@@ -2,6 +2,7 @@ name: newroots-nightly
 on:
   schedule: [{cron: '30 23 * * *'}]   # 23:30 UTC, clear of 20:15-21:45
   workflow_dispatch:
+  push: {branches: [newroots-nightly]}   # TEMP: test run on PR branch only; remove before merge
 permissions: {contents: write}
 concurrency: {group: newroots, cancel-in-progress: false}
 jobs:
