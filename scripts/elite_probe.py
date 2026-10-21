@@ -4,7 +4,14 @@ import csv, io, json, os, re, sys
 import requests
 from html import unescape
 
+from urllib.parse import urlparse, parse_qs
 KEY = os.environ.get("FINVIZ_API_KEY", "").strip()
+_full = os.environ.get("FINVIZ_EXPORT", "").strip()
+if not KEY and _full:  # the Elite key lives inside the FINVIZ_EXPORT link, as in finviz_fetch
+    KEY = (parse_qs(urlparse(_full).query).get("auth") or [""])[0].strip()
+if KEY:
+    print(f"::add-mask::{KEY}", flush=True)
+print("key source:", "FINVIZ_API_KEY" if os.environ.get("FINVIZ_API_KEY", "").strip() else "auth= in FINVIZ_EXPORT", "| present:", bool(KEY))
 if not KEY:
     sys.exit("FINVIZ_API_KEY missing")
 BASE = "https://elite.finviz.com"
