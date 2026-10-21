@@ -24,10 +24,14 @@ for t in ['QQQ','IWM']:
 # Wikimedia: last 7 days per article, summing redirect (old) titles
 p=f'{B}/wiki_pageviews.csv'
 if not os.path.exists(p):
-  m=list(csv.DictReader(open('data/newroots/ticker_wiki_map.csv')));e=(D.datetime.now(D.UTC)-D.timedelta(days=1)).strftime('%Y%m%d');s=(D.datetime.now(D.UTC)-D.timedelta(days=8)).strftime('%Y%m%d');rows=[];bad=0
+  m=list(csv.DictReader(open('data/newroots/ticker_wiki_map.csv')));e=(D.datetime.now(D.UTC)-D.timedelta(days=1)).strftime('%Y%m%d');s=(D.datetime.now(D.UTC)-D.timedelta(days=8)).strftime('%Y%m%d');rows=[];bad=0;wbad={}
   for x in m:
     t=html.unescape(x['resolved_title']);tot={}
-    rd=requests.get('https://en.wikipedia.org/w/api.php',params={'action':'query','list':'backlinks','bltitle':t,'blfilterredir':'redirects','bllimit':50,'blnamespace':0,'format':'json'},headers=UA,timeout=30).json().get('query',{}).get('backlinks',[])
+    try:
+      q=requests.get('https://en.wikipedia.org/w/api.php',params={'action':'query','list':'backlinks','bltitle':t,'blfilterredir':'redirects','bllimit':50,'blnamespace':0,'format':'json'},headers=UA,timeout=30)
+      rd=q.json().get('query',{}).get('backlinks',[])
+    except Exception: rd=[];wbad[q.status_code if 'q' in dir() else 'ERR']=wbad.get(q.status_code,0)+1
+    time.sleep(0.1)
     for ti in [t]+[b['title'] for b in rd]:
       r=requests.get('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/'+u.quote(ti.replace(' ','_'),safe='')+f'/daily/{s}/{e}',headers=UA,timeout=30)
       if r.status_code==200:
@@ -35,6 +39,6 @@ if not os.path.exists(p):
       elif ti==t: bad+=1
     rows+=[[x['ticker'],t,k,v,len(rd)] for k,v in sorted(tot.items())]
   w=csv.writer(open(p,'w'));w.writerow(['ticker','title','date_utc','views_incl_redirects','n_redirects']);w.writerows(rows)
-  LOG.append(['wiki_pageviews.csv','OK',f'fail_titles={bad}',len(rows)])
+  LOG.append(['wiki_pageviews.csv','OK',f'fail_titles={bad} backlink_fail={wbad}',len(rows)])
 w=csv.writer(open(f'{B}/run_log_{D.datetime.now(D.UTC).strftime("%H%M%S")}.csv','w'));w.writerow(['file','status','http','bytes']);w.writerows(LOG)
 for l in LOG: print(*l)
