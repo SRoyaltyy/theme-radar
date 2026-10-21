@@ -1,0 +1,44 @@
+name: Finviz Ratings Nightly (add-only)
+
+on:
+  schedule:
+    # Same DST-safe pairing as finviz_daily; the script's gate runs only once
+    # it is >= 16:30 ET and today's file is not in yet:
+    #   20:45 UTC = 16:45 EDT (summer) | 21:45 UTC = 16:45 EST (winter)
+    - cron: "45 20 * * 1-5"
+    - cron: "45 21 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finviz-ratings
+  cancel-in-progress: false
+
+jobs:
+  ratings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests pandas
+      - name: Verify past history unchanged (hash manifest)
+        run: python scripts/check_history_hashes.py verify
+      - name: Save analyst ratings (top N by dollar volume, ~1.5s/request, 45 min deadline)
+        id: save
+        timeout-minutes: 50
+        env:
+          FINVIZ_EXPORT: ${{ secrets.FINVIZ_EXPORT }}
+          FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
+        run: python scripts/finviz_ratings.py --event "${{ github.event_name }}" --n 1000 --sleep 1.5 --deadline-min 45
+      - name: Commit (add-only, hashes recorded)
+        if: steps.save.outputs.saved == 'true'
+        run: |
+          git config user.name "Theme-Radar-Bot"
+          git config user.email "bot@users.noreply.github.com"
+          bash scripts/commit_with_history.sh "auto: finviz ratings ${{ steps.save.outputs.et_date }}" \
+            "${{ steps.save.outputs.et_date }}" data/finviz_extras/ratings/ data/finviz_extras/status/
