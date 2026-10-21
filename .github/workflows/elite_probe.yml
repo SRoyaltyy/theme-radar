@@ -9,7 +9,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,11 +24,13 @@ jobs:
           python scripts/elite_probe.py
       - name: Probe FRED credit/stress CSVs
         if: always()
+        continue-on-error: true
+        timeout-minutes: 4
         run: |
           mkdir -p probe_out/fred
           for X in BAMLH0A0HYM2 BAMLC0A0CM BAMLH0A3HYC STLFSI4; do
             f=probe_out/fred/$X.csv
-            meta=$(curl -sS -L --http1.1 --retry 3 --retry-all-errors -A "Mozilla/5.0 theme-radar" --max-time 60 -o "$f" -w '%{http_code} %{content_type}' "https://fred.stlouisfed.org/graph/fredgraph.csv?id=$X" || echo "curl_fail -")
+            meta=$(curl -sS -L --http1.1 --retry 1 --connect-timeout 10 -A "Mozilla/5.0 theme-radar" --max-time 25 -o "$f" -w '%{http_code} %{content_type}' "https://fred.stlouisfed.org/graph/fredgraph.csv?id=$X" || echo "curl_fail -")
             lines=$(wc -l < "$f" 2>/dev/null || echo 0)
             first=$(head -1 "$f" 2>/dev/null | cut -c1-200)
             last=$(grep -E '^[0-9]{4}-' "$f" 2>/dev/null | grep -vE ',\.?$' | tail -1)
