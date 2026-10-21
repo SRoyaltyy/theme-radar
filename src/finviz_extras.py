@@ -96,7 +96,7 @@ def _dest(sub: str, name: str, stamp: str) -> Path:
     return p
 
 
-PAGE_CAPS = (20, 50, 100, 200, 500, 1000)  # page sizes that suggest a truncated export
+PAGE_CAPS = (100, 200, 500, 1000)  # page sizes that suggest a truncated export
 MAX_PAGES = 60
 SIGNAL_BUDGET_S = 5 * 60  # keep the whole step under the 8-minute limit
 
@@ -123,7 +123,8 @@ def _paged_signal(s: str, key: str, deadline: float) -> tuple[list[str], int, bo
                 return list(seen), pages, True, ""
             cap = len(page)
         elif not new:
-            return list(seen), pages, False, "paging ignored: page repeated earlier tickers"
+            # export ignores &r=; fall back to splitting the signal by exchange
+            return _partitioned(s, key, seen, pages, cap)
         if len(page) < cap:
             return list(seen), pages, True, ""
         if pages >= MAX_PAGES:
@@ -132,6 +133,24 @@ def _paged_signal(s: str, key: str, deadline: float) -> tuple[list[str], int, bo
             return list(seen), pages, False, "stopped: time budget"
         offset += len(page)
 
+
+PARTITIONS = ["exch_nasd", "exch_nyse", "exch_amex"]
+
+
+def _partitioned(s: str, key: str, seen: dict, pages: int, cap: int):
+    """Union of the signal split by exchange. complete only if every slice is under cap."""
+    complete = True
+    for f in PARTITIONS:
+        time.sleep(PAUSE_S)
+        hdr, rows = _rows(_get("export.ashx", {"v": "111", "s": s, "f": f, "c": "1", "auth": key}))
+        pages += 1
+        ti = hdr.index("Ticker") if "Ticker" in hdr else 0
+        page = [r[ti] for r in rows if len(r) > ti and r[ti]]
+        for t in page:
+            seen.setdefault(t, None)
+        if len(page) >= cap:
+            complete = False
+    return list(seen), pages, complete, "r= ignored; split by exchange" + ("" if complete else ", a slice still hit cap")
 
 def run(date_str: str, probe: bool = False) -> dict:
     stamp = datetime.now(ZoneInfo("America/New_York")).strftime("%H%M%S")
