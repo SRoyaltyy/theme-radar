@@ -39,7 +39,7 @@ PAUSE_S = float(os.environ.get("FINVIZ_EXTRAS_PAUSE", "1.5"))  # rate limit
 
 # Column ids beyond the 0-70 core export. Unknown ids are ignored by Finviz;
 # we keep whatever comes back and record the headers in status.
-EXTRA_COLS = ",".join(["1"] + [str(i) for i in range(71, 161)])
+EXTRA_COLS = ",".join(["1"] + [str(i) for i in range(71, 401)])
 
 # Signal codes as published by Finviz (robots.txt allow-list / screener UI).
 SIGNALS = [
