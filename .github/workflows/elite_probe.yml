@@ -1,0 +1,30 @@
+name: Elite Probe (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Probe Elite endpoints (key masked, nothing committed)
+        env:
+          FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
+        run: |
+          echo "::add-mask::$FINVIZ_API_KEY"
+          python scripts/elite_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: elite-probe
+          path: probe_out/
+          retention-days: 14
