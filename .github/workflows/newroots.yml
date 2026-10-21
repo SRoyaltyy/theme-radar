@@ -1,0 +1,26 @@
+name: newroots-nightly
+on:
+  schedule: [{cron: '30 23 * * *'}]   # 23:30 UTC, clear of 20:15-21:45
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: newroots, cancel-in-progress: false}
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install requests
+      - run: python data/newroots/fetch.py
+      - run: |
+          git config user.name newroots-bot; git config user.email newroots-bot@users.noreply.github.com
+          git add data/newroots/
+          git diff --cached --quiet && exit 0
+          git commit -m "newroots $(date -u +%F)"
+          BR="${GITHUB_REF_NAME}"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin "$BR" && git push origin "HEAD:$BR" && exit 0
+            sleep $((i*10))
+          done
+          exit 1
