@@ -1,0 +1,24 @@
+name: Finviz Extras Probe (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Probe (fetches, prints headers/counts, writes and commits nothing)
+        env:
+          FINVIZ_EXPORT: ${{ secrets.FINVIZ_EXPORT }}
+          FINVIZ_EXPORT_URL: ${{ secrets.FINVIZ_EXPORT_URL }}
+          FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
+        run: python -m src.finviz_extras --probe
