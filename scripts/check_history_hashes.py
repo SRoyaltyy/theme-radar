@@ -67,7 +67,9 @@ RESTATE_LOG_REL = "data/snapshots/RESTATEMENTS.log"
 SNAP_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})(\.raw)?\.csv$")
 DATED_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})[._]")
 DATED_DIRS = ("data/features", "data/scores", "data/composite", "data/universe",
-              "data/attribution/by_horizon")
+              "data/attribution/by_horizon",
+              "data/finviz_extras/fields", "data/finviz_extras/signals",
+              "data/finviz_extras/groups", "data/finviz_extras/status")
 DAILY_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(scan|universe|composite_rank)\.md$")
 
 sys.path.insert(0, str(ROOT))

@@ -19,7 +19,7 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -46,6 +46,16 @@ jobs:
           FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
         run: python -m src.finviz_fetch
 
+      - name: Save Finviz no-history extras (AH, signals, groups; fail-soft)
+        if: steps.gate.outputs.trading == 'true'
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          FINVIZ_EXPORT: ${{ secrets.FINVIZ_EXPORT }}
+          FINVIZ_EXPORT_URL: ${{ secrets.FINVIZ_EXPORT_URL }}
+          FINVIZ_API_KEY: ${{ secrets.FINVIZ_API_KEY }}
+        run: python -m src.finviz_extras --date "${{ steps.gate.outputs.et_date }}"
+
       - name: Record hashes for new dated files
         if: steps.gate.outputs.trading == 'true'
         run: python scripts/check_history_hashes.py add-new --today "${{ steps.gate.outputs.et_date }}"
@@ -55,7 +65,7 @@ jobs:
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/snapshots/
+          git add data/snapshots/ data/finviz_extras/
           git commit -m "auto: finviz snapshot ${{ steps.gate.outputs.et_date }}" || echo "No changes"
           git pull --rebase origin main || true
           git push origin main
