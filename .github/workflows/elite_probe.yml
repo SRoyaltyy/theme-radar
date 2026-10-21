@@ -22,6 +22,18 @@ jobs:
         run: |
           echo "::add-mask::$FINVIZ_API_KEY"
           python scripts/elite_probe.py
+      - name: Probe FRED credit/stress CSVs
+        if: always()
+        run: |
+          mkdir -p probe_out/fred
+          for X in BAMLH0A0HYM2 BAMLC0A0CM BAMLH0A3HYC STLFSI4; do
+            f=probe_out/fred/$X.csv
+            meta=$(curl -sS -L -A "Mozilla/5.0 theme-radar" --max-time 60 -o "$f" -w '%{http_code} %{content_type}' "https://fred.stlouisfed.org/graph/fredgraph.csv?id=$X" || echo "curl_fail -")
+            lines=$(wc -l < "$f" 2>/dev/null || echo 0)
+            first=$(head -1 "$f" 2>/dev/null | cut -c1-200)
+            last=$(grep -E '^[0-9]{4}-' "$f" 2>/dev/null | grep -vE ',\.?$' | tail -1)
+            echo "FRED $X | status+type: $meta | lines: $lines | first: $first | last: $last" | tee -a probe_out/fred/summary.txt
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
