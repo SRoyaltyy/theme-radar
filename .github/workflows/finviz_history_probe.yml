@@ -1,0 +1,47 @@
+name: finviz-history-probe
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe
+        env: {T: "${{ secrets.FINVIZ_EXPORT }}"}
+        run: |
+          pip -q install requests
+          python - <<'PY'
+          import os,re,json,requests
+          tok=os.environ["T"];H={"User-Agent":"Mozilla/5.0"};out={}
+          D=[(r"\b(\d{4}-\d{2}-\d{2})\b","%Y-%m-%d"),(r"\b([A-Z][a-z]{2}-\d{2}-\d{2})\b","%b-%d-%y"),(r"\b(\d{1,2}/\d{1,2}/\d{4})\b","%m/%d/%Y"),(r"\b([A-Z][a-z]{2} \d{1,2} '?\d{2,4})\b",None)]
+          from datetime import datetime
+          def dates(s):
+            got=[]
+            for p,f in D:
+              for m in re.findall(p,s):
+                try: got.append(datetime.strptime(m,f).date().isoformat() if f else m)
+                except: pass
+            iso=sorted(x for x in got if re.match(r"\d{4}-",x))
+            return {"n":len(got),"min":iso[0] if iso else None,"max":iso[-1] if iso else None}
+          def get(u):
+            try:
+              r=requests.get(u+("&" if "?" in u else "?")+"auth="+tok,headers=H,timeout=40);return r.status_code,r.text
+            except Exception as e: return -1,type(e).__name__
+          def sect(h,a,b):
+            i=h.find(a)
+            return h[i:i+b] if i>=0 else ""
+          for t in ["AAPL","CELH","PLTR","SOFI","KOD"]:
+            d={};st,h=get(f"https://elite.finviz.com/quote.ashx?t={t}")
+            d["quote_status"]=st;d["logged_in_hint"]=("Elite" in h and "logout" in h.lower())
+            for k,a in [("ratings","js-table-ratings"),("news","news-table"),("insider","insider")]:
+              s=sect(h,a,400000);d[k]=dates(s) if s else "section_not_found"
+            d["chart_series_keys"]=sorted(set(re.findall(r'"(short[A-Za-z]*|eps[A-Za-z]*|pe[A-Z][A-Za-z]*|revenue[A-Za-z]*|fundamental[A-Za-z]*)"',h)))[:40]
+            for ty,u in [("IA",f"https://elite.finviz.com/api/statement.ashx?t={t}&so=F&s=IA"),("IQ",f"https://elite.finviz.com/api/statement.ashx?t={t}&so=F&s=IQ"),("page",f"https://elite.finviz.com/quote.ashx?t={t}&ty=fi")]:
+              st2,h2=get(u)
+              keys=sorted(set(re.findall(r'"([A-Za-z ]{3,30})"\s*:',h2)))[:60]
+              d["stmt_"+ty]={"status":st2,"len":len(h2),"dates":dates(h2),"report_date_hint":bool(re.search(r"(?i)report(ed)? ?date|filing ?date|filed",h2)),"restat_hint":bool(re.search(r"(?i)restat|as originally|preliminary",h2)),"keys":keys,"head":re.sub(r"\s+"," ",h2[:300]).replace(tok,"***")}
+            out[t]=d
+          s=json.dumps(out,indent=1).replace(tok,"***");open("probe.json","w").write(s)
+          print("done",len(s))
+          PY
+      - uses: actions/upload-artifact@v4
+        with: {name: probe, path: probe.json}
