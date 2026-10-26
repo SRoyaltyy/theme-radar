@@ -1,518 +1,29 @@
 {
-  "asof": "2026-10-23",
+  "asof": "2026-10-26",
   "snapshot_landed": true,
-  "scores_landed": true,
-  "feature_date_T": "2026-10-22",
-  "entry_morning_T1": "2026-10-23",
+  "scores_landed": false,
+  "feature_date_T": "2026-10-23",
+  "entry_morning_T1": "2026-10-26",
   "new_fires": {
-    "fpe_delta_t3_earn_today_3d": [
-      "ALV",
-      "ARGX",
-      "AXP",
-      "BAH",
-      "BBD",
-      "CIVB",
-      "CMCSA",
-      "DGX",
-      "DOV",
-      "DOW",
-      "FBP",
-      "HBAN",
-      "HON",
-      "INFY",
-      "KRC",
-      "PG",
-      "PHM",
-      "R",
-      "SBFG",
-      "SPOT",
-      "UNP"
-    ],
+    "fpe_delta_t3_earn_today_3d": [],
     "fresh_dcp_t1_ep_ge03_2d": [
-      "APLD",
-      "CEG",
-      "CRWV",
-      "D",
-      "INIO",
-      "VRT"
+      "BE",
+      "CRDO",
+      "FIX",
+      "PRFX"
     ],
     "fresh_dcp_t1_avoid_ah_3d": [
-      "APLD",
-      "CEG",
-      "CRWV",
-      "INIO"
+      "CRDO",
+      "FIX",
+      "P",
+      "PRFX"
     ]
   },
-  "newly_scored_count": 58,
-  "newly_scored": [
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "ALLY",
-      "short_ret": -0.0287068738477747,
-      "short_ret_fee_borrow": -0.033206873847774696,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "ALV",
-      "short_ret": 0.0225877940675075,
-      "short_ret_fee_borrow": 0.0180877940675075,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "ARGX",
-      "short_ret": -0.0045876833923561,
-      "short_ret_fee_borrow": -0.0090876833923561,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "AXP",
-      "short_ret": 0.0160834328076897,
-      "short_ret_fee_borrow": 0.011583432807689701,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "BAH",
-      "short_ret": -0.0446845404828597,
-      "short_ret_fee_borrow": -0.049184540482859695,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "BKU",
-      "short_ret": -0.0295368620037808,
-      "short_ret_fee_borrow": -0.034036862003780796,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "CCK",
-      "short_ret": -0.0273276692651309,
-      "short_ret_fee_borrow": -0.0318276692651309,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "CIVB",
-      "short_ret": -0.0512820512820513,
-      "short_ret_fee_borrow": -0.0557820512820513,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "CMCSA",
-      "short_ret": -0.014758497316637,
-      "short_ret_fee_borrow": -0.019258497316637,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "CME",
-      "short_ret": -0.0352172293522061,
-      "short_ret_fee_borrow": -0.0397172293522061,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "COF",
-      "short_ret": 0.0010914864060329,
-      "short_ret_fee_borrow": -0.0034085135939670996,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "DGX",
-      "short_ret": -0.0201163967611335,
-      "short_ret_fee_borrow": -0.024616396761133502,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "DOV",
-      "short_ret": -0.010449426803287,
-      "short_ret_fee_borrow": -0.014949426803287001,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "DOW",
-      "short_ret": -0.0625610948191592,
-      "short_ret_fee_borrow": -0.0670610948191592,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "EGP",
-      "short_ret": 0.0110807453416148,
-      "short_ret_fee_borrow": 0.0065807453416148005,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "EWBC",
-      "short_ret": -0.0227644811725264,
-      "short_ret_fee_borrow": -0.0272644811725264,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "FAF",
-      "short_ret": 0.0232417748264414,
-      "short_ret_fee_borrow": 0.0187417748264414,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "FBP",
-      "short_ret": 0.0058013052936909,
-      "short_ret_fee_borrow": 0.0013013052936909006,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "FCCO",
-      "short_ret": -0.0150260656240417,
-      "short_ret_fee_borrow": -0.0195260656240417,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "FITB",
-      "short_ret": -0.0108757870635374,
-      "short_ret_fee_borrow": -0.0153757870635374,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "GE",
-      "short_ret": 0.0474538966885651,
-      "short_ret_fee_borrow": 0.042953896688565106,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "GSBC",
-      "short_ret": -0.0297747805064259,
-      "short_ret_fee_borrow": -0.0342747805064259,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "HAL",
-      "short_ret": -0.0395951175945221,
-      "short_ret_fee_borrow": -0.044095117594522094,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "HBAN",
-      "short_ret": -0.0122265122265123,
-      "short_ret_fee_borrow": -0.0167265122265123,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "HON",
-      "short_ret": -0.036705419088693,
-      "short_ret_fee_borrow": -0.041205419088693,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "HWC",
-      "short_ret": 0.0083636854175096,
-      "short_ret_fee_borrow": 0.003863685417509601,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "IBM",
-      "short_ret": -0.0481150793650795,
-      "short_ret_fee_borrow": -0.052615079365079497,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "INFY",
-      "short_ret": 0.0244865718799368,
-      "short_ret_fee_borrow": 0.0199865718799368,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "ISRG",
-      "short_ret": -0.0326255707762557,
-      "short_ret_fee_borrow": -0.037125570776255695,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "KEY",
-      "short_ret": -0.0129745314752522,
-      "short_ret_fee_borrow": -0.0174745314752522,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "KRC",
-      "short_ret": -0.0703618609994256,
-      "short_ret_fee_borrow": -0.0748618609994256,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "LMT",
-      "short_ret": -0.1010916513276591,
-      "short_ret_fee_borrow": -0.1055916513276591,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "MEDP",
-      "short_ret": -0.0751409797085618,
-      "short_ret_fee_borrow": -0.07964097970856181,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "MOH",
-      "short_ret": 0.0481066812306572,
-      "short_ret_fee_borrow": 0.0436066812306572,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "MSCI",
-      "short_ret": -0.0404434754685729,
-      "short_ret_fee_borrow": -0.0449434754685729,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "NEM",
-      "short_ret": 0.0679736323944867,
-      "short_ret_fee_borrow": 0.0634736323944867,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "NOC",
-      "short_ret": -0.0326591760299626,
-      "short_ret_fee_borrow": -0.0371591760299626,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "NTRS",
-      "short_ret": -0.014990328820116,
-      "short_ret_fee_borrow": -0.019490328820116,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "OFG",
-      "short_ret": 0.031728045325779,
-      "short_ret_fee_borrow": 0.027228045325778997,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "OII",
-      "short_ret": 0.1089176310415247,
-      "short_ret_fee_borrow": 0.1044176310415247,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "ONB",
-      "short_ret": 0.0007892659826361,
-      "short_ret_fee_borrow": -0.0037107340173638996,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "PG",
-      "short_ret": -0.0106703489831785,
-      "short_ret_fee_borrow": -0.0151703489831785,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "PHM",
-      "short_ret": -0.0581507028726098,
-      "short_ret_fee_borrow": -0.0626507028726098,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "PINE",
-      "short_ret": 0.0870056497175141,
-      "short_ret_fee_borrow": 0.08250564971751409,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "PKG",
-      "short_ret": -0.0350326469110999,
-      "short_ret_fee_borrow": -0.039532646911099895,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "PNFP",
-      "short_ret": -0.0531010599223422,
-      "short_ret_fee_borrow": -0.0576010599223422,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "SAP",
-      "short_ret": -0.0400034937549131,
-      "short_ret_fee_borrow": -0.044503493754913095,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "SON",
-      "short_ret": 0.0139681290576431,
-      "short_ret_fee_borrow": 0.0094681290576431,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "SYF",
-      "short_ret": -0.0038167938931297,
-      "short_ret_fee_borrow": -0.0083167938931297,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "T",
-      "short_ret": 0.1063193851409053,
-      "short_ret_fee_borrow": 0.1018193851409053,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "UNP",
-      "short_ret": -0.018288654775564,
-      "short_ret_fee_borrow": -0.022788654775564,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "WFRD",
-      "short_ret": -0.0946559112679605,
-      "short_ret_fee_borrow": -0.0991559112679605,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "WH",
-      "short_ret": 0.0637362637362636,
-      "short_ret_fee_borrow": 0.059236263736263596,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "WRB",
-      "short_ret": -0.0024606971975391,
-      "short_ret_fee_borrow": -0.0069606971975391,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fpe_delta_t3_earn_today_3d",
-      "date": "2026-10-20",
-      "ticker": "ZION",
-      "short_ret": -0.0249264592042111,
-      "short_ret_fee_borrow": -0.0294264592042111,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fresh_dcp_t1_avoid_ah_3d",
-      "date": "2026-10-20",
-      "ticker": "KOPN",
-      "short_ret": 0.0145772594752187,
-      "short_ret_fee_borrow": 0.0100772594752187,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fresh_dcp_t1_ep_ge03_2d",
-      "date": "2026-10-21",
-      "ticker": "AIBZ",
-      "short_ret": 0.1536144578313252,
-      "short_ret_fee_borrow": 0.1491144578313252,
-      "exit_date": "2026-10-23"
-    },
-    {
-      "cell": "fresh_dcp_t1_ep_ge03_2d",
-      "date": "2026-10-21",
-      "ticker": "FRTT",
-      "short_ret": 0.1038961038961039,
-      "short_ret_fee_borrow": 0.0993961038961039,
-      "exit_date": "2026-10-23"
-    }
-  ],
+  "newly_scored_count": 0,
+  "newly_scored": [],
   "letters_path": "/workspace/stale-news-rejoin/shadow_log/letters/letters_2026-10-05.csv",
   "letter_fails": [],
-  "generated_at_hkt": "2026-10-24 06:03:38 HKT",
+  "generated_at_hkt": "2026-10-27 06:07:46 HKT",
   "milestone_triggered": [],
   "quiet_day": false,
   "notes": [
@@ -538,7 +49,9 @@
     "2026-10-20: rows appended from plan_2026-10-20.csv via plan_build.py --append-log (57); newly_scored=54; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
     "2026-10-21: rows appended from plan_2026-10-21.csv via plan_build.py --append-log (53); newly_scored=60; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
     "2026-10-22: rows appended from plan_2026-10-22.csv via plan_build.py --append-log (44); newly_scored=60; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
-    "2026-10-23: rows appended from plan_2026-10-23.csv via plan_build.py --append-log (31); newly_scored=58; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only."
+    "2026-10-23: rows appended from plan_2026-10-23.csv via plan_build.py --append-log (31); newly_scored=58; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
+    "2026-10-26: rows appended from plan_2026-10-26.csv via plan_build.py --append-log (8); newly_scored=0; labels from theme-radar repo data/labels; milestones judged from scorecard LOCKED/CLEAN only.",
+    "2026-10-26: theme-radar score+features+labels for 2026-10-26 had not landed by 22:10 UTC (no daily workflow run yet), so holds closing 2026-10-26 were left blank and will be scored on a later run; no zero-fill."
   ],
   "paths_written": [
     "/workspace/stale-news-rejoin/shadow_log/log.csv",
@@ -718,13 +231,13 @@
       "2026-10-05": 21
     }
   },
-  "new_fires_source": "plans/plan_2026-10-23.csv (committed 8644803 at 05:56 ET, before 09:30 ET)",
+  "new_fires_source": "plans/plan_2026-10-26.csv (committed 81229bd at 05:55 ET, before 09:30 ET)",
   "scorecard_bar_primary": "Cyrus's bar (primary): win rate > 55% over >= 30 closed trades, after-fee+borrow mean shown (and called out if <= 0). LOCKED or CLEAN rows only; MIXED never counts.",
   "scorecard_bar_extra": "Stricter extra check: closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. LOCKED or CLEAN rows only; MIXED never counts.",
   "scorecard_verdicts": {
     "note": "From shadow_log_lock.py scorecard (LOCKED / CLEAN only count; MIXED is context). cyrus_bar is the primary verdict; extra_check is the stricter 60/12 bar. Returns are short_ret_fee_borrow. Supersedes seen_designed_after.*.verdict, which is computed on mixed history.",
-    "log_sha256": "ace12acf49845a89951e6e9ee3c0720764f43db82606f77d77b7391815990989",
-    "log_rows": 750,
+    "log_sha256": "5234c2375a8e50a40eadaad740f93bc0d384641c5ecc7077690dc6a4a62b86b4",
+    "log_rows": 758,
     "lock_check": "PASS",
     "cells": {
       "fpe_delta_t3_earn_today_3d": {
@@ -785,7 +298,7 @@
         "LOCKED": {
           "closed_n": 30,
           "distinct_dates": 10,
-          "open": 9,
+          "open": 13,
           "win_fee_borrow": 0.8666666666666667,
           "mean_fee_borrow": 0.06073897164489786,
           "counts_toward_bar": true,
@@ -811,7 +324,7 @@
         "CLEAN+LOCKED": {
           "closed_n": 42,
           "distinct_dates": 15,
-          "open": 9,
+          "open": 13,
           "win_fee_borrow": 0.7857142857142857,
           "mean_fee_borrow": 0.04591809052485903,
           "counts_toward_bar": true,
@@ -824,7 +337,7 @@
         "MIXED": {
           "closed_n": 59,
           "distinct_dates": 23,
-          "open": 9,
+          "open": 13,
           "win_fee_borrow": 0.7796610169491526,
           "mean_fee_borrow": 0.047747773203784344,
           "counts_toward_bar": false,
@@ -839,7 +352,7 @@
         "LOCKED": {
           "closed_n": 24,
           "distinct_dates": 10,
-          "open": 13,
+          "open": 17,
           "win_fee_borrow": 0.8333333333333334,
           "mean_fee_borrow": 0.07326424478589792,
           "counts_toward_bar": true,
@@ -865,7 +378,7 @@
         "CLEAN+LOCKED": {
           "closed_n": 37,
           "distinct_dates": 14,
-          "open": 13,
+          "open": 17,
           "win_fee_borrow": 0.7027027027027027,
           "mean_fee_borrow": 0.046156864542041036,
           "counts_toward_bar": true,
@@ -878,7 +391,7 @@
         "MIXED": {
           "closed_n": 59,
           "distinct_dates": 23,
-          "open": 13,
+          "open": 17,
           "win_fee_borrow": 0.7457627118644068,
           "mean_fee_borrow": 0.047091188631968144,
           "counts_toward_bar": false,
