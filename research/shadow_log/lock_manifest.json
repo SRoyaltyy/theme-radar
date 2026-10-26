@@ -6295,6 +6295,19 @@
         "plans": 0,
         "log_rows": 58
       }
+    },
+    {
+      "at_utc": "2026-10-26T09:55:36Z",
+      "plan_pins": [
+        "plan_2026-10-26.csv"
+      ],
+      "first_seals": {
+        "plans": 1,
+        "log_rows": 0,
+        "plan_dates": [
+          "2026-10-26"
+        ]
+      }
     }
   ],
   "plans": {
@@ -6393,6 +6406,13 @@
       "sha256": "b59f5679466637cf761d37770d85b353775de6d2e335a7465d80b24db03abbff",
       "pinned_at_utc": "2026-10-23T09:56:54Z",
       "rows": 31,
+      "status": "fires",
+      "pinned_before_open": true
+    },
+    "plan_2026-10-26.csv": {
+      "sha256": "cbede3eabba0eff36300c931a9219a79a6e4b21c571dcc918de844add76dc3fd",
+      "pinned_at_utc": "2026-10-26T09:55:36Z",
+      "rows": 8,
       "status": "fires",
       "pinned_before_open": true
     }
@@ -13265,6 +13285,116 @@
               "3",
               "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
               "preopen_plan_2026-10-23"
+            ]
+          }
+        }
+      },
+      "2026-10-26": {
+        "entry": "2026-10-26",
+        "file": "plans/plan_2026-10-26.csv",
+        "file_sha256": "cbede3eabba0eff36300c931a9219a79a6e4b21c571dcc918de844add76dc3fd",
+        "sealed_at_utc": "2026-10-26T09:55:36Z",
+        "preopen": true,
+        "status_lines": [
+          "# status=fires rows=8 fpe_delta_t3_earn_today_3d=0 fresh_dcp_t1_ep_ge03_2d=4 fresh_dcp_t1_avoid_ah_3d=4",
+          "# built_at_utc=2026-10-26T09:55:35Z signal_date=2026-10-23 entry_date=2026-10-26 builder_sha256=9e70523ee355d655b125ffd46f8ccd08a25fe762fccfa6ee08c97eb3c5d52840",
+          "# inputs: {\"dcp_candidates\":[\"BE\",\"CRDO\",\"FIX\",\"HON\",\"P\",\"PRFX\",\"SKM\"],\"dcp_prior_snapshot\":\"2026-10-22\",\"earn_gate_n\":0,\"fails\":\"[]\",\"features_T_sha256\":\"a8c7c94559e2a865e753fd7ff18c25ea3cd85ce976d0583ed80f6ff4e9a77405\",\"fpe_prior_snapshot\":\"2026-10-20\",\"fpe_signal_n\":1652,\"letters_log\":\"rows 7 skipped {'2026-10-26': 0} FAILS []\",\"letters_rows\":7,\"letters_sha256\":\"85529b9048d96d71a7c2388b5907be094e56199a55d78f7c3bf3ad50b95ead35\",\"membership\":\"fullscan@d3523789f (committed 2026-10-26T09:44:50Z) sha256=2cafec018941d7b8f688e033da0c1081345e5e75dc4fcd768caac9c2a0fbe398\",\"skipped\":\"{'2026-10-26': 0}\",\"snapshot_T_sha256\":\"8394e7e4812aa3df1d4bf508d983de1a3b33272c28dbb64b26f10da3ea0ac864\",\"snapshots_after_T_ignored\":[],\"tr_head\":\"dec88370e\",\"universe_log\":\"2026-10-26 cand 7 in membership 7 liquid 5 universe 7 excluded []\"}"
+        ],
+        "rows": {
+          "fresh_dcp_t1_ep_ge03_2d|BE": {
+            "sha256": "759c036b8f98bd851750f7ba24195d1d214f28de98d9204c48985b4abb8b860a",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-23",
+              "BE",
+              "2026-10-26",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|CRDO": {
+            "sha256": "2dfa260b7e33a274438829b1449c8eff2d6b6cd1ddf82dd7fce0d1ffd0b9f1f6",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-23",
+              "CRDO",
+              "2026-10-26",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|FIX": {
+            "sha256": "25c72ca32fe9e4da437e045caf7fbce5b52f042425df7c611595dfbd7d06e6b1",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-23",
+              "FIX",
+              "2026-10-26",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|PRFX": {
+            "sha256": "942a590d8f069e340499f3459f2d16ee22ecf32c9bb678a2c907e7ed07a8b9c4",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-23",
+              "PRFX",
+              "2026-10-26",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|CRDO": {
+            "sha256": "fcab79d69d5f020c408bcb33c065b8c64458bef0479ff40cffe44d349681e002",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-23",
+              "CRDO",
+              "2026-10-26",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|FIX": {
+            "sha256": "3fb11451f6fe1101e44c136e01ee540c4f3dcf3ecc34c9fd2533c0c1ee368b12",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-23",
+              "FIX",
+              "2026-10-26",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|P": {
+            "sha256": "38096393653c74c1989e3236a430df46e95a026bfba6711d118f5bb37972d836",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-23",
+              "P",
+              "2026-10-26",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-26"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|PRFX": {
+            "sha256": "ce09350345ed955a838748be15d871ab3e591a90d3f654ec92758e5bf9c8cbd5",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-23",
+              "PRFX",
+              "2026-10-26",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-26"
             ]
           }
         }
