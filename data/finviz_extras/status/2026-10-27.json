@@ -1,0 +1,410 @@
+{
+  "date": "2026-10-27",
+  "scrape_ts_utc": "2026-10-27T20:44:38+00:00",
+  "fields": {
+    "status": "ok",
+    "rows": 11775,
+    "headers": [
+      "Ticker",
+      "After-Hours Close",
+      "After-Hours Change",
+      "Book/sh",
+      "Cash/sh",
+      "Dividend",
+      "Employees",
+      "EPS Next Q",
+      "Income",
+      "Index",
+      "Optionable",
+      "Prev Close",
+      "Sales",
+      "Shortable",
+      "Short Interest",
+      "Float %",
+      "Open",
+      "High",
+      "Low",
+      "Trades",
+      "Performance (1 Minute)",
+      "Performance (2 Minutes)",
+      "Performance (3 Minutes)",
+      "Performance (5 Minutes)",
+      "Performance (10 Minutes)",
+      "Performance (15 Minutes)",
+      "Performance (30 Minutes)",
+      "Performance (1 Hour)",
+      "Performance (2 Hours)",
+      "Performance (4 Hours)",
+      "Asset Type",
+      "ETF Type",
+      "Region",
+      "Single Category",
+      "Sector/Theme",
+      "Tags",
+      "Active/Passive",
+      "Net Expense Ratio",
+      "Total Holdings",
+      "Assets Under Management",
+      "Net Asset Value",
+      "Net Asset Value %",
+      "Net Flows (1 Month)",
+      "Net Flows % (1 Month)",
+      "Net Flows (3 Month)",
+      "Net Flows % (3 Month)",
+      "Net Flows (YTD)",
+      "Net Flows % (YTD)",
+      "Net Flows (1 Year)",
+      "Net Flows % (1 Year)",
+      "Return 1 Year",
+      "Return 3 Year",
+      "Return 5 Year",
+      "Return 10 Year",
+      "Return Since Inception",
+      "All-Time High",
+      "All-Time Low",
+      "EPS Surprise",
+      "Revenue Surprise",
+      "Exchange",
+      "Dividend TTM",
+      "Dividend Ex Date",
+      "EPS Year Over Year TTM",
+      "Sales Year Over Year TTM",
+      "52-Week Range",
+      "News Time",
+      "News URL",
+      "News Title",
+      "Performance (3 Years)",
+      "Performance (5 Years)",
+      "Performance (10 Years)",
+      "After-Hours Volume",
+      "EPS Growth Past 3 Years",
+      "Sales Growth Past 3 Years",
+      "Enterprise Value",
+      "EV/EBITDA",
+      "EV/Sales",
+      "Dividend Growth 1 Year",
+      "Dividend Growth 3 Years",
+      "Dividend Growth 5 Years",
+      "Daily Digest",
+      "Security Type",
+      "Tracked Index",
+      "Candlestick"
+    ],
+    "file": "data/finviz_extras/fields/2026-10-27.csv"
+  },
+  "signals": {
+    "ta_topgainers": {
+      "status": "ok",
+      "count": 200,
+      "rows": 200,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "ta_toplosers": {
+      "status": "ok",
+      "count": 133,
+      "rows": 133,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_newhigh": {
+      "status": "ok",
+      "count": 93,
+      "rows": 93,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_newlow": {
+      "status": "ok",
+      "count": 200,
+      "rows": 200,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "ta_mostvolatile": {
+      "status": "ok",
+      "count": 200,
+      "rows": 200,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "ta_mostactive": {
+      "status": "ok",
+      "count": 200,
+      "rows": 200,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "ta_unusualvolume": {
+      "status": "ok",
+      "count": 200,
+      "rows": 200,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "ta_overbought": {
+      "status": "ok",
+      "count": 16,
+      "rows": 16,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_oversold": {
+      "status": "ok",
+      "count": 80,
+      "rows": 80,
+      "pages": 1,
+      "complete": true
+    },
+    "n_upgrades": {
+      "status": "ok",
+      "count": 8,
+      "rows": 8,
+      "pages": 1,
+      "complete": true
+    },
+    "n_downgrades": {
+      "status": "ok",
+      "count": 12,
+      "rows": 12,
+      "pages": 1,
+      "complete": true
+    },
+    "n_earningsbefore": {
+      "status": "ok",
+      "count": 76,
+      "rows": 76,
+      "pages": 1,
+      "complete": true
+    },
+    "n_earningsafter": {
+      "status": "ok",
+      "count": 86,
+      "rows": 86,
+      "pages": 1,
+      "complete": true
+    },
+    "it_latestbuys": {
+      "status": "ok",
+      "count": 100,
+      "rows": 100,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "it_latestsales": {
+      "status": "ok",
+      "count": 100,
+      "rows": 100,
+      "pages": 5,
+      "complete": true,
+      "note": "r= ignored; split by exchange"
+    },
+    "n_majornews": {
+      "status": "ok",
+      "count": 40,
+      "rows": 40,
+      "pages": 1,
+      "complete": true
+    },
+    "f_ssr": {
+      "status": "ok",
+      "count": 511,
+      "rows": 511,
+      "pages": 1,
+      "complete": true
+    },
+    "f_halted": {
+      "status": "ok",
+      "count": 6,
+      "rows": 6,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_tlsupport": {
+      "status": "ok",
+      "count": 96,
+      "rows": 96,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_tlresistance": {
+      "status": "ok",
+      "count": 98,
+      "rows": 98,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_horizontal": {
+      "status": "ok",
+      "count": 97,
+      "rows": 97,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_wedgeup": {
+      "status": "ok",
+      "count": 26,
+      "rows": 26,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_wedge": {
+      "status": "ok",
+      "count": 17,
+      "rows": 17,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_wedgedown": {
+      "status": "ok",
+      "count": 57,
+      "rows": 57,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_wedgeresistance": {
+      "status": "ok",
+      "count": 10,
+      "rows": 10,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_wedgesupport": {
+      "status": "ok",
+      "count": 28,
+      "rows": 28,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_channelup": {
+      "status": "ok",
+      "count": 60,
+      "rows": 60,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_channel": {
+      "status": "ok",
+      "count": 41,
+      "rows": 41,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_channeldown": {
+      "status": "ok",
+      "count": 65,
+      "rows": 65,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_doubletop": {
+      "status": "ok",
+      "count": 86,
+      "rows": 86,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_multipletop": {
+      "status": "ok",
+      "count": 38,
+      "rows": 38,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_doublebottom": {
+      "status": "ok",
+      "count": 78,
+      "rows": 78,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_multiplebottom": {
+      "status": "ok",
+      "count": 43,
+      "rows": 43,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_headandshoulders": {
+      "status": "ok",
+      "count": 25,
+      "rows": 25,
+      "pages": 1,
+      "complete": true
+    },
+    "ta_p_headandshouldersinv": {
+      "status": "ok",
+      "count": 17,
+      "rows": 17,
+      "pages": 1,
+      "complete": true
+    },
+    "ah_unusualvolume": {
+      "status": "missing",
+      "reason": "RuntimeError('returned 11775 of 11775 tickers: signal code likely ignored by Finviz')"
+    },
+    "ah_topgainers": {
+      "status": "missing",
+      "reason": "RuntimeError('returned 11775 of 11775 tickers: signal code likely ignored by Finviz')"
+    },
+    "ah_toplosers": {
+      "status": "missing",
+      "reason": "RuntimeError('returned 11775 of 11775 tickers: signal code likely ignored by Finviz')"
+    }
+  },
+  "groups": {
+    "industry": {
+      "status": "ok",
+      "rows": 144,
+      "headers": [
+        "No.",
+        "Name",
+        "Performance (Week)",
+        "Performance (Month)",
+        "Performance (Quarter)",
+        "Performance (Half Year)",
+        "Performance (Year)",
+        "Performance (Year To Date)",
+        "Average Volume",
+        "Relative Volume",
+        "Change",
+        "Volume"
+      ],
+      "file": "data/finviz_extras/groups/2026-10-27_industry.csv"
+    },
+    "sector": {
+      "status": "ok",
+      "rows": 11,
+      "headers": [
+        "No.",
+        "Name",
+        "Performance (Week)",
+        "Performance (Month)",
+        "Performance (Quarter)",
+        "Performance (Half Year)",
+        "Performance (Year)",
+        "Performance (Year To Date)",
+        "Average Volume",
+        "Relative Volume",
+        "Change",
+        "Volume"
+      ],
+      "file": "data/finviz_extras/groups/2026-10-27_sector.csv"
+    },
+    "theme": {
+      "status": "missing",
+      "reason": "HTTPError('400 Client Error: Bad Request for url: https://elite.finviz.com/grp_export?g=theme&v=140&o=name&auth=f76293ea-ce44-4687-8100-88edfb57d767')"
+    },
+    "subtheme": {
+      "status": "missing",
+      "reason": "HTTPError('400 Client Error: Bad Request for url: https://elite.finviz.com/grp_export?g=subtheme&v=140&o=name&auth=f76293ea-ce44-4687-8100-88edfb57d767')"
+    }
+  },
+  "signals_file": "data/finviz_extras/signals/2026-10-27.csv"
+}
