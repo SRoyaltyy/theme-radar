@@ -6910,6 +6910,19 @@
           "2026-10-28"
         ]
       }
+    },
+    {
+      "at_utc": "2026-10-29T09:28:56Z",
+      "plan_pins": [
+        "plan_2026-10-29.csv"
+      ],
+      "first_seals": {
+        "plans": 1,
+        "log_rows": 0,
+        "plan_dates": [
+          "2026-10-29"
+        ]
+      }
     }
   ],
   "plans": {
@@ -7029,6 +7042,13 @@
       "sha256": "b33e39ed186f739d7b15610dedd95c92905ce18b5e6d0f42d2682846a8117bdd",
       "pinned_at_utc": "2026-10-28T10:27:47Z",
       "rows": 13,
+      "status": "fires",
+      "pinned_before_open": true
+    },
+    "plan_2026-10-29.csv": {
+      "sha256": "ce2907104153553963bf555870957239b604eeccd5729dfd4ef69f8bb84c26d2",
+      "pinned_at_utc": "2026-10-29T09:28:56Z",
+      "rows": 14,
       "status": "fires",
       "pinned_before_open": true
     }
@@ -14363,6 +14383,188 @@
               "3",
               "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
               "preopen_plan_2026-10-28"
+            ]
+          }
+        }
+      },
+      "2026-10-29": {
+        "entry": "2026-10-29",
+        "file": "plans/plan_2026-10-29.csv",
+        "file_sha256": "ce2907104153553963bf555870957239b604eeccd5729dfd4ef69f8bb84c26d2",
+        "sealed_at_utc": "2026-10-29T09:28:56Z",
+        "preopen": true,
+        "status_lines": [
+          "# status=fires rows=14 fpe_delta_t3_earn_today_3d=0 fresh_dcp_t1_ep_ge03_2d=5 fresh_dcp_t1_avoid_ah_3d=9",
+          "# built_at_utc=2026-10-29T09:28:56Z signal_date=2026-10-28 entry_date=2026-10-29 builder_sha256=9e70523ee355d655b125ffd46f8ccd08a25fe762fccfa6ee08c97eb3c5d52840",
+          "# inputs: {\"dcp_candidates\":[\"AIB\",\"CEG\",\"CIFR\",\"CMS\",\"DUK\",\"EROC\",\"ETN\",\"EVRG\",\"FCEL\",\"GE\",\"GNRC\",\"HUT\",\"MWYN\",\"NWE\",\"SO\",\"TPL\",\"VIAV\",\"WTS\",\"WULF\"],\"dcp_prior_snapshot\":\"2026-10-27\",\"earn_gate_n\":0,\"fails\":\"[]\",\"features_T_sha256\":\"da9f29aed787c75c0b49e98a50e4edde5e7a63c79e909ef61741faa6efbc76e4\",\"fpe_prior_snapshot\":\"2026-10-23\",\"fpe_signal_n\":1606,\"letters_log\":\"rows 19 skipped {'2026-10-29': 0} FAILS []\",\"letters_rows\":19,\"letters_sha256\":\"d14e15d3dbeafa9526e1113f4ce77a608cc0a94aefd3b4cf0b941036c9b8eb10\",\"membership\":\"fullscan@6ae3791b4 (committed 2026-10-29T08:39:20Z) sha256=2cafec018941d7b8f688e033da0c1081345e5e75dc4fcd768caac9c2a0fbe398\",\"skipped\":\"{'2026-10-29': 0}\",\"snapshot_T_sha256\":\"ec13089ea68879e6d45a46c3cfbcd85a682f2d5709d0c23d02d5c9d9026e2faf\",\"snapshots_after_T_ignored\":[],\"tr_head\":\"579d1d58a\",\"universe_log\":\"2026-10-29 cand 19 in membership 19 liquid 16 universe 19 excluded []\"}"
+        ],
+        "rows": {
+          "fresh_dcp_t1_ep_ge03_2d|AIB": {
+            "sha256": "ed7160031ef858bebb3a080aeb8feeb1337e45eb14b4f2f5f59a6001992c0c7c",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-28",
+              "AIB",
+              "2026-10-29",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|CIFR": {
+            "sha256": "dfc8d6d9df724c15d9047c2ee270ce5d5662c5e282ddc1a410817b2f3863998b",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-28",
+              "CIFR",
+              "2026-10-29",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|EROC": {
+            "sha256": "ffca2b59179d1ba41211b72f1d4186aea61ec8d0c2c2f50a1a178d2f8eaa4a0b",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-28",
+              "EROC",
+              "2026-10-29",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|MWYN": {
+            "sha256": "e85491e406f6843a5070bb7bf311a94675bb4e6ed8d58015831fbf86a544fc8f",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-28",
+              "MWYN",
+              "2026-10-29",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|WTS": {
+            "sha256": "ab8b27ecbf0a9a4f4fda5e67f6d96d27f4f88cba8c32e7c72b689a78127ade66",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-10-28",
+              "WTS",
+              "2026-10-29",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|AIB": {
+            "sha256": "48fb66bfbce4aba2a21437d6588cc0ba20b39ec2f39d836935c8962080f98ce1",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "AIB",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|CEG": {
+            "sha256": "153d3332b3b9bc67f12577ac6d71de63a4fa82ceb8567ca8e7481c1b64266b4f",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "CEG",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|EROC": {
+            "sha256": "c908eeecd0966de782b600e2c7d908ba8666f4a715a7b9f1e90792471b436ff4",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "EROC",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|FCEL": {
+            "sha256": "1258c469838af92d76e09dcba40b2ff54ef5e385ec815a0e38ed359177eb191a",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "FCEL",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|HUT": {
+            "sha256": "4e38d9755075e7f7726bbfe2b9cfaeb7fcc13c7116731fea42d7e26c606dabad",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "HUT",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|MWYN": {
+            "sha256": "ff211ca3be5a7002fb791a58f35e8f92a98718ea2dc654fe831cd97ad6a6f27f",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "MWYN",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|VIAV": {
+            "sha256": "b348e7899c222f8da5d5f364cb39f945f8461ea7085b46fdece8a3ae5257f2a6",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "VIAV",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|WTS": {
+            "sha256": "464802e6fbe56a361b70edb3fdbbc74d424ac7333538463299b5a9943805c271",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "WTS",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|WULF": {
+            "sha256": "679cc5787487cd8af61b38ffa4a52dc8291842908bf449f824f0cb84278a69ae",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-10-28",
+              "WULF",
+              "2026-10-29",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-10-29"
             ]
           }
         }
