@@ -1,0 +1,40 @@
+name: Finviz Snapshot Alarm
+
+on:
+  schedule:
+    # ~18:00 ET, DST-safe pair: 22:00 UTC = 18:00 EDT | 23:00 UTC = 18:00 EST.
+    # snapshot_guard.py alarm no-ops before 17:55 ET and on non-trading days.
+    - cron: "0 22 * * 1-5"
+    - cron: "0 23 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check today's raw snapshot (missing or identical to previous day)
+        id: alarm
+        run: |
+          git fetch --depth=2 origin main || true
+          python scripts/snapshot_guard.py alarm
+      - name: Open/update alarm issue
+        if: failure() && steps.alarm.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MSG: ${{ steps.alarm.outputs.message }}
+          DAY: ${{ steps.alarm.outputs.et_date }}
+        run: |
+          title="Finviz snapshot alarm"
+          body="$(date -u +%FT%TZ) ${DAY}: ${MSG}. Fullscan's morning fallback reads this file. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          num=$(gh issue list --state open --search "in:title \"$title\"" --json number -q '.[0].number')
+          if [ -n "$num" ]; then gh issue comment "$num" --body "$body"
+          else gh issue create --title "$title" --body "$body"; fi

@@ -7,6 +7,13 @@ on:
     # The other slot is a no-op (pre-close, or today's snapshot already in).
     - cron: "30 20 * * 1-5"
     - cron: "30 21 * * 1-5"
+    # Backup slots (GitHub cron can be hours late or skipped). Each pair is
+    # EDT | EST for ~17:15, 18:15, 19:15 ET. The "already on main" guard below
+    # makes every extra slot a no-op once <D>.raw.csv exists.
+    - cron: "15 21 * * 1-5"   # 17:15 EDT | 16:15 EST
+    - cron: "15 22 * * 1-5"   # 18:15 EDT | 17:15 EST
+    - cron: "15 23 * * 1-5"   # 19:15 EDT | 18:15 EST
+    - cron: "15 0 * * 2-6"    # 20:15 EDT | 19:15 EST (next UTC day)
   workflow_dispatch:
 
 permissions:
@@ -30,16 +37,23 @@ jobs:
       - name: Install deps
         run: pip install requests pandas
 
+      - name: Skip if today's raw snapshot is already on main (never run twice)
+        id: guard
+        run: |
+          git fetch --depth=1 origin main || true
+          python scripts/snapshot_guard.py exists
+
       - name: Gate (trading day, after 16:00 ET close, not already fetched)
         id: gate
+        if: steps.guard.outputs.exists != 'true'
         run: python scripts/schedule_gate.py finviz --event "${{ github.event_name }}"
 
       - name: Verify past history unchanged (hash manifest)
-        if: steps.gate.outputs.trading == 'true'
+        if: steps.guard.outputs.exists != 'true' && steps.gate.outputs.trading == 'true'
         run: python scripts/check_history_hashes.py verify
 
       - name: Fetch Finviz Elite export
-        if: steps.gate.outputs.trading == 'true'
+        if: steps.guard.outputs.exists != 'true' && steps.gate.outputs.trading == 'true'
         env:
           FINVIZ_EXPORT: ${{ secrets.FINVIZ_EXPORT }}
           FINVIZ_EXPORT_URL: ${{ secrets.FINVIZ_EXPORT_URL }}
@@ -47,7 +61,7 @@ jobs:
         run: python -m src.finviz_fetch
 
       - name: Save Finviz no-history extras (AH, signals, groups; fail-soft)
-        if: steps.gate.outputs.trading == 'true'
+        if: steps.guard.outputs.exists != 'true' && steps.gate.outputs.trading == 'true'
         continue-on-error: true
         timeout-minutes: 8
         env:
@@ -57,11 +71,11 @@ jobs:
         run: python -m src.finviz_extras --date "${{ steps.gate.outputs.et_date }}"
 
       - name: Record hashes for new dated files
-        if: steps.gate.outputs.trading == 'true'
+        if: steps.guard.outputs.exists != 'true' && steps.gate.outputs.trading == 'true'
         run: python scripts/check_history_hashes.py add-new --today "${{ steps.gate.outputs.et_date }}"
 
       - name: Commit snapshot
-        if: steps.gate.outputs.trading == 'true'
+        if: steps.guard.outputs.exists != 'true' && steps.gate.outputs.trading == 'true'
         run: |
           git config user.name "Theme-Radar-Bot"
           git config user.email "bot@users.noreply.github.com"
