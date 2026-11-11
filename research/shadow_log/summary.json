@@ -357,23 +357,23 @@
   "scorecard_bar_extra": "Stricter extra check: closed n >= 60 over >= 12 distinct signal dates, win rate > 55%, mean > 0 after fee+borrow. LOCKED or CLEAN rows only; MIXED never counts.",
   "scorecard_verdicts": {
     "note": "From shadow_log_lock.py scorecard (LOCKED / CLEAN only count; MIXED is context). cyrus_bar is the primary verdict; extra_check is the stricter 60/12 bar. Returns are short_ret_fee_borrow. Supersedes seen_designed_after.*.verdict, which is computed on mixed history.",
-    "log_sha256": "e55acaf2f4d1ca7867fb1fa41359e94cb502fe1bac26ce54316fe45eec3407d5",
-    "log_rows": 2218,
+    "log_sha256": "ca5e6dae331a18d4020511d4133c3ba79f2cf9d519ab68659231ded3ce52b31f",
+    "log_rows": 2433,
     "lock_check": "PASS",
     "cells": {
       "fpe_delta_t3_earn_today_3d": {
         "LOCKED": {
-          "closed_n": 1162,
-          "distinct_dates": 15,
-          "open": 604,
-          "win_fee_borrow": 0.33304647160068845,
-          "mean_fee_borrow": -0.01540361530688648,
+          "closed_n": 1462,
+          "distinct_dates": 16,
+          "open": 496,
+          "win_fee_borrow": 0.32489740082079344,
+          "mean_fee_borrow": -0.017024764723003245,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 33.3% <= 55%, n 1162); mean after fee+borrow -1.54% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 32.5% <= 55%, n 1462); mean after fee+borrow -1.70% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (win 33.3%<=55%, mean -1.54%<=0)"
+          "extra_check_text": "NOT CLEARED (win 32.5%<=55%, mean -1.70%<=0)"
         },
         "CLEAN pre-lock": {
           "closed_n": 50,
@@ -389,24 +389,24 @@
           "extra_check_text": "NOT CLEARED (n 50<60, dates 6<12, win 54.0%<=55%, mean -1.59%<=0)"
         },
         "CLEAN+LOCKED": {
-          "closed_n": 1212,
-          "distinct_dates": 21,
-          "open": 604,
-          "win_fee_borrow": 0.3415841584158416,
-          "mean_fee_borrow": -0.015424441001223588,
+          "closed_n": 1512,
+          "distinct_dates": 22,
+          "open": 496,
+          "win_fee_borrow": 0.33201058201058203,
+          "mean_fee_borrow": -0.01698784889676696,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 34.2% <= 55%, n 1212); mean after fee+borrow -1.54% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 33.2% <= 55%, n 1512); mean after fee+borrow -1.70% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (win 34.2%<=55%, mean -1.54%<=0)"
+          "extra_check_text": "NOT CLEARED (win 33.2%<=55%, mean -1.70%<=0)"
         },
         "MIXED": {
-          "closed_n": 1294,
-          "distinct_dates": 31,
-          "open": 604,
-          "win_fee_borrow": 0.3562596599690881,
-          "mean_fee_borrow": -0.013688532626223758,
+          "closed_n": 1594,
+          "distinct_dates": 32,
+          "open": 496,
+          "win_fee_borrow": 0.34441656210790467,
+          "mean_fee_borrow": -0.015498222243890964,
           "counts_toward_bar": false,
           "cyrus_bar": "CONTEXT_ONLY",
           "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
@@ -417,17 +417,17 @@
       },
       "fresh_dcp_t1_ep_ge03_2d": {
         "LOCKED": {
-          "closed_n": 116,
-          "distinct_dates": 22,
-          "open": 13,
-          "win_fee_borrow": 0.4482758620689655,
-          "mean_fee_borrow": -0.003025743349615958,
+          "closed_n": 120,
+          "distinct_dates": 23,
+          "open": 19,
+          "win_fee_borrow": 0.44166666666666665,
+          "mean_fee_borrow": -0.004356857497294952,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 44.8% <= 55%, n 116); mean after fee+borrow -0.30% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 44.2% <= 55%, n 120); mean after fee+borrow -0.44% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (win 44.8%<=55%, mean -0.30%<=0)"
+          "extra_check_text": "NOT CLEARED (win 44.2%<=55%, mean -0.44%<=0)"
         },
         "CLEAN pre-lock": {
           "closed_n": 12,
@@ -443,24 +443,24 @@
           "extra_check_text": "TOO FEW FOR A VERDICT (n=12 < 30)"
         },
         "CLEAN+LOCKED": {
-          "closed_n": 128,
-          "distinct_dates": 27,
-          "open": 13,
-          "win_fee_borrow": 0.4609375,
-          "mean_fee_borrow": -0.0019109029363930262,
+          "closed_n": 132,
+          "distinct_dates": 28,
+          "open": 19,
+          "win_fee_borrow": 0.45454545454545453,
+          "mean_fee_borrow": -0.0031547897498352315,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 46.1% <= 55%, n 128); mean after fee+borrow -0.19% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 45.5% <= 55%, n 132); mean after fee+borrow -0.32% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (win 46.1%<=55%, mean -0.19%<=0)"
+          "extra_check_text": "NOT CLEARED (win 45.5%<=55%, mean -0.32%<=0)"
         },
         "MIXED": {
-          "closed_n": 145,
-          "distinct_dates": 35,
-          "open": 13,
-          "win_fee_borrow": 0.496551724137931,
-          "mean_fee_borrow": 0.004441125800833722,
+          "closed_n": 149,
+          "distinct_dates": 36,
+          "open": 19,
+          "win_fee_borrow": 0.4899328859060403,
+          "mean_fee_borrow": 0.003168634697992929,
           "counts_toward_bar": false,
           "cyrus_bar": "CONTEXT_ONLY",
           "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
@@ -471,17 +471,17 @@
       },
       "fresh_dcp_t1_avoid_ah_3d": {
         "LOCKED": {
-          "closed_n": 97,
-          "distinct_dates": 22,
-          "open": 30,
-          "win_fee_borrow": 0.4639175257731959,
-          "mean_fee_borrow": -0.010019506038137834,
+          "closed_n": 116,
+          "distinct_dates": 23,
+          "open": 24,
+          "win_fee_borrow": 0.41379310344827586,
+          "mean_fee_borrow": -0.022398590905659484,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 46.4% <= 55%, n 97); mean after fee+borrow -1.00% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 41.4% <= 55%, n 116); mean after fee+borrow -2.24% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (win 46.4%<=55%, mean -1.00%<=0)"
+          "extra_check_text": "NOT CLEARED (win 41.4%<=55%, mean -2.24%<=0)"
         },
         "CLEAN pre-lock": {
           "closed_n": 13,
@@ -497,24 +497,24 @@
           "extra_check_text": "TOO FEW FOR A VERDICT (n=13 < 30)"
         },
         "CLEAN+LOCKED": {
-          "closed_n": 110,
-          "distinct_dates": 26,
-          "open": 30,
-          "win_fee_borrow": 0.4636363636363636,
-          "mean_fee_borrow": -0.00929481793186729,
+          "closed_n": 129,
+          "distinct_dates": 27,
+          "open": 24,
+          "win_fee_borrow": 0.4186046511627907,
+          "mean_fee_borrow": -0.020533135130717306,
           "counts_toward_bar": true,
           "cyrus_bar": "NOT_MET",
-          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 46.4% <= 55%, n 110); mean after fee+borrow -0.93% (negative)",
+          "cyrus_bar_text": "DOES NOT MEET CYRUS BAR (win 41.9% <= 55%, n 129); mean after fee+borrow -2.05% (negative)",
           "cyrus_bar_met_but_mean_negative": false,
           "extra_check": "NOT_CLEARED",
-          "extra_check_text": "NOT CLEARED (win 46.4%<=55%, mean -0.93%<=0)"
+          "extra_check_text": "NOT CLEARED (win 41.9%<=55%, mean -2.05%<=0)"
         },
         "MIXED": {
-          "closed_n": 132,
-          "distinct_dates": 35,
-          "open": 30,
-          "win_fee_borrow": 0.5227272727272727,
-          "mean_fee_borrow": 0.00036474370246363896,
+          "closed_n": 151,
+          "distinct_dates": 36,
+          "open": 24,
+          "win_fee_borrow": 0.4768211920529801,
+          "mean_fee_borrow": -0.010451644308820729,
           "counts_toward_bar": false,
           "cyrus_bar": "CONTEXT_ONLY",
           "cyrus_bar_text": "CONTEXT ONLY - mixed history never counts",
