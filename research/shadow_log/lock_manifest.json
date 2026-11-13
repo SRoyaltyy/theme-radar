@@ -25208,6 +25208,19 @@
         "plans": 0,
         "log_rows": 136
       }
+    },
+    {
+      "at_utc": "2026-11-13T10:27:16Z",
+      "plan_pins": [
+        "plan_2026-11-13.csv"
+      ],
+      "first_seals": {
+        "plans": 1,
+        "log_rows": 0,
+        "plan_dates": [
+          "2026-11-13"
+        ]
+      }
     }
   ],
   "plans": {
@@ -25404,6 +25417,13 @@
       "sha256": "0a593fedba2b76f64fa62366e8e05cc26d546be382045202a49e98e324444d8f",
       "pinned_at_utc": "2026-11-12T10:22:20Z",
       "rows": 168,
+      "status": "fires",
+      "pinned_before_open": true
+    },
+    "plan_2026-11-13.csv": {
+      "sha256": "a676ecabcaf9459f10d955f81815c1f95736796a754bf945237749875d92d145",
+      "pinned_at_utc": "2026-11-13T10:27:16Z",
+      "rows": 80,
       "status": "fires",
       "pinned_before_open": true
     }
@@ -54684,6 +54704,980 @@
               "3",
               "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
               "preopen_plan_2026-11-12"
+            ]
+          }
+        }
+      },
+      "2026-11-13": {
+        "entry": "2026-11-13",
+        "file": "plans/plan_2026-11-13.csv",
+        "file_sha256": "a676ecabcaf9459f10d955f81815c1f95736796a754bf945237749875d92d145",
+        "sealed_at_utc": "2026-11-13T10:27:16Z",
+        "preopen": true,
+        "status_lines": [
+          "# status=fires rows=80 fpe_delta_t3_earn_today_3d=68 fresh_dcp_t1_ep_ge03_2d=7 fresh_dcp_t1_avoid_ah_3d=5",
+          "# built_at_utc=2026-11-13T10:27:15Z signal_date=2026-11-12 entry_date=2026-11-13 builder_sha256=9e70523ee355d655b125ffd46f8ccd08a25fe762fccfa6ee08c97eb3c5d52840",
+          "# inputs: {\"dcp_candidates\":[\"BIRD\",\"CEG\",\"CSCO\",\"FRTT\",\"GEV\",\"GTES\",\"LGN\",\"PWR\",\"TGEN\",\"TLN\",\"VRT\",\"VST\"],\"dcp_prior_snapshot\":\"2026-11-11\",\"earn_gate_n\":482,\"fails\":\"[]\",\"features_T_sha256\":\"ec04d6e8ca5c95af1297be10c9c9be108a6429a21e6aabab739a8e8dcfd6f841\",\"fpe_prior_snapshot\":\"2026-11-09\",\"fpe_signal_n\":1150,\"letters_log\":\"rows 12 skipped {'2026-11-13': 0} FAILS []\",\"letters_rows\":12,\"letters_sha256\":\"8c9645655ab6adf648cfd87fc05f985dec6075abd4434d88be9a062befd0b727\",\"membership\":\"fullscan@47ff3ee4d (committed 2026-11-13T09:44:25Z) sha256=b398275a54afc6987710ab9a085a32ac744d9597adf4a2fb9a6422046fe499c3\",\"skipped\":\"{'2026-11-13': 0}\",\"snapshot_T_sha256\":\"37dbfeee30b9bb7f796cacad4e3ff815ea46b0a0b75e6a979ffdee83fefaffe1\",\"snapshots_after_T_ignored\":[],\"tr_head\":\"ec7df0e53\",\"universe_log\":\"2026-11-13 cand 12 in membership 12 liquid 8 universe 12 excluded []\"}"
+        ],
+        "rows": {
+          "fpe_delta_t3_earn_today_3d|AENT": {
+            "sha256": "fc6f371907faed59ca0b515dd8ebe4f2b128eb0cebaaa3dbe771862042ad24ca",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "AENT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|AMAT": {
+            "sha256": "cbc686d433c2e341eeafaaefef6ae57e336ff382f0f71a7b91bd218ac478cbdf",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "AMAT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|ARCO": {
+            "sha256": "981266d22a274bbb35dbc5f83f8af70bd66260594468d2cfef43c331a05479c2",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "ARCO",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|ARX": {
+            "sha256": "eba3583aab9b76bcbad6302d8ab95b51151e3b24e18602ac721d41995bb539ee",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "ARX",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|ASND": {
+            "sha256": "100a1a1d3464d94b70f2da70c39cc572f327543714de93adf6b4ac3c23d464b3",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "ASND",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|AZUL": {
+            "sha256": "518cdd6359388847846c7fc6ac84cca6d5415ff6111e7f6a3bc86725e7a64040",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "AZUL",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|BJ": {
+            "sha256": "e944c6b51917018df98dd976a1c2c5ca83c33333a4077691fca25fe6ffed276f",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "BJ",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|BKE": {
+            "sha256": "f296c898fa1c27b66ddf87d10e349263261fdf4c3c736b069a2038d73e2489b3",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "BKE",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|BLSH": {
+            "sha256": "2fd7d918b66d70ed764f448dbe9f3323f21b6648101b3afc5abc999c0d2789f1",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "BLSH",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|BLTE": {
+            "sha256": "018c1b98c377eb29bcb836d9b653fb7fd5f704fa0b3f02e670b19ff974f27bd5",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "BLTE",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|BRBR": {
+            "sha256": "e5aa3ab8f2669eb5249908511a0f5d4af7dd7273ebf64a80e2fd4cc8a10979e0",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "BRBR",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|BULL": {
+            "sha256": "69ee1ce9b8decde7ab6a118a3747c6bc22269c69204bb6ffacdfac91eeafaf21",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "BULL",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|CAAP": {
+            "sha256": "39211127c240f488ebd2f99380be9b8edbfb5ac0f95917768150750afdbd1261",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "CAAP",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|CNVS": {
+            "sha256": "25681aa364b8724245920220bcd0cd363d438902d1a4e0f3b4abc0e004bf0352",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "CNVS",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|CSCO": {
+            "sha256": "d817792b4b552933ddd6aa81ea1be69e3c0584dbcd84d5dcbae9608921063ea3",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "CSCO",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|ESLT": {
+            "sha256": "2e2f26fe5b2f6c41995cc88c17faa3fcd7d1ffe3cb842f845bfa4fd79553c2d0",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "ESLT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|FENC": {
+            "sha256": "b988d01d1aaa0b1d957b298f1b79c025e9e59e917437078a88fddba5a3481482",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "FENC",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|FGI": {
+            "sha256": "3f2f724798364b8a2b61cbc7211e345f424581f4c25e7d8600ac8b0f197ec5da",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "FGI",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|FIGR": {
+            "sha256": "07ca4d85ee77229f83281a90f2b14b0579ba71ef15db9c97f2e40ff50b85746e",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "FIGR",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|FRMI": {
+            "sha256": "66a5d07fec8a749b4479501965c55f4b5981ffe4e17483b09674cfc40c5f365b",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "FRMI",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|FRO": {
+            "sha256": "de6c34c223b035a856f13cb83d30647c9162414c443b00140f545d68660c5539",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "FRO",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|FTLF": {
+            "sha256": "96f2d821353aa22d90a980872d86f9b3892740d3aabae6b4323e1c3dd7be0bc1",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "FTLF",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|HAFN": {
+            "sha256": "61b8c1f8a199066a4458162ca0b8fdb1515a40a154b24050702100931a3c824d",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "HAFN",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|HP": {
+            "sha256": "31e445c2060bf419ac0b544ab93e12a2b2de56fa3b690b7ba7d846a3b5814867",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "HP",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|HQI": {
+            "sha256": "9dcb3f075f946830344c04880f29ff9491065e6001ed918c7f9bc770ed92aade",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "HQI",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|HYPD": {
+            "sha256": "960baaccbf4926e0f586c56b990047d532ac482d4d0e795895b116a3c6fb10da",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "HYPD",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|IDN": {
+            "sha256": "575d2bbe9aa95245b1b2803bb458e9dc1265f20058c177db6a2ee200bccb29c4",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "IDN",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|INTU": {
+            "sha256": "887333e1811e9f27626caa939277e5e7d6f807fdf9251bbf2045cf995db52152",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "INTU",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|KEYS": {
+            "sha256": "6fbdd7fc24971b7adca41154bc94477930eb87c221458c3967a38f87575fa247",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "KEYS",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|KLIC": {
+            "sha256": "1b64461c5004f4bdcc656071f922a7a67f8b0c73d989bad572de2d3ed8538fda",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "KLIC",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|LFT": {
+            "sha256": "11fdd1e476ff6ea6c25220fea861657df0624d017e42676fc23d0e90a1325547",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "LFT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|LGN": {
+            "sha256": "3c428d1cdba341f187e053bf5d562b40e8bb038d04b806c6c5061d9ce640a2f9",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "LGN",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|LQDT": {
+            "sha256": "996f9afb15c148120064165d695608e54a97ef19dc01b9560bf13da94fd96d8c",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "LQDT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|LSF": {
+            "sha256": "c3a50dc41b39a0a1ee313258ce22894339cad87f8521964524dba8ae56d7d53f",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "LSF",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|LUXE": {
+            "sha256": "432d0c9f9511729560200c1ca67b5ee707745678fb4dcb8afd5c8dc7f10203b0",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "LUXE",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|MNSO": {
+            "sha256": "c8c7d7de03fd08210e46b1e041040be804f985f4d3041b3e979a2b8ff9dd0a01",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "MNSO",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|MPTI": {
+            "sha256": "725e29a55770e9d89b92d875f2f8b6b33bce543fb580ba6d624a7dcc2870f73c",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "MPTI",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|NEXN": {
+            "sha256": "175e2f303b3cdb6b3cd70ed411aa5a8f4deb1c301161eda66f2a0033b703e647",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "NEXN",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|NGVC": {
+            "sha256": "faaadb64cdef5309e7ddd3497a7bbeb16da2255cbf1461c80d74448bdf8ec30a",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "NGVC",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|NJR": {
+            "sha256": "ecc1e14579d75b9ef5f5842b50c1b5ccab0bc435f1ae5998267d77cb8eb2fb50",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "NJR",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|OCTV": {
+            "sha256": "3582a134bf8a41fb5b87452ef0df6b1d3bdb2877894362e70b00a86ec63b9360",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "OCTV",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|OFRM": {
+            "sha256": "a2720ccc0914f1d84d44e9e6c6f6156c031f61d277799bbbe63adc9904e41a12",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "OFRM",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|OMER": {
+            "sha256": "91802ffce3aa209c49d9224dcf73ed7ce1c9eaf1a666f12ca3d1cd3a32987c14",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "OMER",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|OPRA": {
+            "sha256": "3aef1d94a7d30942cea0ae6d32b8de42fe58613c88d8e8fb52afcf8f099f856f",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "OPRA",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|OWLT": {
+            "sha256": "b4e429809f11cbc9804c4e1b3dd24bc64c4947510a665e1df392aca42421dfb5",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "OWLT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|P": {
+            "sha256": "17806183fb1514a402ebe2274bb64d8153941d033e74c6c705e69eb3dee0ca27",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "P",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|PARK": {
+            "sha256": "733ebfe459ee70338d2ab9bf55dffcdd1f92536454ae955c73710336efea467f",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "PARK",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|PODC": {
+            "sha256": "32f395aa8c17e2a65eeaad1feac1c7426e392d3a4cdc1573db00446bc03dc41a",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "PODC",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|POWL": {
+            "sha256": "35352ea1db4e3e0a74cb58268753b8bcdb6875e4c148b934de21fff892558006",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "POWL",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|RRGB": {
+            "sha256": "6a88143a0d5a59a2ee1abad728335b3761854cab385a5d705b70e190ce213e3d",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "RRGB",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|RSSS": {
+            "sha256": "b7a6e58d2c2d38501da6631d507de3d77308a1964afc2a60cee8dd324684c199",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "RSSS",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SBC": {
+            "sha256": "4aef5d166613838b931e502ffd086b5f5a8201789c9492048dfc0f78f6240067",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SBC",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SBLK": {
+            "sha256": "ee0c3e40c8db97d64ac7809a7fb757ad98f34b82956eb392504ecc5fb365eabd",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SBLK",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SHIM": {
+            "sha256": "2cc8aeeb2c3bf5e81dba9a67e900a2a9e5552e363b2b10dfa6f212bf4955cc1a",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SHIM",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SHIP": {
+            "sha256": "3282ae347274fce3d38ef117ada0474b80a86145be1a24f657efe466a738011a",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SHIP",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SNAL": {
+            "sha256": "cbfe440bad43e2e94fe2031b91d14604204ee88243f3357f8bf3c8099d831310",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SNAL",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SNEX": {
+            "sha256": "382469f406292ec4d4555421cb570f615c107369fe80c029be53ac36c9f8bb0f",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SNEX",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SPMC": {
+            "sha256": "44f2fbad08078cf0df6e0641f8b9b8fa0916e12e76db7ce94e79e8d6e7227915",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SPMC",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|SSYS": {
+            "sha256": "fb809b268fcad81ba246dba1d7476553664fb37275a5e68f15f8bf887760fd4f",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "SSYS",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|TEN": {
+            "sha256": "0a6ce96b60829dc1185bbb52439059bee33a2414215cf14fec2bafe55f92e1c3",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "TEN",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|TGEN": {
+            "sha256": "3dd3b79cd028eb84aee7228c3704e277f63c1c6cd2655066c12a4ab4694cf56e",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "TGEN",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|TRAK": {
+            "sha256": "0ca7986c8798dc74c2fb94a8d5ab5fdf967873c585e2d40fb22d08f18ebde0a6",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "TRAK",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|TRT": {
+            "sha256": "4fb8b25691912954aaa9a889b1ac3515568eb00c5ce0d5039f56625de3ef6880",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "TRT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|UTI": {
+            "sha256": "ad24ee8c4781f3e392de27600d1d0cc25b5e4e788ec190dceb86d9723cdaeccc",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "UTI",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|VIK": {
+            "sha256": "2d2a17d87722351b9f6b3c69325be364ef26d5eb2cbaaa782e5d8365d253e9e3",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "VIK",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|VTSI": {
+            "sha256": "adbcf3f6df8e8844f370e335291ba2e7987e21c8a974311fab61b62c60a2c652",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "VTSI",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|WMT": {
+            "sha256": "fd9c33891779ab290a318e661c07d4730b335a4c22bfe5b81b71c605518bec0b",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "WMT",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fpe_delta_t3_earn_today_3d|WWW": {
+            "sha256": "671dc75488688bf4fa9e8cbe0eee18173e20a46a94321ffe2a1de2ad6a5a9012",
+            "values": [
+              "fpe_delta_t3_earn_today_3d",
+              "2026-11-12",
+              "WWW",
+              "2026-11-13",
+              "3",
+              "3e3e3a5d086d69ed92afadd655edbc49a9f2e1758e33d02d12e33f81ebb0ee69",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|BIRD": {
+            "sha256": "f555de6e2f11a7c0e1324568dd72a314e07ab3fe0e58fd4340fec15266bf15cf",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "BIRD",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|CEG": {
+            "sha256": "88cc40fc3ed5d20b07d6e78ced442c6a01d7da803838a03e3e0e603c29c11ba4",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "CEG",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|FRTT": {
+            "sha256": "dec652c6b8a4a01b2cd90d3633047738f0b7795ff76243143cc2b581a8a4b07e",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "FRTT",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|GEV": {
+            "sha256": "9d013d15c146f9f875145fa6b356092e5035e1d0c5d4e5d409332fcacd373bf8",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "GEV",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|LGN": {
+            "sha256": "c371dac0507b37f311a8bc5af9644ac3e6de940ec258fb4a349af418b58550da",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "LGN",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|TGEN": {
+            "sha256": "340b2f7e4c01fb9bbc22ab7d5c4f97431ce182b6c57fdece858cbc49952f5f44",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "TGEN",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_ep_ge03_2d|VRT": {
+            "sha256": "af2fa0b867d9ed9a9112cb59b774936c92108234e2bc015fbc1f26bccfd455a4",
+            "values": [
+              "fresh_dcp_t1_ep_ge03_2d",
+              "2026-11-12",
+              "VRT",
+              "2026-11-13",
+              "2",
+              "187856c9db6143c2c4c2820cde8be1e3d87363478587558e296758cbf5369845",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|BIRD": {
+            "sha256": "5e045f64ac5c29bfb5a3875e9b743e7e7898c24bcee2a7663e12b60a611e2a99",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-11-12",
+              "BIRD",
+              "2026-11-13",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|LGN": {
+            "sha256": "ebb2fb232a8129f9db32e932627da4ab49b60829c2336b72d781dce32ca0f88e",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-11-12",
+              "LGN",
+              "2026-11-13",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|PWR": {
+            "sha256": "31350321145eba9e2e72a008b0991c3680ef9e1c30db9c0dfd071d12cdfc4fc1",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-11-12",
+              "PWR",
+              "2026-11-13",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|TGEN": {
+            "sha256": "71e2ae88dde058a6ec881c61d5f293008921b8c7bed5a2939f261e66524059cb",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-11-12",
+              "TGEN",
+              "2026-11-13",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-11-13"
+            ]
+          },
+          "fresh_dcp_t1_avoid_ah_3d|VRT": {
+            "sha256": "0849630459e39230d3d25a54f8a1ba21b227f748c58ab77b2e6559040e0b5265",
+            "values": [
+              "fresh_dcp_t1_avoid_ah_3d",
+              "2026-11-12",
+              "VRT",
+              "2026-11-13",
+              "3",
+              "462719f77f2c36880f9c36d77c6591ca681e98c425c83697847463c4b3af7934",
+              "preopen_plan_2026-11-13"
             ]
           }
         }
