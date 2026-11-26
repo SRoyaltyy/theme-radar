@@ -1,60 +1,60 @@
 # Weight learning — decision log
 
-_Generated 2026-11-24 22:58 EST_
+_Generated 2026-11-25 22:24 EST_
 
-- label dates per horizon: 1d: 75, 2d: 75, 3d: 74
-- primary horizon for promotion test: **1d** (75 dates)
+- label dates per horizon: 1d: 76, 2d: 75, 3d: 75
+- primary horizon for promotion test: **1d** (76 dates)
 - existing overrides: {'Price|ret': 0.25, 'Performance (Month)|delta': 0.7977272720422178, 'Average Volume|delta': 0.535246255544024, 'Relative Strength Index (14)|delta': 0.25, 'Short Float|delta': 1.714652925003008, 'Institutional Transactions|level': 1.2409585202366633, 'Institutional Ownership|delta': 1.965812633041632, 'Insider Transactions|level': 0.8326328206101545, 'Target Price|delta': 1.268797374921335, 'Analyst Recom|delta': 1.9775311436298448, 'Sales Growth Quarter Over Quarter|level': 2.0, 'Sales Year Over Year TTM|level': 2.0, 'Profit Margin|delta': 1.1334644530266451, 'EPS Surprise|level': 1.1572627333967958, 'n_catalysts|level': 1.4803200482619683}
 
 ## Per-rule aligned IC (direction corrected for polarity)
 
 | Rule | Horizon | Mean aligned IC | Dates | Proposed × | Testable |
 |---|---|---|---|---|---|
-| Price|ret | 1d | -0.0239 | 73 | 0.250 | yes |
+| Price|ret | 1d | -0.0223 | 74 | 0.250 | yes |
 | Price|ret | 2d | -0.0055 | 73 | 0.250 | yes |
-| Price|ret | 3d | +0.0005 | 72 | 0.250 | yes |
-| Performance (Month)|delta | 1d | -0.0165 | 73 | 0.771 | yes |
+| Price|ret | 3d | -0.0049 | 73 | 0.250 | yes |
+| Performance (Month)|delta | 1d | -0.0147 | 74 | 0.774 | yes |
 | Performance (Month)|delta | 2d | -0.0094 | 73 | 0.783 | yes |
-| Performance (Month)|delta | 3d | -0.0085 | 72 | 0.784 | yes |
-| Average Volume|delta | 1d | -0.0056 | 73 | 0.529 | NO — logs only |
+| Performance (Month)|delta | 3d | -0.0133 | 73 | 0.776 | yes |
+| Average Volume|delta | 1d | -0.0061 | 74 | 0.529 | NO — logs only |
 | Average Volume|delta | 2d | -0.0020 | 73 | 0.533 | NO — logs only |
-| Average Volume|delta | 3d | -0.0001 | 72 | 0.535 | NO — logs only |
-| Relative Strength Index (14)|delta | 1d | -0.0192 | 73 | 0.250 | yes |
+| Average Volume|delta | 3d | +0.0000 | 73 | 0.535 | NO — logs only |
+| Relative Strength Index (14)|delta | 1d | -0.0173 | 74 | 0.250 | yes |
 | Relative Strength Index (14)|delta | 2d | -0.0106 | 73 | 0.250 | yes |
-| Relative Strength Index (14)|delta | 3d | -0.0152 | 72 | 0.250 | yes |
-| Short Float|delta | 1d | -0.0075 | 70 | 1.689 | NO — logs only |
+| Relative Strength Index (14)|delta | 3d | -0.0185 | 73 | 0.250 | yes |
+| Short Float|delta | 1d | -0.0073 | 71 | 1.690 | NO — logs only |
 | Short Float|delta | 2d | -0.0088 | 70 | 1.684 | NO — logs only |
 | Short Float|delta | 3d | -0.0105 | 70 | 1.679 | NO — logs only |
-| Institutional Transactions|level | 1d | -0.0189 | 75 | 1.194 | NO — logs only |
+| Institutional Transactions|level | 1d | -0.0195 | 76 | 1.193 | NO — logs only |
 | Institutional Transactions|level | 2d | -0.0269 | 75 | 1.174 | NO — logs only |
-| Institutional Transactions|level | 3d | -0.0320 | 74 | 1.162 | NO — logs only |
-| Institutional Ownership|delta | 1d | +0.0075 | 73 | 1.995 | NO — logs only |
+| Institutional Transactions|level | 3d | -0.0317 | 75 | 1.162 | NO — logs only |
+| Institutional Ownership|delta | 1d | +0.0072 | 74 | 1.994 | NO — logs only |
 | Institutional Ownership|delta | 2d | +0.0145 | 73 | 2.000 | NO — logs only |
-| Institutional Ownership|delta | 3d | +0.0121 | 72 | 2.000 | NO — logs only |
-| Insider Transactions|level | 1d | -0.0240 | 75 | 0.793 | NO — logs only |
+| Institutional Ownership|delta | 3d | +0.0115 | 73 | 2.000 | NO — logs only |
+| Insider Transactions|level | 1d | -0.0236 | 76 | 0.793 | NO — logs only |
 | Insider Transactions|level | 2d | -0.0318 | 75 | 0.780 | NO — logs only |
-| Insider Transactions|level | 3d | -0.0354 | 74 | 0.774 | NO — logs only |
-| Target Price|delta | 1d | +0.0058 | 73 | 1.284 | NO — logs only |
+| Insider Transactions|level | 3d | -0.0356 | 75 | 0.773 | NO — logs only |
+| Target Price|delta | 1d | +0.0057 | 74 | 1.283 | NO — logs only |
 | Target Price|delta | 2d | +0.0058 | 73 | 1.283 | NO — logs only |
-| Target Price|delta | 3d | +0.0064 | 72 | 1.285 | NO — logs only |
-| Analyst Recom|delta | 1d | +0.0056 | 73 | 2.000 | NO — logs only |
+| Target Price|delta | 3d | +0.0058 | 73 | 1.284 | NO — logs only |
+| Analyst Recom|delta | 1d | +0.0056 | 74 | 1.999 | NO — logs only |
 | Analyst Recom|delta | 2d | +0.0021 | 73 | 1.986 | NO — logs only |
-| Analyst Recom|delta | 3d | +0.0011 | 72 | 1.982 | NO — logs only |
-| Sales Growth Quarter Over Quarter|level | 1d | +0.0142 | 75 | 2.000 | NO — logs only |
+| Analyst Recom|delta | 3d | +0.0011 | 73 | 1.982 | NO — logs only |
+| Sales Growth Quarter Over Quarter|level | 1d | +0.0139 | 76 | 2.000 | NO — logs only |
 | Sales Growth Quarter Over Quarter|level | 2d | +0.0132 | 75 | 2.000 | NO — logs only |
-| Sales Growth Quarter Over Quarter|level | 3d | +0.0127 | 74 | 2.000 | NO — logs only |
-| Sales Year Over Year TTM|level | 1d | +0.0117 | 75 | 2.000 | NO — logs only |
+| Sales Growth Quarter Over Quarter|level | 3d | +0.0131 | 75 | 2.000 | NO — logs only |
+| Sales Year Over Year TTM|level | 1d | +0.0117 | 76 | 2.000 | NO — logs only |
 | Sales Year Over Year TTM|level | 2d | +0.0124 | 75 | 2.000 | NO — logs only |
-| Sales Year Over Year TTM|level | 3d | +0.0115 | 74 | 2.000 | NO — logs only |
-| Profit Margin|delta | 1d | +0.0076 | 73 | 1.151 | NO — logs only |
+| Sales Year Over Year TTM|level | 3d | +0.0122 | 75 | 2.000 | NO — logs only |
+| Profit Margin|delta | 1d | +0.0073 | 74 | 1.150 | NO — logs only |
 | Profit Margin|delta | 2d | +0.0061 | 73 | 1.147 | NO — logs only |
-| Profit Margin|delta | 3d | +0.0054 | 72 | 1.146 | NO — logs only |
-| EPS Surprise|level | 1d | +0.0282 | 75 | 1.223 | NO — logs only |
+| Profit Margin|delta | 3d | +0.0052 | 73 | 1.145 | NO — logs only |
+| EPS Surprise|level | 1d | +0.0267 | 76 | 1.219 | NO — logs only |
 | EPS Surprise|level | 2d | +0.0373 | 75 | 1.244 | NO — logs only |
-| EPS Surprise|level | 3d | +0.0432 | 74 | 1.257 | NO — logs only |
-| n_catalysts|level | 1d | -0.0161 | 75 | 1.433 | yes |
+| EPS Surprise|level | 3d | +0.0422 | 75 | 1.255 | NO — logs only |
+| n_catalysts|level | 1d | -0.0157 | 76 | 1.434 | yes |
 | n_catalysts|level | 2d | -0.0246 | 75 | 1.407 | yes |
-| n_catalysts|level | 3d | -0.0318 | 74 | 1.386 | yes |
+| n_catalysts|level | 3d | -0.0310 | 75 | 1.388 | yes |
 | Relative Volume|level | — | n/a (curved polarity) | — | 1.000 | not adjustable |
 | Relative Strength Index (14)|level | — | n/a (curved polarity) | — | 1.000 | not adjustable |
 | 50-Day Simple Moving Average|level | — | n/a (curved polarity) | — | 1.000 | not adjustable |
@@ -82,43 +82,43 @@ _Generated 2026-11-24 22:58 EST_
 | 2026-08-11 | 3d | +0.0639 | +0.0569 | -0.0070 |
 | 2026-08-12 | 1d | -0.0472 | -0.0479 | -0.0007 |
 | 2026-08-12 | 2d | +0.0520 | +0.0521 | +0.0001 |
-| 2026-08-12 | 3d | +0.0878 | +0.0836 | -0.0042 |
+| 2026-08-12 | 3d | +0.0878 | +0.0835 | -0.0042 |
 | 2026-08-13 | 1d | -0.0908 | -0.0846 | +0.0062 |
 | 2026-08-13 | 2d | -0.1428 | -0.1348 | +0.0080 |
 | 2026-08-13 | 3d | -0.1672 | -0.1619 | +0.0053 |
-| 2026-08-14 | 1d | +0.1577 | +0.1396 | -0.0181 |
+| 2026-08-14 | 1d | +0.1577 | +0.1398 | -0.0179 |
 | 2026-08-14 | 2d | -0.1560 | -0.1555 | +0.0004 |
-| 2026-08-14 | 3d | -0.1404 | -0.1408 | -0.0004 |
-| 2026-08-17 | 1d | -0.2097 | -0.2057 | +0.0040 |
-| 2026-08-17 | 2d | -0.1365 | -0.1348 | +0.0017 |
-| 2026-08-17 | 3d | -0.1034 | -0.1052 | -0.0018 |
+| 2026-08-14 | 3d | -0.1404 | -0.1407 | -0.0004 |
+| 2026-08-17 | 1d | -0.2097 | -0.2059 | +0.0038 |
+| 2026-08-17 | 2d | -0.1365 | -0.1349 | +0.0016 |
+| 2026-08-17 | 3d | -0.1034 | -0.1050 | -0.0016 |
 | 2026-08-18 | 1d | +0.0486 | +0.0448 | -0.0038 |
-| 2026-08-18 | 2d | +0.0270 | +0.0220 | -0.0050 |
+| 2026-08-18 | 2d | +0.0270 | +0.0221 | -0.0050 |
 | 2026-08-18 | 3d | +0.0058 | +0.0077 | +0.0019 |
 | 2026-08-19 | 1d | +0.0108 | +0.0021 | -0.0087 |
-| 2026-08-19 | 2d | +0.0519 | +0.0551 | +0.0033 |
+| 2026-08-19 | 2d | +0.0519 | +0.0552 | +0.0033 |
 | 2026-08-19 | 3d | +0.1772 | +0.1655 | -0.0117 |
 | 2026-08-20 | 1d | -0.0007 | +0.0066 | +0.0073 |
 | 2026-08-20 | 2d | +0.0530 | +0.0575 | +0.0045 |
 | 2026-08-20 | 3d | +0.0387 | +0.0479 | +0.0092 |
-| 2026-08-21 | 1d | -0.0802 | -0.0811 | -0.0009 |
-| 2026-08-21 | 2d | +0.0158 | +0.0128 | -0.0031 |
+| 2026-08-21 | 1d | -0.0802 | -0.0811 | -0.0008 |
+| 2026-08-21 | 2d | +0.0158 | +0.0128 | -0.0030 |
 | 2026-08-21 | 3d | -0.0723 | -0.0728 | -0.0005 |
 | 2026-08-24 | 1d | +0.0056 | -0.0209 | -0.0265 |
 | 2026-08-24 | 2d | -0.0285 | -0.0568 | -0.0283 |
 | 2026-08-24 | 3d | -0.0880 | -0.0865 | +0.0015 |
-| 2026-08-25 | 1d | -0.0503 | -0.0730 | -0.0226 |
+| 2026-08-25 | 1d | -0.0503 | -0.0729 | -0.0226 |
 | 2026-08-25 | 2d | -0.1093 | -0.1169 | -0.0076 |
-| 2026-08-25 | 3d | -0.0661 | -0.0793 | -0.0133 |
+| 2026-08-25 | 3d | -0.0661 | -0.0793 | -0.0132 |
 | 2026-08-26 | 1d | -0.0710 | -0.0521 | +0.0190 |
 | 2026-08-26 | 2d | -0.0146 | -0.0112 | +0.0034 |
 | 2026-08-26 | 3d | -0.0019 | +0.0100 | +0.0119 |
-| 2026-08-28 | 1d | -0.0442 | -0.0307 | +0.0136 |
-| 2026-08-28 | 2d | +0.0258 | +0.0258 | -0.0001 |
+| 2026-08-28 | 1d | -0.0442 | -0.0307 | +0.0135 |
+| 2026-08-28 | 2d | +0.0258 | +0.0258 | -0.0000 |
 | 2026-08-28 | 3d | +0.0108 | +0.0246 | +0.0138 |
-| 2026-08-31 | 1d | -0.0065 | -0.0059 | +0.0006 |
+| 2026-08-31 | 1d | -0.0065 | -0.0060 | +0.0006 |
 | 2026-08-31 | 2d | +0.0398 | +0.0428 | +0.0030 |
-| 2026-08-31 | 3d | +0.1004 | +0.1050 | +0.0047 |
+| 2026-08-31 | 3d | +0.1004 | +0.1051 | +0.0047 |
 | 2026-09-01 | 1d | -0.0847 | -0.0483 | +0.0365 |
 | 2026-09-01 | 2d | -0.2394 | -0.1888 | +0.0506 |
 | 2026-09-01 | 3d | -0.2756 | -0.2316 | +0.0440 |
@@ -134,12 +134,12 @@ _Generated 2026-11-24 22:58 EST_
 | 2026-09-08 | 1d | -0.0849 | -0.0849 | -0.0000 |
 | 2026-09-08 | 2d | -0.1276 | -0.1276 | +0.0000 |
 | 2026-09-08 | 3d | -0.0619 | -0.0619 | +0.0000 |
-| 2026-09-09 | 1d | -0.0163 | -0.0225 | -0.0062 |
-| 2026-09-09 | 2d | +0.0188 | +0.0125 | -0.0063 |
-| 2026-09-09 | 3d | -0.0591 | -0.0606 | -0.0015 |
+| 2026-09-09 | 1d | -0.0163 | -0.0224 | -0.0061 |
+| 2026-09-09 | 2d | +0.0188 | +0.0126 | -0.0063 |
+| 2026-09-09 | 3d | -0.0591 | -0.0605 | -0.0014 |
 | 2026-09-10 | 1d | -0.0932 | -0.0880 | +0.0052 |
-| 2026-09-10 | 2d | +0.1308 | +0.1158 | -0.0149 |
-| 2026-09-10 | 3d | +0.1827 | +0.1681 | -0.0146 |
+| 2026-09-10 | 2d | +0.1308 | +0.1159 | -0.0149 |
+| 2026-09-10 | 3d | +0.1827 | +0.1681 | -0.0145 |
 | 2026-09-11 | 1d | -0.0419 | -0.0537 | -0.0118 |
 | 2026-09-11 | 2d | -0.0676 | -0.0785 | -0.0109 |
 | 2026-09-11 | 3d | -0.1072 | -0.1150 | -0.0078 |
@@ -156,10 +156,10 @@ _Generated 2026-11-24 22:58 EST_
 | 2026-09-17 | 2d | +0.2454 | +0.2444 | -0.0011 |
 | 2026-09-17 | 3d | +0.3070 | +0.3055 | -0.0015 |
 | 2026-09-18 | 1d | +0.0668 | +0.0691 | +0.0023 |
-| 2026-09-18 | 2d | +0.0651 | +0.0700 | +0.0049 |
-| 2026-09-18 | 3d | +0.1188 | +0.1206 | +0.0018 |
+| 2026-09-18 | 2d | +0.0651 | +0.0699 | +0.0048 |
+| 2026-09-18 | 3d | +0.1188 | +0.1206 | +0.0017 |
 | 2026-09-21 | 1d | +0.1709 | +0.1712 | +0.0004 |
-| 2026-09-21 | 2d | -0.0452 | -0.0444 | +0.0008 |
+| 2026-09-21 | 2d | -0.0452 | -0.0444 | +0.0009 |
 | 2026-09-21 | 3d | -0.0110 | -0.0092 | +0.0019 |
 | 2026-09-22 | 1d | -0.1323 | -0.1344 | -0.0021 |
 | 2026-09-22 | 2d | -0.1167 | -0.1178 | -0.0011 |
@@ -188,8 +188,8 @@ _Generated 2026-11-24 22:58 EST_
 | 2026-10-02 | 1d | +0.0316 | +0.0335 | +0.0019 |
 | 2026-10-02 | 2d | +0.0757 | +0.0766 | +0.0009 |
 | 2026-10-02 | 3d | -0.0028 | -0.0026 | +0.0002 |
-| 2026-10-05 | 1d | -0.1002 | -0.0993 | +0.0008 |
-| 2026-10-05 | 2d | -0.0538 | -0.0559 | -0.0022 |
+| 2026-10-05 | 1d | -0.1002 | -0.0994 | +0.0008 |
+| 2026-10-05 | 2d | -0.0538 | -0.0560 | -0.0022 |
 | 2026-10-05 | 3d | -0.0885 | -0.0922 | -0.0037 |
 | 2026-10-06 | 1d | -0.0979 | -0.1005 | -0.0026 |
 | 2026-10-06 | 2d | -0.0822 | -0.0880 | -0.0058 |
@@ -222,16 +222,16 @@ _Generated 2026-11-24 22:58 EST_
 | 2026-10-19 | 2d | +0.0326 | +0.0313 | -0.0013 |
 | 2026-10-19 | 3d | +0.0943 | +0.0955 | +0.0012 |
 | 2026-10-20 | 1d | -0.2056 | -0.2030 | +0.0026 |
-| 2026-10-20 | 2d | +0.3252 | +0.3234 | -0.0017 |
+| 2026-10-20 | 2d | +0.3252 | +0.3235 | -0.0017 |
 | 2026-10-20 | 3d | +0.2546 | +0.2524 | -0.0022 |
 | 2026-10-21 | 1d | -0.0789 | -0.0742 | +0.0046 |
 | 2026-10-21 | 2d | -0.0301 | -0.0269 | +0.0031 |
 | 2026-10-21 | 3d | +0.0185 | +0.0214 | +0.0029 |
-| 2026-10-22 | 1d | -0.1349 | -0.1312 | +0.0036 |
+| 2026-10-22 | 1d | -0.1349 | -0.1313 | +0.0036 |
 | 2026-10-22 | 2d | -0.1951 | -0.1912 | +0.0039 |
-| 2026-10-22 | 3d | -0.3132 | -0.3116 | +0.0015 |
+| 2026-10-22 | 3d | -0.3132 | -0.3117 | +0.0015 |
 | 2026-10-23 | 1d | +0.0067 | +0.0057 | -0.0010 |
-| 2026-10-23 | 2d | -0.0839 | -0.0867 | -0.0027 |
+| 2026-10-23 | 2d | -0.0839 | -0.0867 | -0.0028 |
 | 2026-10-23 | 3d | -0.1140 | -0.1173 | -0.0033 |
 | 2026-10-26 | 1d | -0.0571 | -0.0585 | -0.0014 |
 | 2026-10-26 | 2d | -0.0612 | -0.0627 | -0.0015 |
@@ -292,8 +292,10 @@ _Generated 2026-11-24 22:58 EST_
 | 2026-11-19 | 3d | +0.0898 | +0.0898 | -0.0000 |
 | 2026-11-20 | 1d | -0.4649 | -0.4655 | -0.0006 |
 | 2026-11-20 | 2d | -0.3709 | -0.3695 | +0.0014 |
+| 2026-11-20 | 3d | -0.3294 | -0.3278 | +0.0015 |
+| 2026-11-24 | 1d | +0.1239 | +0.1236 | -0.0003 |
 
-_Champion reconstruction check: mean |rebuilt price category − stored price_score| = 0.1127 (should be ~0; large values mean the learner's model of the engine has drifted from score_engine — distrust this run)._
+_Champion reconstruction check: mean |rebuilt price category − stored price_score| = 0.1112 (should be ~0; large values mean the learner's model of the engine has drifted from score_engine — distrust this run)._
 
 ## Decision
 
